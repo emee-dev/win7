@@ -1,0 +1,268 @@
+<script lang="ts">
+  import interact from "interactjs";
+  import Window from "@/components/window/window.svelte";
+  import { Button } from "@/components/button";
+  import Notepad from "@/apps/Notepad/notepad.svelte";
+  import { ContextMenu, BarMenu } from "@/components/menu";
+  import type { MenuProps } from "@/components/menu";
+  import { onMount } from "svelte";
+  import { Selecto } from "@/components/selecto";
+  import DesktopIcon from "./DesktopIcon.svelte";
+  import type { SvelteHTMLElements } from "svelte/elements";
+  import { StartMenu } from "@/components/startmenu";
+  import {
+    checkDesktopHeightExceeded,
+    checkDesktopWidthExceeded,
+  } from "./utils";
+  import Taskbar from "@/components/taskbar/taskbar.svelte";
+
+  let desktop: HTMLElement;
+
+  type Placement = {
+    column: number;
+    row: number;
+  };
+
+  type SelectoItemProps = {
+    label: string;
+    id: string;
+    props?: SvelteHTMLElements["div"];
+    meta: any;
+    placement?: Placement;
+  };
+
+  const DESKTOP_WIDTH = 1272;
+  const DESKTOP_HEIGHT = 478;
+
+  const INITIAL_COLUMN = 2;
+  const INITIAL_ROW = 2;
+
+  // To keep track of the max no of items that fit the screen vertically
+  let max_no_column_items = $state(0);
+  let hasReachedVerticalMax = $state(false);
+
+  let mouseCoordinates = $state({ x: 0, y: 0 });
+
+  let desktop: HTMLElement;
+
+  type Placement = {
+    column: number;
+    row: number;
+  };
+
+  type SelectoItemProps = {
+    label: string;
+    id: string;
+    props?: SvelteHTMLElements["div"];
+    meta: any;
+    placement?: Placement;
+  };
+  let icons = $state<SelectoItemProps[]>([
+    // {
+    //   id: "0",
+    //   label: `Computer`,
+    //   placement: {
+    //     // write me a function that places the next item in the row
+    //     // this is a x*y grid of icons similar to window icons layout
+    //     // each individual icon is of 70px * 70px
+    //     // first item is placed at the start of the screen using flex box postions (top, left)
+    //     //
+    //     top: INITIAL_COLUMN,
+    //     left: INITIAL_ROW, // 70 * 0 + 2 = 2
+    //   },
+    //   meta: {
+    //     selecto: "meta",
+    //   },
+    // },
+    // {
+    //   id: "1",
+    //   label: `Recycle bin`,
+    //   placement: {
+    //     top: 2,
+    //     left: 72,
+    //   },
+    //   meta: {
+    //     selecto: "meta",
+    //   },
+    // },
+    // {
+    //   id: "2",
+    //   label: `Notepad`,
+    //   placement: {
+    //     top: 2,
+    //     left: 142,
+    //   },
+    //   meta: {
+    //     selecto: "meta",
+    //   },
+    // },
+    // {
+    //   id: "3",
+    //   label: `Calculator`,
+    //   placement: {
+    //     top: 2,
+    //     left: 212,
+    //   },
+    //   meta: {
+    //     selecto: "meta",
+    //   },
+    // },
+    // {
+    //   id: "4",
+    //   label: `Racing game`,
+    //   placement: {
+    //     top: 2,
+    //     left: 282,
+    //   },
+    //   meta: {
+    //     selecto: "meta",
+    //   },
+    // },
+    // {
+    //   id: "5",
+    //   label: `Action game`,
+    //   placement: {
+    //     top: 2,
+    //     left: 352,
+    //   },
+    //   meta: {
+    //     selecto: "meta",
+    //   },
+    // },
+  ]);
+
+  let iconIndexCounter = $state(0);
+  let rows = $state(INITIAL_ROW);
+
+  // let rowsDerived = $derived(Number(iconIndexCounter));
+
+  function placeItemsInAColumn(itemIndex: number): Placement {
+    let itemHeight = 70;
+    let itemWidth = 70;
+    // let row = itemHeight * itemIndex + INITIAL_ROW;
+
+    // Problems
+    // for row: INITIAL_ROW is a fixed constant which is wrong we need to account
+    // for the number of columns
+    // 2. Row should not be increasing at the same time as column, only increase row after a
+    // certain number of column items are reached.
+    // 3. The means once we know the know the vertical_max then reset the column
+
+    // let items_per_vertical_max = itemWidth * itemIndex + INITIAL_COLUMN;
+    let items_per_vertical_max;
+
+    if (hasReachedVerticalMax) {
+      items_per_vertical_max = itemWidth * itemIndex + rows - 70;
+    } else {
+      items_per_vertical_max = itemWidth * itemIndex + INITIAL_COLUMN;
+    }
+
+    return { row: rows, column: items_per_vertical_max };
+  }
+
+  
+  function placeItemsInAColumn(itemIndex: number): Placement {
+    let itemHeight = 70;
+    let itemWidth = 70;
+
+    let rows = INITIAL_ROW; //  increase to allow the columns to move to the right eg 2, 72, 142 etc
+    let items_per_vertical_max = itemWidth * itemIndex + INITIAL_COLUMN;
+
+    return { row: rows, column: items_per_vertical_max };
+  }
+</script>
+
+{#snippet selectoItems(items: SelectoItemProps[], classname: string)}
+  {#each items as item}
+    <!-- column: 352, row: 72. Length: 6 -->
+    <DesktopIcon
+      style={`top: ${item.placement?.column}px; left: ${item.placement?.row}px; background: red;`}
+      class={classname}
+      selecto_meta={item}
+    />
+  {/each}
+{/snippet}
+
+<Selecto
+  ondoubleclick={(data: SelectoItemProps) => {
+    console.log("Recieved", data);
+  }}
+>
+  <main
+    bind:this={desktop}
+    onmousemove={(ev) => {
+      mouseCoordinates.x = ev.clientX;
+      mouseCoordinates.y = ev.clientY;
+    }}
+    class="desktop selecto-area relative h-screen scrollbar-hide overflow-hidden"
+  >
+    {@render selectoItems(icons, "selecto_selectible")}
+
+    <div class="flex">
+      <button
+        class="ml-auto"
+        onclick={() => {
+          let height = desktop.clientHeight;
+          // let width = desktop.clientWidth;
+
+          let { column, row } = placeItemsInAColumn(iconIndexCounter);
+
+          // stop checking after the first hit
+          if (column + 72 >= height && !hasReachedVerticalMax) {
+            if (!hasReachedVerticalMax) {
+              hasReachedVerticalMax = true;
+            }
+          }
+
+          if (hasReachedVerticalMax) {
+            console.log("Hit");
+            iconIndexCounter = 0;
+            rows = rows + 70;
+            // return;
+          }
+
+          console.log(`column: ${column}, row: ${row}. icons: ${icons.length}`);
+
+          let id = crypto.randomUUID();
+          let label = `Computer`;
+
+          icons.push({
+            id,
+            label,
+            placement: {
+              column,
+              row,
+            },
+            meta: {
+              selecto: "meta",
+            },
+          });
+
+          iconIndexCounter++;
+        }}
+      >
+        Add new icon {max_no_column_items}
+      </button>
+    </div>
+
+    <!-- <ContextMenu {menuItems} /> -->
+
+    <!-- <Window title="*Untitled - Notepad">
+    <Notepad />
+  </Window> -->
+
+    <!-- Startmenu -->
+    <StartMenu isHidden />
+
+    <Taskbar />
+  </main>
+</Selecto>
+
+<style>
+  .desktop {
+    background-image: url("/bg.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+</style>
