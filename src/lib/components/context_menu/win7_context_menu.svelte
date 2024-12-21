@@ -1,8 +1,10 @@
 <script lang="ts">
-  // import type { Snippet } from "svelte";
-  import { type MenuProps } from "./index";
+  import { getContextState } from "./ctx.svelte";
+  import { type MenuProps } from ".";
 
-  const { menuItems }: { menuItems: MenuProps[] } = $props();
+  // const { menuItems }: { menuItems: MenuProps[] } = $props();
+
+  const ctx = getContextState();
 </script>
 
 {#snippet nestedMenuItem(menuItem: MenuProps, idx: number)}
@@ -18,6 +20,10 @@
     onclick={menuItem.onclick}
     tabindex={idx === 0 ? 0 : null}
   >
+    {#if menuItem.icon}
+      <img src={menuItem.icon} alt={menuItem.label} />
+    {/if}
+
     {menuItem.label}
 
     {#if menuItem.subMenu}
@@ -25,9 +31,6 @@
         {#each menuItem.subMenu as subMenuItem}
           <li role="menuitem" onclick={(e) => subMenuItem.onclick?.()}>
             <span class="menuitem">{subMenuItem.label}</span>
-            <!-- <a href="#menubar">
-              {subMenuItem.label}
-            </a> -->
           </li>
         {/each}
       </ul>
@@ -47,13 +50,16 @@
     onclick={menuItem.onclick}
     tabindex={idx === 0 ? 0 : null}
   >
-    <!-- <a href="#menu">{menuItem.label}</a> -->
+    {#if menuItem.icon}
+      <img src={menuItem.icon} alt={menuItem.label} />
+    {/if}
+
     <span class="menuitem">{menuItem.label}</span>
   </li>
 {/snippet}
 
-<ul role="menubar" class="can-hover h-[28px]">
-  {#each menuItems as item, index}
+<ul role="menu" style="width: 200px" class="can-hover select-none">
+  {#each ctx.menuItems as item, index}
     {#if !item.subMenu}
       {@render menuItem(item, index)}
     {:else}

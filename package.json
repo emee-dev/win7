@@ -18,11 +18,13 @@
 		"@sveltejs/kit": "^2.9.0",
 		"@sveltejs/vite-plugin-svelte": "^5.0.0",
 		"autoprefixer": "^10.4.20",
+		"bits-ui": "1.0.0-next.73",
 		"clsx": "^2.1.1",
 		"csstype": "^3.1.3",
 		"eslint": "^9.7.0",
 		"eslint-plugin-svelte": "^2.36.0",
 		"globals": "^15.0.0",
+		"lucide-svelte": "^0.468.0",
 		"svelte": "^5.0.0",
 		"svelte-check": "^4.0.0",
 		"tailwind-merge": "^2.5.5",
@@ -38,10 +40,15 @@
 		"7.css": "^0.17.0",
 		"@tailwindcss/typography": "^0.5.15",
 		"@thisux/sveltednd": "^0.0.16",
+		"@zenfs/core": "^1.6.10",
+		"@zenfs/dom": "^1.1.0",
+		"buffer": "^6.0.3",
 		"class-variance-authority": "^0.7.1",
 		"interactjs": "^1.10.27",
 		"memfs": "^4.15.0",
+		"process": "^0.11.10",
 		"screenfull": "^6.0.2",
-		"selecto": "^1.26.3"
+		"selecto": "^1.26.3",
+		"tsx": "^4.19.2"
 	}
 }

@@ -4,8 +4,8 @@
   import Window from "@/components/window/window.svelte";
   import { Button } from "@/components/button";
   import Notepad from "@/apps/Notepad/notepad.svelte";
-  import { ContextMenu, BarMenu } from "@/components/menu";
-  import type { MenuProps } from "@/components/menu";
+  import { ContextMenu, Win7BarMenu } from "@/components/context_menu";
+  import type { MenuProps } from "@/components/context_menu";
 
   let menuItems = $state<MenuProps[]>([
     {

@@ -1,6 +1,5 @@
 <script lang="ts">
-  // import type { Snippet } from "svelte";
-  import { type MenuProps } from "./index";
+  import { type MenuProps } from ".";
 
   const { menuItems }: { menuItems: MenuProps[] } = $props();
 </script>
@@ -16,19 +15,14 @@
     aria-haspopup="true"
     aria-disabled={disable}
     onclick={menuItem.onclick}
-    tabindex={idx === 0 ? 0 : null}
+    tabindex={0}
   >
-    {#if menuItem.icon}
-      <img src={menuItem.icon} alt={menuItem.label} />
-    {/if}
-
     {menuItem.label}
 
     {#if menuItem.subMenu}
       <ul role="menu">
         {#each menuItem.subMenu as subMenuItem}
           <li role="menuitem" onclick={(e) => subMenuItem.onclick?.()}>
-            <!-- <a href="#menu" class="menuitem">{subMenuItem.label}</a> -->
             <span class="menuitem">{subMenuItem.label}</span>
           </li>
         {/each}
@@ -47,18 +41,13 @@
     class={divider}
     aria-disabled={disable}
     onclick={menuItem.onclick}
-    tabindex={idx === 0 ? 0 : null}
+    tabindex={0}
   >
-    {#if menuItem.icon}
-      <img src={menuItem.icon} alt={menuItem.label} />
-    {/if}
-
-    <!-- <a href="#menu">{menuItem.label}</a> -->
     <span class="menuitem">{menuItem.label}</span>
   </li>
 {/snippet}
 
-<ul role="menu" style="width: 200px" class="can-hover select-none">
+<ul role="menubar" class="can-hover h-[28px]">
   {#each menuItems as item, index}
     {#if !item.subMenu}
       {@render menuItem(item, index)}

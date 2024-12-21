@@ -20,7 +20,6 @@
     }}
   >
     <span data-icon="start-button" class="icon"></span>
-    <!-- style="--icon: url('/img/startbutton.webp');" -->
   </div>
 
   <!-- https://win7simu.visnalize.com -->
@@ -207,7 +206,7 @@
     --tw-ring-color: rgba(59, 130, 246, 0.5);
     --tw-ring-offset-shadow: 0 0 transparent;
     --tw-ring-shadow: 0 0 transparent;
-    --icon: url("https://win7simu.visnalize.com/img/computer.f1f7f519.webp");
+    --icon: url("/img/mycomputer.webp");
     user-select: none;
     outline: none;
     box-sizing: border-box;

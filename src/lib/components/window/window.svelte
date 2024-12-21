@@ -3,7 +3,7 @@
   import { onMount, type Snippet } from "svelte";
   import screenfull from "screenfull";
   import type { WindowProps } from ".";
-  import { BarMenu, type MenuProps } from "../menu";
+  import { Win7BarMenu, type MenuProps } from "@/components/context_menu";
   // import Container from "./Container.svelte";
 
   const { children, title }: WindowProps = $props();
@@ -142,7 +142,6 @@
           },
           listeners: {
             move(event) {
-              // Use updated position from dataset
               let x = parseFloat(event.target.dataset.x) || 0;
               let y = parseFloat(event.target.dataset.y) || 0;
 
@@ -150,8 +149,6 @@
               x += event.deltaRect.left;
               y += event.deltaRect.top;
 
-              // Apply size and updated position
-              // wrapper or parent container
               Object.assign(event.target.style, {
                 width: `${event.rect.width}px`,
                 height: `${event.rect.height}px`,
@@ -179,6 +176,14 @@
     }
   });
 </script>
+
+<!-- 
+<svelte:window
+  on:contextmenu|preventDefault={(e: OnContextMenu) => {
+    e.preventDefault();
+  }}
+/>
+-->
 
 {#snippet resizeHandles()}
   <div class="top-resize-handle w-full h-1 absolute top-0 z-30"></div>
@@ -243,65 +248,7 @@
       class="window-body flex-1 flex flex-col overflow-auto"
       style="height: 100%;"
     >
-      <BarMenu {menuItems} />
-      <!-- <ul role="menubar" class="can-hover h-[28px]">
-        <li role="menuitem" tabindex="0" aria-haspopup="true">
-          File
-          <ul role="menu">
-            <li role="menuitem">
-              <a href="#menubar">
-                Open <span>Ctrl+O</span>
-              </a>
-            </li>
-            <li role="menuitem">
-              <a href="#menubar">
-                Save <span>Ctrl+S</span>
-              </a>
-            </li>
-            <li role="menuitem" class="has-divider">
-              <a href="#menubar">
-                Save As... <span>Ctrl+Shift+S</span>
-              </a>
-            </li>
-            <li role="menuitem"><a href="#menubar">Exit</a></li>
-          </ul>
-        </li>
-        <li role="menuitem" tabindex="0" aria-haspopup="true">
-          Edit
-          <ul role="menu">
-            <li role="menuitem"><a href="#menubar">Undo</a></li>
-            <li role="menuitem"><a href="#menubar">Copy</a></li>
-            <li role="menuitem"><a href="#menubar">Cut</a></li>
-            <li role="menuitem" class="has-divider">
-              <a href="#menubar">Paste</a>
-            </li>
-            <li role="menuitem"><a href="#menubar">Delete</a></li>
-            <li role="menuitem"><a href="#menubar">Find...</a></li>
-            <li role="menuitem"><a href="#menubar">Replace...</a></li>
-            <li role="menuitem"><a href="#menubar">Go to...</a></li>
-          </ul>
-        </li>
-        <li role="menuitem" tabindex="0" aria-haspopup="true">
-          View
-          <ul role="menu">
-            <li role="menuitem" tabindex="0" aria-haspopup="true">
-              Zoom
-              <ul role="menu">
-                <li role="menuitem"><button>Zoom In</button></li>
-                <li role="menuitem"><button>Zoom Out</button></li>
-              </ul>
-            </li>
-            <li role="menuitem"><a href="#menubar">Status Bar</a></li>
-          </ul>
-        </li>
-        <li role="menuitem" tabindex="0" aria-haspopup="true">
-          Help
-          <ul role="menu">
-            <li role="menuitem"><a href="#menubar">View Help</a></li>
-            <li role="menuitem"><a href="#menubar">About</a></li>
-          </ul>
-        </li>
-      </ul> -->
+      <Win7BarMenu {menuItems} />
 
       <!-- The content inside window-body -->
       <div class="content-area flex-1 bg-white p-0">{@render children()}</div>

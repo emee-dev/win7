@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from "class-variance-authority";
-import type { HTMLButtonAttributes } from "svelte/elements";
+import type { HTMLButtonAttributes, HTMLAttributes } from "svelte/elements";
 import Root from "./button.svelte";
 
 const buttonVariants = cva("button", {
