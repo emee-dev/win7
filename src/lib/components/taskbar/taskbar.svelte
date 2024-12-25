@@ -8,6 +8,7 @@
     getFs,
     type TaskManagerItem,
   } from "../../../routes/win7/FileSystem.svelte";
+  import { getProgramIcon } from "../../../routes/win7/utils";
 
   const fs = getFs();
 
@@ -21,13 +22,31 @@
   });
 
   const toggleStartMenu = () => (isStartMenuOpen = !isStartMenuOpen);
+
+  const toggleWindowView = (
+    windowId: string,
+    status: "minimized" | "inview"
+  ) => {
+    if (status === "inview") {
+      fs.modifyTask(windowId, { windowStatus: "minimized" });
+    }
+
+    if (status === "minimized") {
+      fs.modifyTask(windowId, { windowStatus: "inview" });
+    }
+  };
 </script>
 
 {#snippet taskBarItem(window: TaskManagerItem)}
+  <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+  <!-- style="--icon: url('/img/calculator.webp');" -->
+
   <div
     class={`taskbar-item group relative ${window.windowStatus === "inview" && "opened"}`}
     data-target="computer"
+    style={`--icon: url('${getProgramIcon(window.programId)}');`}
     data-icon="computer"
+    onclick={() => toggleWindowView(window.windowId, window.windowStatus)}
   >
     <div
       class="window hidden group-hover:block right-[50%] h-[180px] translate-x-[50%] absolute shadow-none bottom-[calc(40px)] bg-neutral-400"
@@ -56,7 +75,7 @@
   </div>
 
   <div id="taskbar-items">
-    {#each fs.getTasks() as item}
+    {#each fs.getTasks() as item (item.windowId)}
       {@render taskBarItem(item)}
     {/each}
   </div>
@@ -229,20 +248,9 @@
   }
 
   #taskbar-items .taskbar-item {
-    visibility: inherit;
-    --window-color: rgba(170, 209, 251, 0.65);
-    --window-color-inactive: rgba(170, 209, 251, 0.3);
-    --tw-shadow: 0 0 transparent;
-    --tw-ring-offset-width: 0px;
-    --tw-ring-offset-color: #fff;
-    --tw-ring-color: rgba(59, 130, 246, 0.5);
-    --tw-ring-offset-shadow: 0 0 transparent;
-    --tw-ring-shadow: 0 0 transparent;
-    --icon: url("/img/mycomputer.webp");
     user-select: none;
     outline: none;
     box-sizing: border-box;
-    --tw-ring-inset: var(--tw-empty, /*!*/ /*!*/);
     display: flex;
     -webkit-box-align: center;
     align-items: center;
@@ -304,6 +312,10 @@
     -webkit-transition: none;
     transition: none;
     opacity: 1;
+  }
+
+  #taskbar-items .taskbar-item:active {
+    background-position: 55% 70%;
   }
 
   /* When the tab item window is minimized or opened */

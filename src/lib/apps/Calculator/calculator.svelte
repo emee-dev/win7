@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { getFs } from "../../../routes/win7/FileSystem.svelte";
+  import {
+    getFs,
+    type TaskManagerItem,
+  } from "../../../routes/win7/FileSystem.svelte";
+  import { getProgramIcon } from "../../../routes/win7/utils";
   import { combineNumbers, type ValidOperators } from "./utils";
   import Window from "./window.svelte";
 
@@ -8,7 +12,7 @@
       x: number;
       y: number;
     };
-  };
+  } & TaskManagerItem;
 
   type NumberNode = MouseEvent & { currentTarget: EventTarget } & {
     target: {
@@ -16,17 +20,16 @@
     };
   };
 
-  // TODO we need to manually set the window within the inner bounds of the desktop
-  type WindowPlacement = {
-    x: string;
-    y: string;
-  };
   const fs = getFs();
-
-  let { placement = $bindable({ x: 0, y: 0 }), windowId }: CalculatorProps =
-    $props();
-
   const validOperators: ValidOperators[] = ["*", "+", "-", "/"];
+  // const icon = "/img/calculator.webp";
+
+  let {
+    label,
+    windowId,
+    programId,
+    placement = $bindable({ x: 0, y: 0 }),
+  }: CalculatorProps = $props();
 
   let operation = $state<string[]>([]);
 
@@ -113,10 +116,6 @@
     operation.push(operator);
   };
 
-  $inspect(operation).with((e, v) => {
-    console.log("step history", v);
-  });
-
   function toggleNegative(str: string): string {
     if (str.startsWith("-")) {
       return str.slice(1); // Remove the '-' prefix if it exists
@@ -125,15 +124,25 @@
   }
 
   const onclose = () => {
-    console.log(`Window: ${windowId} was closed.`);
+    fs.terminateTask(windowId);
+  };
 
-    // fs.modifyTask(windowId, {});
+  const onminimize = () => {
+    fs.modifyTask(windowId, { windowStatus: "minimized" });
   };
 </script>
 
 <!-- credits: https://codepen.io/dahis39/pen/jaJQeq -->
 
-<Window title={windowId} showBarMenu={false} {placement} {onclose}>
+<Window
+  {onclose}
+  {windowId}
+  {onminimize}
+  bind:placement
+  title={label}
+  showBarMenu={false}
+  icon={getProgramIcon(programId)}
+>
   <main class="flex flex-col">
     <div class="display">
       <input

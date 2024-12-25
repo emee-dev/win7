@@ -12,7 +12,7 @@
   import { StartMenu } from "@/components/startmenu";
   import { setContext } from "svelte";
   import Taskbar from "@/components/taskbar/taskbar.svelte";
-  import { menuItems } from "./utils";
+  import { menuItems, type InstalledPrograms } from "./utils";
   import Par from "./Par.svelte";
   import { initFs, getFs, type TaskManagerItem } from "./FileSystem.svelte";
   import Moveable from "moveable";
@@ -38,8 +38,6 @@
 
   let mouseCoordinates = $state({ x: 0, y: 0 });
   let moveable: Moveable;
-
-  type InstalledPrograms = "Calculator" | "Notepad";
 
   const ICON_SIZE = 70;
   const MARGIN = 2; // Margin between icons
@@ -68,8 +66,7 @@
     return { column, row };
   }
 
-  // $inspect(fs.getDesktopFiles());
-  // $inspect(fs.getTasks());
+  $inspect(fs.getTasks());
 </script>
 
 {#snippet selectoItems(items: SelectoItemProps[], classname: string)}
@@ -130,19 +127,20 @@
       <button
         onclick={() => {
           fs.launchTask({
+            label: "Calculator",
             taskStatus: "running",
-            pinnedToTaskbar: false,
-            windowLabel: "Calculator",
             windowStatus: "inview",
+            pinnedToTaskbar: false,
+            programId: "Calculator",
             windowId: crypto.randomUUID(),
           });
         }}
         >Start Calculator
       </button>
 
-      {#each fs.getTasks() as instance}
+      {#each fs.getTasks() as instance (instance.windowId)}
         <!-- TODO provide a proper taskId for id-ing installed programs -->
-        {@const programId = instance.windowLabel as InstalledPrograms}
+        {@const programId = instance.programId as InstalledPrograms}
 
         {#if programId === "Calculator"}
           {@render renderCal(instance)}

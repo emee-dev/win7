@@ -1,54 +1,45 @@
 <script lang="ts">
   import Interact from "interactjs";
-  import { onMount, type Snippet } from "svelte";
+  import { onDestroy, onMount, type Snippet } from "svelte";
   import screenfull from "screenfull";
   // import type { WindowProps } from "@/components/window";
   import { Win7BarMenu, type MenuProps } from "@/components/context_menu";
   import { NOT_SELECTABLE } from "@/components/selecto";
-  import { preventDefault } from "svelte/legacy";
+  import { getFs } from "../../../routes/win7/FileSystem.svelte";
 
   type WindowProps = {
-    children: Snippet<[]>;
     title: string;
+    icon: string;
+    windowId: string;
+    children: Snippet<[]>;
     showBarMenu: boolean;
-    onclose?: () => void;
+    onclose?: (windowUi?: HTMLElement) => void;
+    onminimize?: (windowUi?: HTMLElement) => void;
     placement?: {
       x: number;
       y: number;
     };
   };
 
+  let windowUi: HTMLElement;
+  let windowInstance: ReturnType<typeof Interact> | null;
+  const fs = getFs();
+
   const {
-    children,
+    icon,
     title,
     onclose,
+    children,
+    onminimize,
     showBarMenu = true,
     placement = $bindable({ x: 0, y: 0 }),
+    ...rest
   }: WindowProps = $props();
 
-  let windowUi: HTMLElement;
-
   let position = $state(placement);
-  let windowInstance = $state<ReturnType<typeof Interact> | null>(null);
   let isFullscreen = $state(false);
 
   onMount(() => {
-    function dragMoveListener(event: any) {
-      console.log("Hello");
-      let target = event.target,
-        // keep the dragged position in the data-x/data-y attributes
-        x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx,
-        y = (parseFloat(target.getAttribute("data-y")) || 0) + event.dy;
-      // translate the element
-      target.style.webkitTransform = target.style.transform =
-        "translate(" + x + "px, " + y + "px)";
-      // update the posiion attributes
-      target.setAttribute("data-x", x);
-      target.setAttribute("data-y", y);
-    }
-    // this is used later in the resizing and gesture demos
-    // @ts-expect-error
-    window.dragMoveListener = dragMoveListener;
     windowInstance = Interact(windowUi);
   });
 
@@ -65,17 +56,40 @@
     isFullscreen = false;
   };
 
+  $effect(() => {
+    let tasks = fs.getTasks();
+
+    if (tasks.length === 0) {
+      return;
+    }
+
+    let currentTask = tasks.find((task) => task.windowId === rest.windowId);
+
+    if (!currentTask) {
+      return;
+    }
+
+    if (currentTask.windowStatus === "inview") {
+      windowUi.style.visibility = "visible";
+    }
+
+    if (currentTask.windowStatus === "minimized") {
+      windowUi.style.visibility = "hidden";
+    }
+  });
+
   const minimizeWindow = () => {
-    windowInstance?.unset();
-    windowUi.style.visibility = "hidden";
+    if (onminimize) {
+      onminimize();
+    }
   };
 
   const closeWindow = () => {
+    windowUi.style.display = "none";
+
     if (onclose) {
       onclose();
     }
-    // windowInstance?.unset();
-    // windowUi.style.display = "none";
   };
 
   $effect(() => {
@@ -152,6 +166,12 @@
         ],
       });
   });
+
+  onDestroy(() => {
+    if (windowInstance) {
+      windowInstance.unset();
+    }
+  });
 </script>
 
 <!-- <svelte:window on:drag={dragMoveListener} /> -->
@@ -171,10 +191,7 @@
   ></div>
 {/snippet}
 
-<!-- TODO there is a potential bug with statically setting the translate values when resizing window
- potential fix: use windowUi instance to specify the translate value on mount.
- 
--->
+<!-- bind:this={windowUi} -->
 <div
   class="background absolute select-none"
   bind:this={windowUi}
@@ -201,11 +218,7 @@
 
     <div class="title-bar">
       <div class="title-bar-text flex gap-x-2">
-        <img
-          src="/1023.ico"
-          alt="wind"
-          class="size-4 bg-transparent object-fill"
-        />
+        <img src={icon} alt="wind" class="size-4 bg-transparent object-fill" />
         {title}
       </div>
 

@@ -1,5 +1,6 @@
-import { getContext, setContext } from "svelte";
+import { getContext, setContext, untrack } from "svelte";
 import type { SvelteHTMLElements } from "svelte/elements";
+import type { InstalledPrograms } from "./utils";
 
 class Item {
   public name: string;
@@ -281,14 +282,15 @@ type DesktopFile = SelectoItemProps & {};
 
 // For managing executable files.
 export type TaskManagerItem = {
+  label: string;
   windowId: string;
   taskStatus: "running" | "paused";
-  windowStatus: "minimized" | "inview" | "terminated";
-  windowLabel: string;
-  // executablePath: string;
+  windowStatus: "minimized" | "inview";
+  programId: InstalledPrograms;
   meta?: Record<string, string>;
   content?: Executable;
   pinnedToTaskbar: boolean;
+  // executablePath: string;
 };
 
 class Win7FileSystem {
@@ -343,8 +345,6 @@ class Win7FileSystem {
   }
 
   modifyTask(taskId: string, entries?: Partial<TaskManagerItem>) {
-    // let tasks = this.getTasks();
-
     let modified = this.taskManager.map((item) => {
       if (item.windowId === taskId) {
         return {
@@ -358,7 +358,18 @@ class Win7FileSystem {
 
     this.taskManager = modified;
 
-    console.log("task", modified);
+    // console.log("task", modified);
+  }
+
+  terminateTask(
+    taskId: string,
+    status?: Partial<Pick<TaskManagerItem, "windowStatus">>
+  ) {
+    let modified = this.taskManager.filter((item) => item.windowId !== taskId);
+
+    console.log("modified", modified);
+
+    this.taskManager = modified;
   }
 }
 

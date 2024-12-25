@@ -50,3 +50,14 @@ export let menuItems: MenuProps[] = [
   //   label: "Personalize",
   // },
 ];
+
+export type InstalledPrograms = "Calculator" | "Notepad" | "MyComputer";
+
+export const getProgramIcon = (program: InstalledPrograms) => {
+  const programs = {
+    Calculator: "/img/calculator.webp",
+    MyComputer: "/img/mycomputer.webp",
+  } as Record<InstalledPrograms, string>;
+
+  return programs[program];
+};
