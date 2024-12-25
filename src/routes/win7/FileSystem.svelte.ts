@@ -17,14 +17,39 @@ class Item {
   }
 }
 
+// class FileItem extends Item {
+//   public mimetype: string;
+//   public textContent: string | null;
+//   public executable: Executable | null;
+
+//   constructor(
+//     name: string,
+//     mimetype: string,
+//     textContent: string | null = null
+//   ) {
+//     super(name);
+//     if (!/\.\w+$/.test(name)) {
+//       throw new Error(
+//         `Invalid file name '${name}'. A valid file extension is required.`
+//       );
+//     }
+//     this.mimetype = mimetype;
+//     this.textContent = textContent;
+//   }
+// }
+
+type Executable = {
+  icon: string;
+};
+
 class FileItem extends Item {
   public mimetype: string;
-  public textContent: string | null;
+  public content: string | Executable | null;
 
   constructor(
     name: string,
     mimetype: string,
-    textContent: string | null = null
+    content: string | Executable | null = null
   ) {
     super(name);
     if (!/\.\w+$/.test(name)) {
@@ -33,7 +58,7 @@ class FileItem extends Item {
       );
     }
     this.mimetype = mimetype;
-    this.textContent = textContent;
+    this.content = content;
   }
 }
 
@@ -254,10 +279,24 @@ type SelectoItemProps = {
 
 type DesktopFile = SelectoItemProps & {};
 
+// For managing executable files.
+export type TaskManagerItem = {
+  windowId: string;
+  taskStatus: "running" | "paused";
+  windowStatus: "minimized" | "inview" | "terminated";
+  windowLabel: string;
+  // executablePath: string;
+  meta?: Record<string, string>;
+  content?: Executable;
+  pinnedToTaskbar: boolean;
+};
+
 class Win7FileSystem {
   private desktopFiles = $state<DesktopFile[]>([]);
   private SU: string = "";
   fs: Directory | null = null;
+
+  private taskManager = $state<TaskManagerItem[]>([]);
 
   constructor(su: string) {
     const root = new Directory(su);
@@ -291,6 +330,15 @@ class Win7FileSystem {
 
   getDesktopFiles() {
     return this.desktopFiles;
+  }
+
+  // Task manager
+  launchTask(task: TaskManagerItem) {
+    this.taskManager.push(task);
+  }
+
+  getTasks() {
+    return this.taskManager;
   }
 }
 

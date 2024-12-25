@@ -2,12 +2,13 @@
   import { onMount, type Snippet } from "svelte";
   import VanillaSelecto from "selecto";
   import Interact from "interactjs";
+  import { NOT_SELECTABLE, SELECTABLE_ITEM } from ".";
 
   let container: HTMLElement;
-  let selectArea: HTMLElement;
+  // let selectArea: HTMLElement;
   let interactable: ReturnType<typeof Interact>;
 
-  const SELECTIBLE = ".selecto_selectible";
+  const SELECTABLE = "." + SELECTABLE_ITEM;
 
   type SelectoProps = {
     children: Snippet<[]>;
@@ -21,7 +22,7 @@
   const { children, ondoubleclick }: SelectoProps = $props();
 
   onMount(() => {
-    interactable = Interact(SELECTIBLE);
+    interactable = Interact(SELECTABLE);
   });
 
   $effect(() => {
@@ -43,9 +44,6 @@
   });
 
   $effect(() => {
-    // if (!selectArea || !container || !interactable) {
-    //   return;
-    // }
     if (!container || !interactable) {
       return;
     }
@@ -53,12 +51,20 @@
     const selecto = new VanillaSelecto({
       container: container as HTMLElement,
       dragContainer: ".selecto-area",
-      selectableTargets: [".selecto-area", SELECTIBLE],
-      // hitRate: 100,
+      selectableTargets: [".selecto-area", SELECTABLE],
       hitRate: "10px",
       selectByClick: true,
       selectFromInside: true,
       ratio: 0,
+    });
+
+    selecto.on("dragStart", (e: any) => {
+      const target = e.inputEvent.target;
+
+      // Prevent selecting icons when dragging an item.
+      if (target.classList.contains(NOT_SELECTABLE)) {
+        e.stop();
+      }
     });
 
     selecto.on("select", (e) => {
@@ -76,9 +82,7 @@
 
 <!-- Selecto area -->
 <div class="w-full h-full" bind:this={container}>
-  <!-- <div class={"selecto-area select-none max-w-lg p-10"} bind:this={selectArea}> -->
   {@render children()}
-  <!-- </div> -->
 </div>
 
 <style>

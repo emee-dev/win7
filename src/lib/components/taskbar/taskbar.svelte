@@ -1,6 +1,15 @@
+<!-- <div class="taskbar-item" data-target="computer" data-icon="computer"></div>
+    <div class="taskbar-item opened" data-target="bin" data-icon="bin"></div> -->
+
 <script lang="ts">
   import { onMount } from "svelte";
   import { handleBattery, type CustomNavigator } from "./utils";
+  import {
+    getFs,
+    type TaskManagerItem,
+  } from "../../../routes/win7/FileSystem.svelte";
+
+  const fs = getFs();
 
   let { isStartMenuOpen = $bindable(false) }: { isStartMenuOpen: boolean } =
     $props();
@@ -10,23 +19,46 @@
       //   handleBattery(navigator as CustomNavigator);
     }
   });
+
+  const toggleStartMenu = () => (isStartMenuOpen = !isStartMenuOpen);
 </script>
 
-<div id="taskbar" class="">
+{#snippet taskBarItem(window: TaskManagerItem)}
   <div
-    id="start-button"
-    onclick={() => {
-      isStartMenuOpen = !isStartMenuOpen;
-    }}
+    class={`taskbar-item group relative ${window.windowStatus === "inview" && "opened"}`}
+    data-target="computer"
+    data-icon="computer"
   >
+    <div
+      class="window hidden group-hover:block right-[50%] h-[180px] translate-x-[50%] absolute shadow-none bottom-[calc(40px)] bg-neutral-400"
+      style="width: 230px; max-width: 229px;"
+    >
+      <div class="title-bar"></div>
+      <div
+        class="window-body has-space flex-1 flex flex-col overflow-auto bg-neutral-400"
+        style="height: calc(100% - 10px);"
+      >
+        <p>There are just so many possibilities:</p>
+        <ul>
+          <li>A Task Manager</li>
+          <li>A Notepad</li>
+          <li>Or even a File Explorer!</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+{/snippet}
+
+<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+<div id="taskbar" class="">
+  <div id="start-button" class="mr-6 ml-5" onclick={toggleStartMenu}>
     <span data-icon="start-button" class="icon"></span>
   </div>
 
-  <!-- https://win7simu.visnalize.com -->
   <div id="taskbar-items">
-    <div class="taskbar-item" data-target="computer" data-icon="computer"></div>
-    <div class="taskbar-item opened" data-target="bin" data-icon="bin"></div>
-    <!-- Place window tray here... -->
+    {#each fs.getTasks() as item}
+      {@render taskBarItem(item)}
+    {/each}
   </div>
 
   <div id="taskbar-tray">
@@ -275,7 +307,7 @@
   }
 
   /* When the tab item window is minimized or opened */
-  .taskbar-item.opened::before {
+  :global(.taskbar-item.opened::before) {
     background: linear-gradient(
       155deg,
       hsla(0, 0%, 100%, 0.7019607843),
@@ -423,4 +455,8 @@
   .show-desktop:hover {
     background-color: hsla(0, 0%, 100%, 0.2);
   }
+
+  /* .preview {
+    background-color: red;
+  } */
 </style>

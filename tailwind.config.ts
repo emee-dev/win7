@@ -119,7 +119,9 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: [...fontFamily.sans],
+        segoe: ["'Segoe UI'", "sans-serif"],
+        segoePro: ["'Segoe Pro Display'", "sans-serif"],
+        // sans: [...fontFamily.sans],
       },
       keyframes: {
         "accordion-down": {

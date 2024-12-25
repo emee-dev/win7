@@ -6,7 +6,7 @@
   import { ContextMenu, Win7BarMenu } from "@/components/context_menu";
   import type { MenuProps } from "@/components/context_menu";
   import { onMount } from "svelte";
-  import { Selecto } from "@/components/selecto";
+  import { SELECTABLE_ITEM, Selecto } from "@/components/selecto";
   import DesktopIcon from "./DesktopIcon.svelte";
   import type { SvelteHTMLElements } from "svelte/elements";
   import { StartMenu } from "@/components/startmenu";
@@ -14,7 +14,10 @@
   import Taskbar from "@/components/taskbar/taskbar.svelte";
   import { menuItems } from "./utils";
   import Par from "./Par.svelte";
-  import { initFs, getFs } from "./FileSystem.svelte";
+  import { initFs, getFs, type TaskManagerItem } from "./FileSystem.svelte";
+  import Moveable from "moveable";
+  import { cn } from "@/utils";
+  import Calculator from "@/apps/Calculator/calculator.svelte";
 
   let desktop: HTMLElement;
 
@@ -34,12 +37,14 @@
   const fs = initFs(":root");
 
   let mouseCoordinates = $state({ x: 0, y: 0 });
+  let moveable: Moveable;
+
+  type InstalledPrograms = "Calculator" | "Notepad";
 
   const ICON_SIZE = 70;
   const MARGIN = 2; // Margin between icons
   const ICON_STEP = ICON_SIZE + MARGIN;
 
-  // let icons = $state<SelectoItemProps[]>([]);
   let currentRow = $state(0); // Tracks horizontal position (left to right)
   let currentColumn = $state(0); // Tracks vertical position (top to bottom)
   let isStartMenuOpen = $state(false);
@@ -63,7 +68,8 @@
     return { column, row };
   }
 
-  $inspect(fs.getDesktopFiles());
+  // $inspect(fs.getDesktopFiles());
+  $inspect(fs.getTasks());
 </script>
 
 {#snippet selectoItems(items: SelectoItemProps[], classname: string)}
@@ -74,6 +80,11 @@
       selecto_meta={item}
     />
   {/each}
+{/snippet}
+<!-- $state({ x: 349.333, y: 11.3333 }); -->
+
+{#snippet renderCal(task: TaskManagerItem)}
+  <Calculator placement={{ x: 349.333, y: 11.3333 }} {...task} />
 {/snippet}
 
 <Selecto
@@ -94,23 +105,13 @@
       }}
       class="desktop selecto-area relative h-screen scrollbar-hide overflow-hidden"
     >
-      <!-- {@render selectoItems(icons, "selecto_selectible")} -->
-      {@render selectoItems(fs.getDesktopFiles(), "selecto_selectible")}
+      {@render selectoItems(fs.getDesktopFiles(), SELECTABLE_ITEM)}
 
       <div class="flex">
         <button
           class="ml-auto"
           onclick={() => {
             let { column, row } = placeNextIcon();
-
-            // icons.push({
-            //   id: crypto.randomUUID(),
-            //   label: `Icon ${icons.length + 1}`,
-            //   placement: { column, row },
-            //   meta: {
-            //     selecto: "meta",
-            //   },
-            // });
 
             fs.createIcon({
               id: crypto.randomUUID(),
@@ -124,31 +125,32 @@
         >
           Add new icon
         </button>
-
-        <button onclick={() => value.count++}>increment</button>
       </div>
 
-      <ContextMenu
-        menuItems={[
-          {
-            label: "Icon context",
-            hasDivider: "has-divider",
-          },
-          {
-            label: "Icon Paste as",
-            isDisabled: true,
-          },
-        ]}
-        class="bg-red-400 m-5"
-      >
-        <div class="w-fit bg-green-400">Right Click Here</div>
-      </ContextMenu>
+      <button
+        onclick={() => {
+          fs.launchTask({
+            taskStatus: "running",
+            pinnedToTaskbar: false,
+            windowLabel: "Calculator",
+            windowStatus: "inview",
+            windowId: crypto.randomUUID(),
+          });
+        }}
+        >Start Calculator
+      </button>
 
-      <!-- <ContextMenu {menuItems} /> -->
+      {#each fs.getTasks() as instance}
+        {@const programId = instance.windowLabel as InstalledPrograms}
 
-      <!-- <Window title="*Untitled - Notepad">
-    <Notepad />
-  </Window> -->
+        {#if programId === "Calculator"}
+          {@render renderCal(instance)}
+        {:else if programId === "Notepad"}
+          <Window title="*Untitled - Notepad" showBarMenu>
+            <Notepad />
+          </Window>
+        {/if}
+      {/each}
 
       <!-- Startmenu -->
       <StartMenu bind:isStartMenuOpen />
