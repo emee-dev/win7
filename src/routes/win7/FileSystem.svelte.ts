@@ -333,12 +333,32 @@ class Win7FileSystem {
   }
 
   // Task manager
+
+  getTasks() {
+    return this.taskManager;
+  }
+
   launchTask(task: TaskManagerItem) {
     this.taskManager.push(task);
   }
 
-  getTasks() {
-    return this.taskManager;
+  modifyTask(taskId: string, entries?: Partial<TaskManagerItem>) {
+    // let tasks = this.getTasks();
+
+    let modified = this.taskManager.map((item) => {
+      if (item.windowId === taskId) {
+        return {
+          ...item,
+          ...entries,
+        };
+      }
+
+      return item;
+    });
+
+    this.taskManager = modified;
+
+    console.log("task", modified);
   }
 }
 

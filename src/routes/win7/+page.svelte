@@ -69,7 +69,7 @@
   }
 
   // $inspect(fs.getDesktopFiles());
-  $inspect(fs.getTasks());
+  // $inspect(fs.getTasks());
 </script>
 
 {#snippet selectoItems(items: SelectoItemProps[], classname: string)}
@@ -141,6 +141,7 @@
       </button>
 
       {#each fs.getTasks() as instance}
+        <!-- TODO provide a proper taskId for id-ing installed programs -->
         {@const programId = instance.windowLabel as InstalledPrograms}
 
         {#if programId === "Calculator"}

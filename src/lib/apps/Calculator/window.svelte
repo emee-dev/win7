@@ -5,6 +5,7 @@
   // import type { WindowProps } from "@/components/window";
   import { Win7BarMenu, type MenuProps } from "@/components/context_menu";
   import { NOT_SELECTABLE } from "@/components/selecto";
+  import { preventDefault } from "svelte/legacy";
 
   type WindowProps = {
     children: Snippet<[]>;
@@ -26,8 +27,7 @@
   }: WindowProps = $props();
 
   let windowUi: HTMLElement;
-  // let position = $state({ x: 349.333, y: 11.3333 });
-  // let position = $state({ x: 0, y: 0 });
+
   let position = $state(placement);
   let windowInstance = $state<ReturnType<typeof Interact> | null>(null);
   let isFullscreen = $state(false);
@@ -74,8 +74,8 @@
     if (onclose) {
       onclose();
     }
-    windowInstance?.unset();
-    windowUi.style.display = "none";
+    // windowInstance?.unset();
+    // windowUi.style.display = "none";
   };
 
   $effect(() => {

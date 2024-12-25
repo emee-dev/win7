@@ -123,6 +123,12 @@
     }
     return `-${str}`; // Add the '-' prefix if it doesn't exist
   }
+
+  const onclose = () => {
+    console.log(`Window: ${windowId} was closed.`);
+
+    // fs.modifyTask(windowId, {});
+  };
 </script>
 
 <!-- credits: https://codepen.io/dahis39/pen/jaJQeq -->
