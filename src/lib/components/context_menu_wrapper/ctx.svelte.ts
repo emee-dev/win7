@@ -23,7 +23,7 @@ type Dimensions = Action<
 type OnContextMenu = MouseEvent & { currentTarget: EventTarget };
 
 class ContextMenuState {
-  menuItems: MenuProps[] = $state([]);
+  // menuItems: MenuProps[] = $state([]);
 
   // Cursor position during right click
   pos = $state({ x: 0, y: 0 });
@@ -47,9 +47,9 @@ class ContextMenuState {
     this.context_trigger = true;
   }
 
-  init(items: MenuProps[]) {
-    this.menuItems = items;
-  }
+  // init(items: MenuProps[]) {
+  //   this.menuItems = items;
+  // }
 
   handleClickOutside() {
     this.showMenu = false;

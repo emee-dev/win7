@@ -2,7 +2,7 @@
   import interact from "interactjs";
   import { onMount } from "svelte";
   import Window from "@/components/window/window.svelte";
-  import { Button } from "@/components/button";
+  import { Button } from "@/components/ui/button";
   import Notepad from "@/apps/Notepad/notepad.svelte";
   import { ContextMenu, Win7BarMenu } from "@/components/context_menu";
   import type { MenuProps } from "@/components/context_menu";

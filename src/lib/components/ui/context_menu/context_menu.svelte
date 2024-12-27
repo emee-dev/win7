@@ -1,10 +1,14 @@
 <script lang="ts">
-  import { getContextMenu } from "./ctx.svelte";
-  import { type MenuProps } from ".";
+  type MenuProps = {
+    label: string;
+    icon?: string;
+    subMenu?: MenuProps[];
+    hasDivider?: "has-divider" | null;
+    isDisabled?: boolean;
+    onclick?: () => void;
+  };
 
-  // const { menuItems }: { menuItems: MenuProps[] } = $props();
-
-  const ctx = getContextMenu();
+  const { menuItems }: { menuItems: MenuProps[] } = $props();
 </script>
 
 {#snippet nestedMenuItem(menuItem: MenuProps, idx: number)}
@@ -59,7 +63,7 @@
 {/snippet}
 
 <ul role="menu" style="width: 200px" class="can-hover select-none">
-  {#each ctx.menuItems as item, index}
+  {#each menuItems as item, index}
     {#if !item.subMenu}
       {@render menuItem(item, index)}
     {:else}

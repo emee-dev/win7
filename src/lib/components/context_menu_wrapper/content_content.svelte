@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { CONTEXT_ZINDEX, type TriggerProps } from "@/components/context_menu";
+  import { CONTEXT_ZINDEX, type TriggerProps } from "./index";
   import { getContextMenu } from "./ctx.svelte";
   import { cn } from "@/utils";
   import { onMount } from "svelte";

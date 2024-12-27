@@ -3,8 +3,6 @@ import type { SvelteHTMLElements } from "svelte/elements";
 import Content from "./content_content.svelte";
 import Trigger from "./content_trigger.svelte";
 import Root from "./root.svelte";
-import Win7BarMenu from "./win7_bar_menu.svelte";
-import Win7ContextMenu from "./win7_context_menu.svelte";
 
 type MenuProps = {
   label: string;
@@ -18,7 +16,6 @@ type MenuProps = {
 type RootProps = Component<ContextProps, {}, "">;
 
 export type ContextProps = SvelteHTMLElements["div"] & {
-  menuItems: MenuProps[];
   children: Snippet<[]>;
 };
 
@@ -48,9 +45,4 @@ RootWithDotNotation.Trigger = Trigger;
 // This is a custom implementation, awaiting an official solution.
 RootWithDotNotation.Content = Content;
 
-export {
-  RootWithDotNotation as ContextMenu,
-  Win7BarMenu,
-  Win7ContextMenu,
-  type MenuProps,
-};
+export { RootWithDotNotation as ContextMenu, type MenuProps };

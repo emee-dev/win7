@@ -7,8 +7,8 @@
   import {
     getFs,
     type TaskManagerItem,
-  } from "../../../routes/win7/FileSystem.svelte";
-  import { getProgramIcon } from "../../../routes/win7/utils";
+  } from "../../../../routes/win7/FileSystem.svelte";
+  import { getProgramIcon } from "../../../../routes/win7/utils";
 
   const fs = getFs();
 

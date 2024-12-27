@@ -1,16 +1,11 @@
 <script lang="ts">
-  import Interact from "interactjs";
   import VanillaSelecto from "selecto";
   import { onMount, type Snippet } from "svelte";
-  import { NOT_SELECTABLE, SELECTABLE_ITEM } from ".";
+  import { NOT_SELECTABLE } from ".";
   import Moveable, { type MoveableRefTargetType } from "moveable";
 
-  let container: HTMLElement;
   let moveableRef: Moveable;
   let selectoRef: VanillaSelecto;
-  let interactRef: ReturnType<typeof Interact>;
-
-  const SELECTABLE = "." + SELECTABLE_ITEM;
 
   type SelectoProps = {
     children: Snippet<[]>;
@@ -32,6 +27,7 @@
 
     moveableRef = new Moveable(moveableParentContainer, {
       target: targets,
+      origin: false,
       draggable: true,
     });
 
@@ -68,11 +64,10 @@
     });
 
     selectoRef.on("dragStart", (e: any) => {
-      const target = e.inputEvent.target;
+      const target = e.inputEvent.target as HTMLElement;
 
-      // Prevent selecting icons when dragging an item.
+      // Prevent dragging on unsupported items.
       if (target.classList.contains(NOT_SELECTABLE)) {
-        console.log("Not selectable");
         return e.stop();
       }
 
@@ -80,7 +75,8 @@
 
       if (
         isMoveableElement ||
-        targets!.some((t) => t === target || t.contains(target))
+        // targets.some((t) => t === target || t.contains(target))
+        targets.some((t) => t === target)
       ) {
         e.stop();
       }

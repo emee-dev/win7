@@ -4,10 +4,6 @@ breathtakingly concise components that do minimal work in the browser, using
 languages you already know — HTML, CSS and JavaScript. It’s a love letter to
 web development. But don’t take our word for it. Developers consistently
 rank Svelte as the framework they’re most excited about using.`.trim();
-
-
-
-
 </script>
 
 <div

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { type TriggerProps } from "@/components/context_menu";
+  import { type TriggerProps } from "./index";
   import { cn } from "@/utils";
   import { getContextMenu } from "./ctx.svelte";
   import { onMount } from "svelte";

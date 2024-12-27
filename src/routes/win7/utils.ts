@@ -1,4 +1,4 @@
-import type { MenuProps } from "@/components/context_menu";
+import type { MenuProps } from "@/components/context_menu_wrapper";
 
 export let menuItems: MenuProps[] = [
   {

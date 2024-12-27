@@ -3,7 +3,8 @@
   import { onDestroy, onMount, type Snippet } from "svelte";
   import screenfull from "screenfull";
   // import type { WindowProps } from "@/components/window";
-  import { Win7BarMenu, type MenuProps } from "@/components/context_menu";
+  import { Win7BarMenu } from "@/components/ui/bar_menu";
+  import { type MenuProps } from "@/components/context_menu_wrapper";
   import { NOT_SELECTABLE } from "@/components/selecto";
   import { getFs } from "../../../routes/win7/FileSystem.svelte";
 
@@ -40,7 +41,7 @@
   let isFullscreen = $state(false);
 
   onMount(() => {
-    windowInstance = Interact(windowUi);
+    windowInstance = Interact(windowUi, {});
   });
 
   // Fullscreen logic
@@ -175,7 +176,6 @@
 </script>
 
 <!-- <svelte:window on:drag={dragMoveListener} /> -->
-
 {#snippet resizeHandles()}
   <div
     class={`top-resize-handle w-full h-1 absolute top-0 z-30 ${NOT_SELECTABLE}`}
@@ -191,7 +191,6 @@
   ></div>
 {/snippet}
 
-<!-- bind:this={windowUi} -->
 <div
   class="background absolute select-none"
   bind:this={windowUi}

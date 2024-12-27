@@ -1,15 +1,16 @@
 <script lang="ts">
   import Notepad from "@/apps/Notepad/notepad.svelte";
-  import { ContextMenu, Win7ContextMenu } from "@/components/context_menu";
+  import { Win7ContextMenu } from "@/components/ui/context_menu";
   import { Selecto } from "@/components/selecto";
   import Window from "@/components/window/window.svelte";
   import Calculator from "@/apps/Calculator/calculator.svelte";
-  import { StartMenu } from "@/components/startmenu";
-  import Taskbar from "@/components/taskbar/taskbar.svelte";
+  import { StartMenu } from "@/components/ui/startmenu";
+  import Taskbar from "@/components/ui/taskbar/taskbar.svelte";
   import type { SvelteHTMLElements } from "svelte/elements";
   import { initFs, type TaskManagerItem } from "./FileSystem.svelte";
   import DesktopIcon from "./Icon.svelte";
   import { menuItems, type InstalledPrograms } from "./utils";
+  import { ContextMenu } from "@/components/context_menu_wrapper";
 
   let desktop: HTMLElement;
 
@@ -65,7 +66,7 @@
 
 {#snippet selectoItems(items: SelectoItemProps[])}
   {#each items as item (item.id)}
-    <ContextMenu menuItems={[{ label: "Icon rename" }]} class="">
+    <ContextMenu class="">
       <ContextMenu.Trigger>
         <DesktopIcon
           style={`top: ${item.placement?.column}px; left: ${item.placement?.row}px;`}
@@ -73,7 +74,7 @@
         />
       </ContextMenu.Trigger>
       <ContextMenu.Content>
-        <Win7ContextMenu />
+        <Win7ContextMenu menuItems={[{ label: "Icon rename" }]} />
       </ContextMenu.Content>
     </ContextMenu>
   {/each}
@@ -84,7 +85,7 @@
 {/snippet}
 
 <Selecto>
-  <ContextMenu {menuItems} class={`w-screen h-screen`}>
+  <ContextMenu class={`w-screen h-screen`}>
     <ContextMenu.Trigger>
       <main
         bind:this={desktop}
@@ -146,7 +147,7 @@
       </main>
     </ContextMenu.Trigger>
     <ContextMenu.Content>
-      <Win7ContextMenu />
+      <Win7ContextMenu {menuItems} />
     </ContextMenu.Content>
   </ContextMenu>
 </Selecto>

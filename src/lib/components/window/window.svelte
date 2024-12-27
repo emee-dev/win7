@@ -3,8 +3,8 @@
   import { onMount, type Snippet } from "svelte";
   import screenfull from "screenfull";
   import type { WindowProps } from ".";
-  import { Win7BarMenu, type MenuProps } from "@/components/context_menu";
-  // import Container from "./Container.svelte";
+  import { Win7BarMenu } from "@/components/ui/bar_menu";
+  import { type MenuProps } from "@/components/context_menu_wrapper";
 
   const { children, title, showBarMenu = true }: WindowProps = $props();
 

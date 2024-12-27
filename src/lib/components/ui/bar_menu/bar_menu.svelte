@@ -1,5 +1,12 @@
 <script lang="ts">
-  import { type MenuProps } from ".";
+  type MenuProps = {
+    label: string;
+    icon?: string;
+    subMenu?: MenuProps[];
+    hasDivider?: "has-divider" | null;
+    isDisabled?: boolean;
+    onclick?: () => void;
+  };
 
   const { menuItems }: { menuItems: MenuProps[] } = $props();
 </script>
