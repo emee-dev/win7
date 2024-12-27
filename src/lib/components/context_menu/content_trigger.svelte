@@ -1,0 +1,26 @@
+<script lang="ts">
+  import { type TriggerProps } from "@/components/context_menu";
+  import { cn } from "@/utils";
+  import { getContextMenu } from "./ctx.svelte";
+  import { onMount } from "svelte";
+
+  const context = getContextMenu();
+
+  let { children, class: className, ...rest }: TriggerProps = $props();
+
+  onMount(() => {
+    context.initTrigger();
+  });
+</script>
+
+<!-- TODO: make sure to close other context menus onright click -->
+
+<div
+  class={cn("", className)}
+  {...rest}
+  role="menu"
+  tabindex="-1"
+  oncontextmenu={(e) => context.handleRightClick(e)}
+>
+  {@render children?.()}
+</div>

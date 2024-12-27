@@ -294,7 +294,17 @@ export type TaskManagerItem = {
 };
 
 class Win7FileSystem {
-  private desktopFiles = $state<DesktopFile[]>([]);
+  private desktopFiles = $state<DesktopFile[]>([
+    // {
+    //   id: "1",
+    //   label: "Computer",
+    //   meta: {},
+    //   placement: {
+    //     row: 2,
+    //     column: 2,
+    //   },
+    // },
+  ]);
   private SU: string = "";
   fs: Directory | null = null;
 

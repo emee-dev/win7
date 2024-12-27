@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
   import type { SvelteHTMLElements } from "svelte/elements";
 
   type Placement = {
@@ -18,36 +18,28 @@
   } & SvelteHTMLElements["div"];
 
   let { selecto_meta, class: className, ...rest }: SelectoItem = $props();
-</script>
+</script> -->
 
-<div
-  class={`${className} computer icon group`}
-  id={selecto_meta.label}
-  data-label={selecto_meta.label}
-  data-selecto={JSON.stringify(selecto_meta)}
-  {...rest}
->
-  <div class="absolute invisible group-hover:visible">
-    {`col: ${selecto_meta?.placement?.column}px; row: ${selecto_meta?.placement?.row}px;`}
-  </div>
+<!-- id={selecto_meta.label}
+data-label={selecto_meta.label}
+data-selecto={JSON.stringify(selecto_meta)}
+{...rest} -->
+<div class={`item group flex flex-col`}>
+  <span class="icon-wrapper mx-auto">
+    <span
+      class="icon size-[40px] pt-1"
+      style="--icon: url('/img/empty_folder.webp');"
+    >
+    </span>
+  </span>
+
+  <span class="mx-auto">Computer</span>
 </div>
 
 <style>
-  .cube {
-    display: inline-block;
-    border-radius: 5px;
-    width: 40px;
-    height: 40px;
-    margin: 4px;
-    background: #eee;
-    --color: #4af;
-    line-height: 40px;
-  }
-
-  /* Icons */
-  .icon {
+  .item {
+    /* display: block; */
     position: absolute;
-    display: block;
     width: 70px;
     height: 70px;
     background-size: 48px;
@@ -58,7 +50,7 @@
     z-index: 2;
   }
 
-  .icon::after {
+  /* .item::after {
     display: block;
     position: absolute;
     top: 50px;
@@ -67,15 +59,24 @@
     content: attr(data-label);
     color: #ffffff;
     text-shadow: 0 2px 2px #000;
+  } */
+
+  .item .icon-wrapper {
+    user-select: none;
+    position: relative;
   }
 
-  .icon:hover {
+  .item .icon-wrapper .icon {
+    display: inline-block;
+    background: var(--icon) no-repeat 50%;
+    background-size: contain;
+    /* width: 100%;
+    height: 100%; */
+    margin: 0;
+  }
+
+  .item:hover {
     background-color: rgba(255, 255, 255, 0.3);
     border-color: rgba(255, 255, 255, 0.3);
-  }
-
-  #computer {
-    top: 0;
-    left: 0;
   }
 </style>

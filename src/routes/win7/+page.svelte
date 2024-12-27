@@ -3,11 +3,16 @@
   import Window from "@/components/window/window.svelte";
   import { Button } from "@/components/button";
   import Notepad from "@/apps/Notepad/notepad.svelte";
-  import { ContextMenu, Win7BarMenu } from "@/components/context_menu";
+  import {
+    ContextMenu,
+    Win7BarMenu,
+    Win7ContextMenu,
+  } from "@/components/context_menu";
   import type { MenuProps } from "@/components/context_menu";
   import { onMount } from "svelte";
   import { SELECTABLE_ITEM, Selecto } from "@/components/selecto";
-  import DesktopIcon from "./DesktopIcon.svelte";
+  // import DesktopIcon from "./DesktopIcon.svelte";
+  import DesktopIcon2 from "./Icon.svelte";
   import type { SvelteHTMLElements } from "svelte/elements";
   import { StartMenu } from "@/components/startmenu";
   import { setContext } from "svelte";
@@ -66,16 +71,23 @@
     return { column, row };
   }
 
-  $inspect(fs.getTasks());
+  // $inspect(fs.getTasks());
 </script>
 
 {#snippet selectoItems(items: SelectoItemProps[], classname: string)}
-  {#each items as item}
-    <DesktopIcon
-      style={`top: ${item.placement?.column}px; left: ${item.placement?.row}px;`}
-      class={classname}
-      selecto_meta={item}
-    />
+  {#each items as item (item.id)}
+    <ContextMenu menuItems={[{ label: "Icon rename" }]} class="">
+      <ContextMenu.Trigger>
+        <DesktopIcon2
+          style={`top: ${item.placement?.column}px; left: ${item.placement?.row}px;`}
+          class={classname}
+          selecto_meta={item}
+        />
+      </ContextMenu.Trigger>
+      <ContextMenu.Content>
+        <Win7ContextMenu />
+      </ContextMenu.Content>
+    </ContextMenu>
   {/each}
 {/snippet}
 <!-- $state({ x: 349.333, y: 11.3333 }); -->
@@ -90,72 +102,72 @@
   }}
 >
   <ContextMenu {menuItems} class="w-screen h-screen">
-    <!-- <ContextMenu.Trigger>
-      <button>Click Me Here</button>
-    </ContextMenu.Trigger> -->
-
-    <main
-      bind:this={desktop}
-      onmousemove={(ev) => {
-        mouseCoordinates.x = ev.clientX;
-        mouseCoordinates.y = ev.clientY;
-      }}
-      class="desktop selecto-area relative h-screen scrollbar-hide overflow-hidden"
-    >
-      {@render selectoItems(fs.getDesktopFiles(), SELECTABLE_ITEM)}
-
-      <div class="flex">
-        <button
-          class="ml-auto"
-          onclick={() => {
-            let { column, row } = placeNextIcon();
-
-            fs.createIcon({
-              id: crypto.randomUUID(),
-              label: `Icon ${fs.getDesktopFiles().length + 1}.exe`,
-              placement: { column, row },
-              meta: {
-                selecto: "meta",
-              },
-            });
-          }}
-        >
-          Add new icon
-        </button>
-      </div>
-
-      <button
-        onclick={() => {
-          fs.launchTask({
-            label: "Calculator",
-            taskStatus: "running",
-            windowStatus: "inview",
-            pinnedToTaskbar: false,
-            programId: "Calculator",
-            windowId: crypto.randomUUID(),
-          });
+    <ContextMenu.Trigger class="">
+      <main
+        bind:this={desktop}
+        onmousemove={(ev) => {
+          mouseCoordinates.x = ev.clientX;
+          mouseCoordinates.y = ev.clientY;
         }}
-        >Start Calculator
-      </button>
+        class="desktop selecto-area relative h-screen scrollbar-hide overflow-hidden"
+      >
+        {@render selectoItems(fs.getDesktopFiles(), SELECTABLE_ITEM)}
 
-      {#each fs.getTasks() as instance (instance.windowId)}
-        <!-- TODO provide a proper taskId for id-ing installed programs -->
-        {@const programId = instance.programId as InstalledPrograms}
+        <div class="flex">
+          <button
+            class="ml-auto"
+            onclick={() => {
+              let { column, row } = placeNextIcon();
 
-        {#if programId === "Calculator"}
-          {@render renderCal(instance)}
-        {:else if programId === "Notepad"}
-          <Window title="*Untitled - Notepad" showBarMenu>
-            <Notepad />
-          </Window>
-        {/if}
-      {/each}
+              fs.createIcon({
+                id: crypto.randomUUID(),
+                label: `Icon ${fs.getDesktopFiles().length + 1}.exe`,
+                placement: { column, row },
+                meta: {
+                  selecto: "meta",
+                },
+              });
+            }}
+          >
+            Add new icon
+          </button>
+          <button
+            onclick={() => {
+              fs.launchTask({
+                label: "Calculator",
+                taskStatus: "running",
+                windowStatus: "inview",
+                pinnedToTaskbar: false,
+                programId: "Calculator",
+                windowId: crypto.randomUUID(),
+              });
+            }}
+            >Start Calculator
+          </button>
+        </div>
 
-      <!-- Startmenu -->
-      <StartMenu bind:isStartMenuOpen />
+        {#each fs.getTasks() as instance (instance.windowId)}
+          <!-- TODO provide a proper taskId for id-ing installed programs -->
+          {@const programId = instance.programId as InstalledPrograms}
 
-      <Taskbar bind:isStartMenuOpen />
-    </main>
+          {#if programId === "Calculator"}
+            {@render renderCal(instance)}
+          {:else if programId === "Notepad"}
+            <Window title="*Untitled - Notepad" showBarMenu>
+              <Notepad />
+            </Window>
+          {/if}
+        {/each}
+
+        <!-- Startmenu -->
+        <StartMenu bind:isStartMenuOpen />
+
+        <Taskbar bind:isStartMenuOpen />
+      </main>
+    </ContextMenu.Trigger>
+    <ContextMenu.Content>
+      <Win7ContextMenu />
+    </ContextMenu.Content>
   </ContextMenu>
 </Selecto>
 
