@@ -3,6 +3,7 @@
   import { getContextMenu } from "./ctx.svelte";
   import { cn } from "@/utils";
   import { onMount } from "svelte";
+  import { NOT_SELECTABLE } from "../selecto";
 
   const context = getContextMenu();
 
@@ -15,7 +16,7 @@
 
 {#if context.showMenu}
   <nav
-    class={cn("w-fit h-fit", className)}
+    class={cn("w-fit h-fit", NOT_SELECTABLE, className)}
     {...rest}
     use:context.updateMenuDimensions
     onclick_outside={() => context.handleClickOutside()}

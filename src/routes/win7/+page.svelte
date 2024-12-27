@@ -1,16 +1,14 @@
 <script lang="ts">
   import Notepad from "@/apps/Notepad/notepad.svelte";
   import { ContextMenu, Win7ContextMenu } from "@/components/context_menu";
-  import { SELECTABLE_ITEM, Selecto } from "@/components/selecto";
+  import { Selecto } from "@/components/selecto";
   import Window from "@/components/window/window.svelte";
-  // import DesktopIcon from "./DesktopIcon.svelte";
   import Calculator from "@/apps/Calculator/calculator.svelte";
   import { StartMenu } from "@/components/startmenu";
   import Taskbar from "@/components/taskbar/taskbar.svelte";
-  import Moveable from "moveable";
   import type { SvelteHTMLElements } from "svelte/elements";
   import { initFs, type TaskManagerItem } from "./FileSystem.svelte";
-  import DesktopIcon2 from "./Icon.svelte";
+  import DesktopIcon from "./Icon.svelte";
   import { menuItems, type InstalledPrograms } from "./utils";
 
   let desktop: HTMLElement;
@@ -31,7 +29,6 @@
   const fs = initFs(":root");
 
   let mouseCoordinates = $state({ x: 0, y: 0 });
-  let moveable: Moveable;
 
   const ICON_SIZE = 70;
   const MARGIN = 2; // Margin between icons
@@ -70,7 +67,7 @@
   {#each items as item (item.id)}
     <ContextMenu menuItems={[{ label: "Icon rename" }]} class="">
       <ContextMenu.Trigger>
-        <DesktopIcon2
+        <DesktopIcon
           style={`top: ${item.placement?.column}px; left: ${item.placement?.row}px;`}
           selecto_meta={item}
         />
@@ -87,12 +84,12 @@
 {/snippet}
 
 <Selecto>
-  <ContextMenu {menuItems} class="w-screen h-screen">
-    <ContextMenu.Trigger class="">
+  <ContextMenu {menuItems} class={`w-screen h-screen`}>
+    <ContextMenu.Trigger>
       <main
         bind:this={desktop}
         onmousemove={onMouseMove}
-        class="desktop selecto-area relative h-screen scrollbar-hide overflow-hidden"
+        class="desktop relative h-screen scrollbar-hide overflow-hidden select-none"
       >
         {@render selectoItems(fs.getDesktopFiles())}
 

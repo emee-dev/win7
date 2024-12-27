@@ -3,6 +3,7 @@
   import { cn } from "@/utils";
   import { getContextMenu } from "./ctx.svelte";
   import { onMount } from "svelte";
+  import { NOT_SELECTABLE } from "../selecto";
 
   const context = getContextMenu();
 
@@ -16,7 +17,7 @@
 <!-- TODO: make sure to close other context menus onright click -->
 
 <div
-  class={cn("", className)}
+  class={cn("", NOT_SELECTABLE, className)}
   {...rest}
   role="menu"
   tabindex="-1"

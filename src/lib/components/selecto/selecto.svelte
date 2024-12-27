@@ -1,72 +1,104 @@
 <script lang="ts">
-  import { onMount, type Snippet } from "svelte";
-  import VanillaSelecto from "selecto";
   import Interact from "interactjs";
+  import VanillaSelecto from "selecto";
+  import { onMount, type Snippet } from "svelte";
   import { NOT_SELECTABLE, SELECTABLE_ITEM } from ".";
+  import Moveable, { type MoveableRefTargetType } from "moveable";
 
   let container: HTMLElement;
-  // let selectArea: HTMLElement;
-  let interactable: ReturnType<typeof Interact>;
+  let moveableRef: Moveable;
+  let selectoRef: VanillaSelecto;
+  let interactRef: ReturnType<typeof Interact>;
 
   const SELECTABLE = "." + SELECTABLE_ITEM;
 
   type SelectoProps = {
     children: Snippet<[]>;
-    /**
-     * Refers to on double click of a single `SelectoComponent` child components.
-     * @param data
-     */
   };
 
   const { children }: SelectoProps = $props();
+  let targets = $state<MoveableRefTargetType[]>([]);
+
+  const hitRate = 0;
+  const selectByClick = true;
+  const selectFromInside = false;
+  const toggleContinueSelect = ["shift"];
+  const ratio = 0;
 
   onMount(() => {
-    interactable = Interact(SELECTABLE);
-  });
+    const moveableParentContainer = document.querySelector(
+      `.desktop`
+    ) as HTMLElement;
 
-  $effect(() => {
-    if (!interactable) {
-      return;
-    }
-
-    // interactable.on("doubletap", (event: any) => {
-    //   if (event.double) {
-    //     console.log("Double first");
-    //     ondoubleclick({
-    //       ev: "doubletap",
-    //       meta: JSON.parse(event.target.getAttribute("data-selecto")!),
-    //     });
-    //   }
-    // });
-  });
-
-  $effect(() => {
-    if (!container || !interactable) {
-      return;
-    }
-
-    const selecto = new VanillaSelecto({
-      container: container as HTMLElement,
-      dragContainer: ".selecto-area",
-      selectableTargets: [".selecto-area", SELECTABLE],
-      hitRate: "10px",
-      selectByClick: true,
-      selectFromInside: true,
-      ratio: 0,
+    moveableRef = new Moveable(moveableParentContainer, {
+      target: targets,
+      draggable: true,
     });
 
-    selecto.on("dragStart", (e: any) => {
+    selectoRef = new VanillaSelecto({
+      dragContainer: ".desktop",
+      selectableTargets: [".selecto_selectable"],
+      hitRate: hitRate,
+      selectByClick: selectByClick,
+      selectFromInside: selectFromInside,
+      toggleContinueSelect: toggleContinueSelect,
+      ratio: ratio,
+      keyContainer: window,
+    });
+  });
+
+  $effect(() => {
+    if (!selectoRef) {
+      console.log("SelectoRef not defined.");
+      return;
+    }
+
+    moveableRef.on("clickGroup", (e) => {
+      selectoRef!.clickTarget(e.inputEvent, e.inputTarget);
+    });
+
+    moveableRef.on("render", (e) => {
+      e.target.style.cssText += e.cssText;
+    });
+
+    moveableRef.on("renderGroup", (e) => {
+      e.events.forEach((ev) => {
+        ev.target.style.cssText += ev.cssText;
+      });
+    });
+
+    selectoRef.on("dragStart", (e: any) => {
       const target = e.inputEvent.target;
 
       // Prevent selecting icons when dragging an item.
       if (target.classList.contains(NOT_SELECTABLE)) {
+        console.log("Not selectable");
+        return e.stop();
+      }
+
+      let isMoveableElement = moveableRef.isMoveableElement(target);
+
+      if (
+        isMoveableElement ||
+        targets!.some((t) => t === target || t.contains(target))
+      ) {
         e.stop();
       }
     });
 
-    selecto.on("select", (e) => {
+    selectoRef.on("selectEnd", (e) => {
+      if (e.isDragStartEnd) {
+        e.inputEvent.preventDefault();
+        moveableRef!.waitToChangeTarget().then(() => {
+          moveableRef!.dragStart(e.inputEvent);
+        });
+      }
+
+      moveableRef.target = e.selected;
+    });
+
+    selectoRef.on("select", (e) => {
       e.added.forEach((el) => {
-        // TODO make so it that the user can provide the select class
         el.classList.add("selected");
       });
 
@@ -78,9 +110,11 @@
 </script>
 
 <!-- Selecto area -->
-<div class="w-full h-full" bind:this={container}>
-  {@render children()}
-</div>
+
+<!-- <div class="w-full h-full not_selectable" bind:this={container}> -->
+{@render children()}
+
+<!-- </div> -->
 
 <style>
   :global(:root) {
@@ -88,11 +122,6 @@
     --selecto-color: #4af;
     --selecto-size: 40px;
   }
-
-  /* .selecto-area :global(.selected) {
-      color: #fff;
-      background: var(--color);
-    } */
 
   /* Icon active state */
   :global(.selecto-area .selected) {
