@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { SELECTABLE_ITEM } from "@/components/selecto";
+  import { cn } from "@/utils";
   import type { SvelteHTMLElements } from "svelte/elements";
 
   type Placement = {
@@ -22,7 +24,7 @@
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
-  class="item"
+  class={cn("item", SELECTABLE_ITEM, className)}
   style={`width: 70px; height: 70px; z-index: 1; ${rest.style}`}
   ondblclick={() => {
     console.log(selecto_meta);

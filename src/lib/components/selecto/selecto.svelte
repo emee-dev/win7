@@ -16,10 +16,9 @@
      * Refers to on double click of a single `SelectoComponent` child components.
      * @param data
      */
-    ondoubleclick: (data: any) => void;
   };
 
-  const { children, ondoubleclick }: SelectoProps = $props();
+  const { children }: SelectoProps = $props();
 
   onMount(() => {
     interactable = Interact(SELECTABLE);
@@ -30,17 +29,15 @@
       return;
     }
 
-    // interactable.origin("self")
-
-    interactable.on("doubletap", (event: any) => {
-      if (event.double) {
-        console.log("Double first");
-        ondoubleclick({
-          ev: "doubletap",
-          meta: JSON.parse(event.target.getAttribute("data-selecto")!),
-        });
-      }
-    });
+    // interactable.on("doubletap", (event: any) => {
+    //   if (event.double) {
+    //     console.log("Double first");
+    //     ondoubleclick({
+    //       ev: "doubletap",
+    //       meta: JSON.parse(event.target.getAttribute("data-selecto")!),
+    //     });
+    //   }
+    // });
   });
 
   $effect(() => {

@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { getContextState } from "./ctx.svelte";
+  import { getContextMenu } from "./ctx.svelte";
   import { type MenuProps } from ".";
 
   // const { menuItems }: { menuItems: MenuProps[] } = $props();
 
-  const ctx = getContextState();
+  const ctx = getContextMenu();
 </script>
 
 {#snippet nestedMenuItem(menuItem: MenuProps, idx: number)}
