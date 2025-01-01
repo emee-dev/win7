@@ -27,7 +27,7 @@ export const CONTEXT_ZINDEX = 10;
 
 export type ContentProps = { children: Snippet<[]>; class?: string };
 
-type RootWithDotNotation = RootProps & {
+type RootWithDotNotationProps = RootProps & {
   Trigger: __sveltets_2_IsomorphicComponent<TriggerProps>;
   Content: __sveltets_2_IsomorphicComponent<ContentProps>;
 };
@@ -35,7 +35,7 @@ type RootWithDotNotation = RootProps & {
 // Assigning additional properties (Trigger and Content) to the Root component
 // using dot notation. This approach is not officially supported by the Svelte
 // library, which may result in missing or unsupported types.
-const RootWithDotNotation: RootWithDotNotation = Root as any;
+const RootWithDotNotation: RootWithDotNotationProps = Root as any;
 
 // @ts-expect-error Adding Trigger as a dot notation property on Root.
 // This is a custom implementation, awaiting an official solution.

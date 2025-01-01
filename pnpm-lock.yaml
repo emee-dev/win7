@@ -23,6 +23,9 @@ importers:
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
+      cssom:
+        specifier: ^0.5.0
+        version: 0.5.0
       interactjs:
         specifier: ^1.10.27
         version: 1.10.27
@@ -54,6 +57,9 @@ importers:
       '@sveltejs/vite-plugin-svelte':
         specifier: ^5.0.0
         version: 5.0.1(svelte@5.8.0)(vite@6.0.3(@types/node@22.10.2)(jiti@1.21.6)(tsx@4.19.2)(yaml@2.6.1))
+      '@types/cssom':
+        specifier: ^0.4.3
+        version: 0.4.3
       autoprefixer:
         specifier: ^10.4.20
         version: 10.4.20(postcss@8.4.49)
@@ -863,6 +869,9 @@ packages:
   '@types/cookie@0.6.0':
     resolution: {integrity: sha512-4Kh9a6B2bQciAhf7FSuMRRkUWecJgJu9nPnx3yzpsfXX/c50REIqpHY4C82bXP90qrLtXtkDxTZosYO3UpOwlA==}
 
+  '@types/cssom@0.4.3':
+    resolution: {integrity: sha512-cThQxtgHC2wyXp2gnDd4lh6EJfpmUADIJX613HcmFVwELw/gQya8Ok7EBkJ3g2z9G2N0NNZywXvjZ4A8dPWYFw==}
+
   '@types/estree@1.0.6':
     resolution: {integrity: sha512-AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw==}
 
@@ -1158,6 +1167,9 @@ packages:
     resolution: {integrity: sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg==}
     engines: {node: '>=4'}
     hasBin: true
+
+  cssom@0.5.0:
+    resolution: {integrity: sha512-iKuQcq+NdHqlAcwUY0o/HL69XQrUaQdMjmStJ8JFmUaiiQErlhrmuigkg/CU4E2J0IyUKUrMAgl36TvN67MqTw==}
 
   csstype@3.1.3:
     resolution: {integrity: sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==}
@@ -2717,6 +2729,8 @@ snapshots:
 
   '@types/cookie@0.6.0': {}
 
+  '@types/cssom@0.4.3': {}
+
   '@types/estree@1.0.6': {}
 
   '@types/json-schema@7.0.15': {}
@@ -3056,6 +3070,8 @@ snapshots:
       '@scena/matrix': 1.1.1
 
   cssesc@3.0.0: {}
+
+  cssom@0.5.0: {}
 
   csstype@3.1.3: {}
 

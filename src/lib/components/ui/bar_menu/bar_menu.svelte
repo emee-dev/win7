@@ -3,7 +3,6 @@
     label: string;
     icon?: string;
     subMenu?: MenuProps[];
-    hasDivider?: "has-divider" | null;
     isDisabled?: boolean;
     onclick?: () => void;
   };
@@ -11,25 +10,22 @@
   const { menuItems }: { menuItems: MenuProps[] } = $props();
 </script>
 
-{#snippet nestedMenuItem(menuItem: MenuProps, idx: number)}
-  {@const disable = menuItem.isDisabled}
-  {@const divider = menuItem.hasDivider || null}
+{#snippet nestedMenuItem(menuItem: MenuProps)}
+  {@const isDisabled = menuItem?.isDisabled || null}
 
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <li
     role="menuitem"
-    class={divider}
     aria-haspopup="true"
-    aria-disabled={disable}
-    onclick={menuItem.onclick}
-    tabindex={0}
+    aria-disabled={isDisabled}
+    onclick={menuItem?.onclick}
   >
     {menuItem.label}
 
     {#if menuItem.subMenu}
       <ul role="menu">
-        {#each menuItem.subMenu as subMenuItem}
-          <li role="menuitem" onclick={(e) => subMenuItem.onclick?.()}>
+        {#each menuItem.subMenu as subMenuItem (subMenuItem.label)}
+          <li role="menuitem" onclick={subMenuItem?.onclick}>
             <span class="menuitem">{subMenuItem.label}</span>
           </li>
         {/each}
@@ -38,28 +34,24 @@
   </li>
 {/snippet}
 
-{#snippet menuItem(menuItem: MenuProps, idx: number)}
-  {@const disable = menuItem.isDisabled}
-  {@const divider = menuItem.hasDivider || null}
+{#snippet menuItem(menuItem: MenuProps)}
+  {@const isDisabled = menuItem?.isDisabled || null}
+  <!-- {@const divider = menuItem?.hasDivider || null} -->
 
   <!-- svelte-ignore a11y_click_events_have_key_events -->
-  <li
-    role="menuitem"
-    class={divider}
-    aria-disabled={disable}
-    onclick={menuItem.onclick}
-    tabindex={0}
-  >
-    <span class="menuitem">{menuItem.label}</span>
+
+  <li role="menuitem" aria-disabled={isDisabled} onclick={menuItem.onclick}>
+    <!-- <span class="menuitem">{menuItem.label}</span> -->
+    {menuItem.label}
   </li>
 {/snippet}
 
 <ul role="menubar" class="can-hover h-[28px]">
-  {#each menuItems as item, index}
-    {#if !item.subMenu}
-      {@render menuItem(item, index)}
+  {#each menuItems as item (item.label)}
+    {#if item.subMenu}
+      {@render nestedMenuItem(item)}
     {:else}
-      {@render nestedMenuItem(item, index)}
+      {@render menuItem(item)}
     {/if}
   {/each}
 </ul>

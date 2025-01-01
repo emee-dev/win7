@@ -1,18 +1,13 @@
 <script lang="ts">
-  import { type ContextProps } from "./index";
   import { onMount } from "svelte";
-  import type { Action } from "svelte/action";
   import { setContextMenu } from "./ctx.svelte";
+  import { type ContextProps } from "./index";
 
   const context = setContextMenu();
 
   type OnContextMenu = MouseEvent & { currentTarget: EventTarget };
 
-  let { children, ...rest }: ContextProps = $props();
-
-  // onMount(() => {
-  //   context.init(menuItems);
-  // });
+  let { children }: ContextProps = $props();
 
   onMount(() => {
     if (!context.context_trigger) {

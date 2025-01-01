@@ -1,28 +1,22 @@
 <script lang="ts">
-  type MenuProps = {
-    label: string;
-    icon?: string;
-    subMenu?: MenuProps[];
-    hasDivider?: "has-divider" | null;
-    isDisabled?: boolean;
-    onclick?: () => void;
-  };
+  import { ContextMenu, Label } from "bits-ui";
+  import type { MenuProps } from ".";
 
   const { menuItems }: { menuItems: MenuProps[] } = $props();
 </script>
 
-{#snippet nestedMenuItem(menuItem: MenuProps, idx: number)}
-  {@const disable = menuItem.isDisabled}
-  {@const divider = menuItem.hasDivider || null}
+{#snippet nestedMenuItem(menuItem: MenuProps)}
+  {@const isDisabled = menuItem?.isDisabled || null}
+  {@const divider = menuItem?.hasDivider || null}
 
   <!-- svelte-ignore a11y_click_events_have_key_events -->
+
   <li
     role="menuitem"
     class={divider}
     aria-haspopup="true"
-    aria-disabled={disable}
+    aria-disabled={isDisabled}
     onclick={menuItem.onclick}
-    tabindex={idx === 0 ? 0 : null}
   >
     {#if menuItem.icon}
       <img src={menuItem.icon} alt={menuItem.label} />
@@ -32,7 +26,7 @@
 
     {#if menuItem.subMenu}
       <ul role="menu">
-        {#each menuItem.subMenu as subMenuItem}
+        {#each menuItem.subMenu as subMenuItem (subMenuItem.label)}
           <li role="menuitem" onclick={(e) => subMenuItem.onclick?.()}>
             <span class="menuitem">{subMenuItem.label}</span>
           </li>
@@ -42,17 +36,17 @@
   </li>
 {/snippet}
 
-{#snippet menuItem(menuItem: MenuProps, idx: number)}
-  {@const disable = menuItem.isDisabled}
-  {@const divider = menuItem.hasDivider || null}
+{#snippet menuItem(menuItem: MenuProps)}
+  {@const isDisabled = menuItem?.isDisabled || null}
+  {@const divider = menuItem?.hasDivider || null}
 
   <!-- svelte-ignore a11y_click_events_have_key_events -->
+
   <li
     role="menuitem"
     class={divider}
-    aria-disabled={disable}
+    aria-disabled={isDisabled}
     onclick={menuItem.onclick}
-    tabindex={idx === 0 ? 0 : null}
   >
     {#if menuItem.icon}
       <img src={menuItem.icon} alt={menuItem.label} />
@@ -63,11 +57,11 @@
 {/snippet}
 
 <ul role="menu" style="width: 200px" class="can-hover select-none">
-  {#each menuItems as item, index}
-    {#if !item.subMenu}
-      {@render menuItem(item, index)}
+  {#each menuItems as item (item.label)}
+    {#if item.subMenu}
+      {@render nestedMenuItem(item)}
     {:else}
-      {@render nestedMenuItem(item, index)}
+      {@render menuItem(item)}
     {/if}
   {/each}
 </ul>

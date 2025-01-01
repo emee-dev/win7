@@ -23,8 +23,6 @@ type Dimensions = Action<
 type OnContextMenu = MouseEvent & { currentTarget: EventTarget };
 
 class ContextMenuState {
-  // menuItems: MenuProps[] = $state([]);
-
   // Cursor position during right click
   pos = $state({ x: 0, y: 0 });
 
@@ -46,10 +44,6 @@ class ContextMenuState {
   initTrigger() {
     this.context_trigger = true;
   }
-
-  // init(items: MenuProps[]) {
-  //   this.menuItems = items;
-  // }
 
   handleClickOutside() {
     this.showMenu = false;
@@ -77,22 +71,22 @@ class ContextMenuState {
     this.pos.y = browserH - y < h ? y - h : y;
   }
 
-  updateMenuDimensions: Dimensions = (node: HTMLElement) => {
+  handleContextMenu: Dimensions = (node: HTMLElement) => {
     // Update context menu dimensions
     this.menu.h = node.offsetHeight;
     this.menu.w = node.offsetWidth;
 
-    const handleClick = (event: any) => {
+    const handleClickOutside = (event: any) => {
       if (node && !node.contains(event.target) && !event.defaultPrevented) {
         node.dispatchEvent(new CustomEvent("click_outside", node as any));
       }
     };
 
-    document.addEventListener("click", handleClick, true);
+    document.addEventListener("click", handleClickOutside, true);
 
     return {
       destroy() {
-        document.removeEventListener("click", handleClick, true);
+        document.removeEventListener("click", handleClickOutside, true);
       },
     };
   };

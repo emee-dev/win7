@@ -1,77 +1,47 @@
-// let op = ["1", "0", "+", "4", "0", "*", "2"]; // ["12", "+", "4"]
-// let op = ["50", "*", "2", "/", "2"]; // ["12", "+", "4"]
+// /**
+//  * Extracts the path and the last folder or file name with extension.
+//  *
+//  * @param path_like - The full path of the file or folder.
+//  * @returns An object with `path` (directory) and `filename_ext` (file or folder name).
+//  */
+// export const extractPath = (path_like) => {
+//   const regex = /^(.*[\/])([^\/]+)$/;
 
-// Logic
-// 1. Add each operation item to the array
-// 2. After each assignment operation ["+", "-", "/", "*"],
-// calculate res and assign the new value to the array.
+//   const match = path_like.match(regex);
+//   if (!match) {
+//     return null;
+//   }
 
-// Operations
-// ← deletes one char from the number input
-// CE cancels or resets the number input to zero (0)
-// C cancels every operation
-// ± prepends plus or minus to the current chars in the number input
-// √ calculates the square root of the current chars disregarding any previous opertion use: Math.sqrt(2);
-// 1/x divides one using the current number in the number input
+//   const path = match[1];
+//   const filename_ext = match[2];
 
-type ValidOperators = "+" | "/" | "*" | "-";
+//   return { path, filename_ext };
+// };
 
-const evalResult = (str: string): number | "ERROR" => {
-  try {
-    return eval(str);
-  } catch (error) {
-    return "ERROR";
-  }
-};
+function collapseDesktopFolders(dir) {
+  const desktopFolders = dir.filter((path) => /\/Desktop(\/|$)/.test(path));
 
-let op = ["1", "+", "3", "2", "1", "+", "2", "/", "10"]; // ["1", "+", "32"];
-
-const combineNumbers = (
-  op: (string | ValidOperators)[]
-): (string | ValidOperators)[] => {
-  return op.reduce<(string | ValidOperators)[]>((acc, cur) => {
-    const last = acc[acc.length - 1];
-
-    if (!isNaN(Number(cur)) && !isNaN(Number(last))) {
-      // If the current and last elements are numbers, concatenate them
-      acc[acc.length - 1] = String(last) + String(cur);
-    } else {
-      // Otherwise, add the current element to the accumulator
-      acc.push(cur);
+  const collapsedFolders = desktopFolders.reduce((result, path) => {
+    const parent = result.find((p) => path.startsWith(p + "/"));
+    if (!parent) {
+      result.push(path);
     }
-
-    return acc;
+    return result;
   }, []);
-};
 
-const calculation = combineNumbers(op).reduce((acc, curItem, index, arr) => {
-  let operator = curItem as ValidOperators;
+  return collapsedFolders;
+}
 
-  if (operator === "+") {
-    let nextItem = Number(arr[index + 1]);
+const dir = [
+  "C:",
+  "C:/Users",
+  "C:/Users/:root",
+  "C:/Users/:root/Desktop",
+  "C:/Users/:root/Desktop/New folder",
+  "C:/Users/:root/Desktop/Abc",
+  "C:/Users/:root/Desktop/Abc/Opp/SK",
+  "C:/Users/:root/Desktop/Op/Opp/SK",
+];
 
-    return (Number(acc) + nextItem).toString();
-  }
-
-  if (operator === "-") {
-    let nextItem = Number(arr[index + 1]);
-
-    return (Number(acc) - nextItem).toString();
-  }
-
-  if (operator === "/") {
-    let nextItem = Number(arr[index + 1]);
-
-    return (Number(acc) / nextItem).toString();
-  }
-
-  if (operator === "*") {
-    let nextItem = Number(arr[index + 1]);
-
-    return (Number(acc) * nextItem).toString();
-  }
-
-  return acc;
-});
-
-console.log("calculation", calculation);
+const result = collapseDesktopFolders(dir);
+console.log(result);

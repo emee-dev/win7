@@ -1,8 +1,8 @@
 <script lang="ts">
+  import Moveable, { type MoveableRefTargetType } from "moveable";
   import VanillaSelecto from "selecto";
   import { onMount, type Snippet } from "svelte";
   import { NOT_SELECTABLE } from ".";
-  import Moveable, { type MoveableRefTargetType } from "moveable";
 
   let moveableRef: Moveable;
   let selectoRef: VanillaSelecto;
@@ -45,8 +45,7 @@
 
   $effect(() => {
     if (!selectoRef) {
-      console.log("SelectoRef not defined.");
-      return;
+      throw new Error("SelectoRef not defined.");
     }
 
     moveableRef.on("clickGroup", (e) => {
@@ -75,8 +74,8 @@
 
       if (
         isMoveableElement ||
-        // targets.some((t) => t === target || t.contains(target))
-        targets.some((t) => t === target)
+        // @ts-expect-error typeerror contains() is not defined.
+        targets.some((t) => t === target || t.contains(target))
       ) {
         e.stop();
       }
@@ -85,6 +84,7 @@
     selectoRef.on("selectEnd", (e) => {
       if (e.isDragStartEnd) {
         e.inputEvent.preventDefault();
+
         moveableRef!.waitToChangeTarget().then(() => {
           moveableRef!.dragStart(e.inputEvent);
         });
@@ -105,12 +105,7 @@
   });
 </script>
 
-<!-- Selecto area -->
-
-<!-- <div class="w-full h-full not_selectable" bind:this={container}> -->
 {@render children()}
-
-<!-- </div> -->
 
 <style>
   :global(:root) {

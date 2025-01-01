@@ -1,113 +1,133 @@
 <script lang="ts">
-  import Notepad from "@/apps/Notepad/notepad.svelte";
-  import { Win7ContextMenu } from "@/components/ui/context_menu";
+  import { ContextMenu } from "@/components/context_menu_inprogress";
+  import { DesktopWindows, os } from "@/components/desktop";
+  import DesktopIcons from "@/components/desktop/desktop_icons.svelte";
   import { Selecto } from "@/components/selecto";
-  import Window from "@/components/window/window.svelte";
-  import Calculator from "@/apps/Calculator/calculator.svelte";
+  import { Win7ContextMenu } from "@/components/ui/popup_menu";
   import { StartMenu } from "@/components/ui/startmenu";
   import Taskbar from "@/components/ui/taskbar/taskbar.svelte";
-  import type { SvelteHTMLElements } from "svelte/elements";
-  import { initFs, type TaskManagerItem } from "./FileSystem.svelte";
-  import DesktopIcon from "./Icon.svelte";
-  import { menuItems, type InstalledPrograms } from "./utils";
-  import { ContextMenu } from "@/components/context_menu_wrapper";
+  import { onMount } from "svelte";
+  import { menuItems } from "@/components/desktop/utils";
+  import Window from "@/components/window/window.svelte";
+  import Notepad from "@/apps/Notepad/notepad.svelte";
 
   let desktop: HTMLElement;
 
-  type Placement = {
-    column: number;
-    row: number;
-  };
-
-  type SelectoItemProps = {
-    label: string;
-    id: string;
-    props?: SvelteHTMLElements["div"];
-    meta: any;
-    placement?: Placement;
-  };
-
-  const fs = initFs(":root");
+  const fs = os.initFs(":root");
 
   let mouseCoordinates = $state({ x: 0, y: 0 });
 
-  const ICON_SIZE = 70;
-  const MARGIN = 2; // Margin between icons
-  const ICON_STEP = ICON_SIZE + MARGIN;
-
-  let currentRow = $state(0); // Tracks horizontal position (left to right)
-  let currentColumn = $state(0); // Tracks vertical position (top to bottom)
   let isStartMenuOpen = $state(false);
 
-  function placeNextIcon(): Placement {
-    const desktopHeight = desktop.clientHeight;
-
-    // Set the current position for the icon
-    const column = currentColumn;
-    const row = currentRow;
-
-    // Move down to the next row
-    currentColumn += ICON_STEP;
-
-    // If the next row exceeds the desktop height, reset to the top and move to the next column
-    if (currentColumn + ICON_SIZE > desktopHeight) {
-      currentColumn = 0; // Reset to the top
-      currentRow += ICON_STEP; // Move to the next column
-    }
-
-    return { column, row };
-  }
+  onMount(() => {
+    fs.mount({
+      desktop,
+      dir: [
+        "C:",
+        "C:/Users",
+        "C:/Users/:root",
+        "C:/Users/:root/Desktop",
+        "C:/Users/:root/Desktop/New folder",
+      ],
+      files: [
+        {
+          fileName: "MyComputer.exe",
+          programId: "MyComputer",
+          type: "executable",
+          mount_to: "C:/Users/:root/Desktop/MyComputer.exe",
+        },
+        {
+          fileName: "npm.txt",
+          executeBy: "Notepad",
+          type: "file_or_folder",
+          textContent: "the following is my npm private keys.",
+          mimetype: "application/text",
+          mount_to: "C:/Users/:root/Desktop/npm.txt",
+        },
+        {
+          fileName: "exam.txt",
+          executeBy: "Notepad",
+          type: "file_or_folder",
+          textContent: "the following is my npm private keys.",
+          mimetype: "application/text",
+          mount_to: "C:/Users/:root/Desktop/exam.txt",
+        },
+      ],
+    });
+  });
 
   const onMouseMove = (ev: any) => {
     mouseCoordinates.x = ev.clientX;
     mouseCoordinates.y = ev.clientY;
   };
+
+  const Icon = "/img/bg.jpg";
 </script>
 
-{#snippet selectoItems(items: SelectoItemProps[])}
-  {#each items as item (item.id)}
-    <ContextMenu class="">
-      <ContextMenu.Trigger>
-        <DesktopIcon
-          style={`top: ${item.placement?.column}px; left: ${item.placement?.row}px;`}
-          selecto_meta={item}
-        />
-      </ContextMenu.Trigger>
-      <ContextMenu.Content>
-        <Win7ContextMenu menuItems={[{ label: "Icon rename" }]} />
-      </ContextMenu.Content>
-    </ContextMenu>
-  {/each}
-{/snippet}
-
-{#snippet renderCal(task: TaskManagerItem)}
-  <Calculator placement={{ x: 349.333, y: 11.3333 }} {...task} />
-{/snippet}
-
 <Selecto>
-  <ContextMenu class={`w-screen h-screen`}>
-    <ContextMenu.Trigger>
+  <ContextMenu.Root>
+    <ContextMenu.Trigger
+      oncontextmenu={(e) => {
+        // Prevent accidental context menu on elements other than the desktop
+        if (e.target !== desktop) {
+          e.stopPropagation();
+          e.preventDefault();
+
+          return;
+        }
+      }}
+    >
       <main
+        class="desktop relative h-screen scrollbar-hide overflow-hidden select-none"
         bind:this={desktop}
         onmousemove={onMouseMove}
-        class="desktop relative h-screen scrollbar-hide overflow-hidden select-none"
+        style="--icon: url('{Icon}');"
       >
-        {@render selectoItems(fs.getDesktopFiles())}
+        <DesktopIcons />
 
         <div class="flex">
           <button
             class="ml-auto"
             onclick={() => {
-              let { column, row } = placeNextIcon();
+              let { column, row } = fs.placeNextIcon();
 
+              // Create an executable shortcut
+              // fs.createIcon({
+              //   id: crypto.randomUUID(),
+              //   label: "MyComputer.exe",
+              //   programId: "MyComputer",
+              //   type: "executable",
+              //   placement: { column, row },
+              // });
               fs.createIcon({
                 id: crypto.randomUUID(),
-                label: `Icon ${fs.getDesktopFiles().length + 1}.exe`,
+                label: "RecycleBin.exe",
+                programId: "RecycleBin",
+                type: "executable",
                 placement: { column, row },
-                meta: {
-                  selecto: "meta",
-                },
               });
+
+              // let { column: column2, row: row2 } = fs.placeNextIcon();
+
+              // // Create a file shortcut
+              // fs.createIcon({
+              //   id: crypto.randomUUID(),
+              //   label: "npm.txt",
+              //   executeBy: "Notepad",
+              //   type: "file_or_folder",
+              //   placement: { column: column2, row: row2 },
+              // });
+
+              // let { column: column3, row: row3 } = fs.placeNextIcon();
+
+              // // Create a folder shortcut
+              // fs.createIcon({
+              //   id: crypto.randomUUID(),
+              //   label: "New folder",
+              //   type: "file_or_folder",
+              //   executeBy: "File_Manager",
+              //   placement: { column: column3, row: row3 },
+              // });
             }}
           >
             Add new icon
@@ -115,46 +135,55 @@
           <button
             onclick={() => {
               fs.launchTask({
+                id: crypto.randomUUID(),
                 label: "Calculator",
                 taskStatus: "running",
                 windowStatus: "inview",
                 pinnedToTaskbar: false,
                 programId: "Calculator",
-                windowId: crypto.randomUUID(),
               });
             }}
             >Start Calculator
           </button>
+          <button
+            onclick={() => {
+              fs.launchTask({
+                id: crypto.randomUUID(),
+                label: "Notepad",
+                taskStatus: "running",
+                windowStatus: "inview",
+                pinnedToTaskbar: false,
+                programId: "Notepad",
+              });
+            }}
+            >Start Notepad
+          </button>
+          <button
+            onclick={() => {
+              // console.log("Folders", fs.getFolder("C:/Users/:root/Desktop"));
+              console.log("Folders", fs.getFolder("C:/Users/:root/Desktop"));
+            }}
+            >Log fs
+          </button>
         </div>
 
-        {#each fs.getTasks() as instance (instance.windowId)}
-          <!-- TODO provide a proper taskId for id-ing installed programs -->
-          {@const programId = instance.programId as InstalledPrograms}
+        <DesktopWindows />
 
-          {#if programId === "Calculator"}
-            {@render renderCal(instance)}
-          {:else if programId === "Notepad"}
-            <Window title="*Untitled - Notepad" showBarMenu>
-              <Notepad />
-            </Window>
-          {/if}
-        {/each}
+        <!-- <Notepad {...fs.getTasks?.()[0]} /> -->
 
-        <!-- Startmenu -->
         <StartMenu bind:isStartMenuOpen />
-
         <Taskbar bind:isStartMenuOpen />
       </main>
     </ContextMenu.Trigger>
-    <ContextMenu.Content>
+    <ContextMenu.Content class="z-50 w-full max-w-[229px] outline-none">
       <Win7ContextMenu {menuItems} />
     </ContextMenu.Content>
-  </ContextMenu>
+  </ContextMenu.Root>
 </Selecto>
 
 <style>
   .desktop {
-    background-image: url("/bg.jpg");
+    background-image: var(--icon);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;

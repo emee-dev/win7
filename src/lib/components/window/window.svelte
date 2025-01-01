@@ -4,7 +4,7 @@
   import screenfull from "screenfull";
   import type { WindowProps } from ".";
   import { Win7BarMenu } from "@/components/ui/bar_menu";
-  import { type MenuProps } from "@/components/context_menu_wrapper";
+  import { type MenuProps } from "@/components/context_menu";
 
   const { children, title, showBarMenu = true }: WindowProps = $props();
 
@@ -177,7 +177,6 @@
 </script>
 
 <!-- <svelte:window on:drag={dragMoveListener} /> -->
-
 {#snippet resizeHandles()}
   <div class="top-resize-handle w-full h-1 absolute top-0 z-30"></div>
   <div class="left-resize-handle w-1 h-full absolute left-0 z-30"></div>
@@ -196,7 +195,7 @@
     class="window glass active relative"
     style="
       max-width: 100%; 
-      height: 100%; /* Ensure the window takes full height */
+      height: 100%;  
       display: flex; 
       flex-direction: column; 
       --window-background-color: #805ba5;"

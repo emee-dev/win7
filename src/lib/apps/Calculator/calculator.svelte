@@ -2,10 +2,10 @@
   import {
     getFs,
     type TaskManagerItem,
-  } from "../../../routes/win7/FileSystem.svelte";
-  import { getProgramIcon } from "../../../routes/win7/utils";
+  } from "@/components/desktop/file_system.svelte";
   import { combineNumbers, type ValidOperators } from "./utils";
-  import Window from "./window.svelte";
+  import { Window } from "@/components/window_inprogress";
+  import { getIconByProgramId } from "@/components/desktop/utils";
 
   type CalculatorProps = {
     placement?: {
@@ -22,11 +22,10 @@
 
   const fs = getFs();
   const validOperators: ValidOperators[] = ["*", "+", "-", "/"];
-  // const icon = "/img/calculator.webp";
 
   let {
     label,
-    windowId,
+    id: windowId,
     programId,
     placement = $bindable({ x: 0, y: 0 }),
   }: CalculatorProps = $props();
@@ -135,112 +134,121 @@
 <!-- credits: https://codepen.io/dahis39/pen/jaJQeq -->
 
 <Window
-  {onclose}
   {windowId}
-  {onminimize}
   bind:placement
-  title={label}
   showBarMenu={false}
-  icon={getProgramIcon(programId)}
+  style="width: 270px; height: 330px;"
+  interactjs={{
+    min: { width: 270, height: 330 },
+    max: { width: 270, height: 330 },
+  }}
+  disableResize
 >
-  <main class="flex flex-col">
-    <div class="display">
-      <input
-        class="w-full border-none"
-        type="text"
-        disabled
-        value={displaySteps}
-      />
-      <input
-        class="w-full border-none text-right font-mono"
-        type="text"
-        disabled
-        maxlength="20"
-        value={calculation}
-      />
-    </div>
+  <Window.Head title={label} icon={getIconByProgramId(programId)}>
+    <Window.MinimizeBtn {onminimize} />
+    <Window.CloseBtn {onclose} />
+  </Window.Head>
 
-    <table class="btns flex-1">
-      <tbody class="">
-        <tr>
-          <td
-            class="btn"
-            onclick={() => {
-              operation = operation.slice(0, -1);
-            }}><span>←</span></td
-          >
-          <td class="btn" onclick={() => {}}><span>CE</span></td>
-          <td
-            class="btn"
-            onclick={() => {
-              operation = [""];
-            }}><span>C</span></td
-          >
-          <td
-            class="btn"
-            onclick={() => {
-              let lastItem = operation.at(-1);
+  <Window.Content>
+    <main class="flex flex-col">
+      <div class="display">
+        <input
+          class="w-full border-none"
+          type="text"
+          disabled
+          value={displaySteps}
+        />
+        <input
+          class="w-full border-none text-right font-mono"
+          type="text"
+          disabled
+          maxlength="20"
+          value={calculation}
+        />
+      </div>
 
-              if (!lastItem) {
-                return;
-              }
+      <table class="btns flex-1">
+        <tbody class="">
+          <tr>
+            <td
+              class="btn"
+              onclick={() => {
+                operation = operation.slice(0, -1);
+              }}><span>←</span></td
+            >
+            <td class="btn" onclick={() => {}}><span>CE</span></td>
+            <td
+              class="btn"
+              onclick={() => {
+                operation = [""];
+              }}><span>C</span></td
+            >
+            <td
+              class="btn"
+              onclick={() => {
+                let lastItem = operation.at(-1);
 
-              // toggleNegative(lastItem)
-            }}><span>±</span></td
-          >
-          <td class="btn font-segoePro" onclick={() => {}}><span>√</span></td>
-        </tr>
-        <tr>
-          <td class="btn btn-bright" onclick={handleNumber as any}
-            ><span>7</span></td
-          >
-          <td class="btn btn-bright" onclick={handleNumber as any}
-            ><span>8</span></td
-          >
-          <td class="btn btn-bright" onclick={handleNumber as any}
-            ><span>9</span></td
-          >
-          <td class="btn" onclick={handleOperator as any}><span>/</span></td>
-          <td class="btn"><span>%</span></td>
-        </tr>
-        <tr>
-          <td class="btn btn-bright" onclick={handleNumber as any}
-            ><span>4</span></td
-          >
-          <td class="btn btn-bright" onclick={handleNumber as any}
-            ><span>5</span></td
-          >
-          <td class="btn btn-bright" onclick={handleNumber as any}
-            ><span>6</span></td
-          >
-          <td class="btn" onclick={handleOperator as any}><span>*</span></td>
-          <td class="btn"><span>1/x</span></td>
-        </tr>
-        <tr>
-          <td class="btn btn-bright" onclick={handleNumber as any}
-            ><span>1</span></td
-          >
-          <td class="btn btn-bright" onclick={handleNumber as any}
-            ><span>2</span></td
-          >
-          <td class="btn btn-bright" onclick={handleNumber as any}
-            ><span>3</span></td
-          >
-          <td class="btn" onclick={handleOperator as any}><span>-</span></td>
-          <td class="btn text-3xl" rowspan="2"
-            ><span class="font-bold">=</span></td
-          >
-        </tr>
-        <tr>
-          <td class="btn btn-bright" colspan="2" onclick={handleNumber as any}
-            ><span class="">0</span></td
-          >
-          <td class="btn btn-bright"><span>.</span></td>
-          <td class="btn" onclick={handleOperator as any}><span>+</span></td>
-        </tr>
-      </tbody>
-    </table>
-  </main>
+                if (!lastItem) {
+                  return;
+                }
+
+                // toggleNegative(lastItem)
+              }}><span>±</span></td
+            >
+            <td class="btn font-segoePro" onclick={() => {}}><span>√</span></td>
+          </tr>
+          <tr>
+            <td class="btn btn-bright" onclick={handleNumber as any}
+              ><span>7</span></td
+            >
+            <td class="btn btn-bright" onclick={handleNumber as any}
+              ><span>8</span></td
+            >
+            <td class="btn btn-bright" onclick={handleNumber as any}
+              ><span>9</span></td
+            >
+            <td class="btn" onclick={handleOperator as any}><span>/</span></td>
+            <td class="btn"><span>%</span></td>
+          </tr>
+          <tr>
+            <td class="btn btn-bright" onclick={handleNumber as any}
+              ><span>4</span></td
+            >
+            <td class="btn btn-bright" onclick={handleNumber as any}
+              ><span>5</span></td
+            >
+            <td class="btn btn-bright" onclick={handleNumber as any}
+              ><span>6</span></td
+            >
+            <td class="btn" onclick={handleOperator as any}><span>*</span></td>
+            <td class="btn"><span>1/x</span></td>
+          </tr>
+          <tr>
+            <td class="btn btn-bright" onclick={handleNumber as any}
+              ><span>1</span></td
+            >
+            <td class="btn btn-bright" onclick={handleNumber as any}
+              ><span>2</span></td
+            >
+            <td class="btn btn-bright" onclick={handleNumber as any}
+              ><span>3</span></td
+            >
+            <td class="btn" onclick={handleOperator as any}><span>-</span></td>
+            <td class="btn text-3xl" rowspan="2"
+              ><span class="font-bold">=</span></td
+            >
+          </tr>
+          <tr>
+            <td class="btn btn-bright" colspan="2" onclick={handleNumber as any}
+              ><span class="">0</span></td
+            >
+            <td class="btn btn-bright"><span>.</span></td>
+            <td class="btn" onclick={handleOperator as any}><span>+</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </main>
+  </Window.Content>
 </Window>
 
 <style>
@@ -306,10 +314,6 @@
 
   .btns {
     font-size: 16px;
-    /* visibility: inherit; */
-    /* font-family:
-      Segoe UI,
-      sans-serif; */
     font-weight: 900;
     width: 100%;
     border-spacing: 5px;

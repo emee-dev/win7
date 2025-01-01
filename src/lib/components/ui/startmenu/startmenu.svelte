@@ -9,7 +9,7 @@
   let rightCaret = `\\23F5`;
 
   function handleClickOutside(event: any) {
-    // isHidden = true;
+    isStartMenuOpen = false;
   }
 
   type OutsideClick = Action<
@@ -49,6 +49,9 @@
   </div>
 {/snippet}
 
+<!-- oncontextmenu={(ev) => {
+  ev.preventDefault();
+}} -->
 <div
   use:clicks
   onclick_outside={handleClickOutside}
@@ -137,17 +140,9 @@
       Segoe UI,
       sans-serif;
     --window-color: rgba(170, 209, 251, 0.65);
-    --window-color-inactive: rgba(170, 209, 251, 0.3);
-    --tw-shadow: 0 0 transparent;
-    --tw-ring-offset-width: 0px;
-    --tw-ring-offset-color: #fff;
-    --tw-ring-color: rgba(59, 130, 246, 0.5);
-    --tw-ring-offset-shadow: 0 0 transparent;
-    --tw-ring-shadow: 0 0 transparent;
     user-select: none;
     --tw-ring-inset: var(--tw-empty,);
     z-index: 99;
-    /* cursor: none !important; */
     position: absolute;
     bottom: 40px;
     display: flex;
@@ -193,7 +188,6 @@
   }
 
   .program {
-    /* Modified part remove after if it does not work */
     box-sizing: border-box;
     width: 100%;
     position: relative;
@@ -226,7 +220,6 @@
   }
 
   .program.featured {
-    /* height: 10.5%; */
     height: 12.5%;
     background: var(--icon) no-repeat 3px/28px;
     padding-left: 45px;
@@ -246,55 +239,18 @@
       linear-gradient(180deg, #ddecfd, #c2dcfd) no-repeat 0;
   }
 
-  /* Btn */
-  /* .btn {
-      background: var(--button-gradient);
-      border: var(--button-border);
-      border-color: var(--button-border-color);
-      border-radius: var(--border-radius);
-      box-shadow: var(--button-shadow);
-      user-select: none;
-      box-sizing: border-box;
-      color: #222;
-      font: var(--font);
-      min-height: 23px;
-      min-width: 75px;
-      padding: 0 12px;
-      text-transform: none;
-      position: relative;
-      text-align: center;
-      z-index: 0;
-    }
-  
-    .btn:not(:disabled):not(:hover) {
-      border-color: var(--button-border-color);
-      transition: border-color 1s linear;
-    }
-  
-    .btn:not(:disabled):hover {
-      border-color: var(--button-border-color-hovered);
-      transition: border-color 0.3s;
-    }
-  
-    .btn,
-    [role="button"] {
-      cursor: pointer;
-    } */
-
   #start-menu .extra {
     position: absolute;
-    /* bottom: 40px; */
     bottom: 0px;
     display: flex;
     flex-direction: column;
-    /* height: 411px; */
-    font-size: 9pt;
+    justify-items: center;
+    font-size: 12px;
   }
 
   .extra .programs-nav {
     user-select: none;
     display: flex;
-    /* -webkit-box-align: center; */
     align-items: center;
     position: relative;
     margin: -2px 3px 3px 3px;
@@ -374,45 +330,18 @@
   }
 
   .account .img {
-    /* border: 1px solid #555; */
     border-radius: 3px;
-    margin: auto; /* Ensure parent container context supports this */
-    /* box-shadow: 0 0 0 1px hsla(0, 0%, 100%, 0.33); */
+    margin: auto;
     align-self: center;
     filter: contrast(0.7);
   }
 
-  /* .links .link {
-      padding: 3px 5px;
-      margin: 2px 0;
-      border-radius: 3px;
-      border: 1px solid transparent;
-      -webkit-transition: all 0.15s;
-      transition: all 0.15s;
-      -webkit-box-flex: 1;
-      -ms-flex: 1;
-      flex: 1;
-      position: relative;
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: flex;
-      -webkit-box-orient: vertical;
-      -webkit-box-direction: normal;
-      -ms-flex-direction: column;
-      flex-direction: column;
-      -webkit-box-pack: center;
-      -ms-flex-pack: center;
-      justify-content: center;
-      -webkit-box-sizing: border-box;
-      box-sizing: border-box;
-    } */
-
   /* Supposed to happen on hover of link */
   .links .link {
-    -webkit-box-orient: vertical;
+    /* -webkit-box-orient: vertical;
     -webkit-box-direction: normal;
     -webkit-box-pack: center;
-    -webkit-box-flex: 1;
+    -webkit-box-flex: 1; */
     font-size: 9pt;
     color: #fff;
     user-select: none;

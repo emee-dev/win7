@@ -18,7 +18,7 @@
   <nav
     class={cn("w-fit h-fit", NOT_SELECTABLE, className)}
     {...rest}
-    use:context.updateMenuDimensions
+    use:context.handleContextMenu
     onclick_outside={() => context.handleClickOutside()}
     style="position: absolute; top:{context.pos.y}px; left:{context.pos
       .x}px; z-index: {CONTEXT_ZINDEX}"

@@ -3,12 +3,11 @@
 
 <script lang="ts">
   import { onMount } from "svelte";
-  import { handleBattery, type CustomNavigator } from "./utils";
   import {
     getFs,
     type TaskManagerItem,
-  } from "../../../../routes/win7/FileSystem.svelte";
-  import { getProgramIcon } from "../../../../routes/win7/utils";
+  } from "@/components/desktop/file_system.svelte";
+  import { getIconByProgramId } from "@/components/desktop/utils";
 
   const fs = getFs();
 
@@ -39,13 +38,9 @@
 
 {#snippet taskBarItem(window: TaskManagerItem)}
   <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-  <!-- style="--icon: url('/img/calculator.webp');" -->
-
   <div
     class={`taskbar-item group relative ${window.windowStatus === "inview" && "opened"}`}
-    data-target="computer"
-    style={`--icon: url('${getProgramIcon(window.programId)}');`}
-    data-icon="computer"
+    style={`--icon: url('${getIconByProgramId(window.programId)}');`}
     onclick={() => toggleWindowView(window.windowId, window.windowStatus)}
   >
     <div
@@ -71,7 +66,7 @@
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 <div id="taskbar" class="">
   <div id="start-button" class="mr-6 ml-5" onclick={toggleStartMenu}>
-    <span data-icon="start-button" class="icon"></span>
+    <span class="icon"></span>
   </div>
 
   <div id="taskbar-items">
@@ -227,7 +222,7 @@
   }
 
   #taskbar-items {
-    --window-color: rgba(170, 209, 251, 0.65);
+    /* --window-color: rgba(170, 209, 251, 0.65);
     --window-color-inactive: rgba(170, 209, 251, 0.3);
     --bg: url("https://win7simu.visnalize.com/img/default.deccec52.webp");
     --tw-shadow: 0 0 transparent;
@@ -235,8 +230,7 @@
     --tw-ring-offset-color: #fff;
     --tw-ring-color: rgba(59, 130, 246, 0.5);
     --tw-ring-offset-shadow: 0 0 transparent;
-    --tw-ring-shadow: 0 0 transparent;
-    --tw-ring-inset: var(--tw-empty, /*!*/ /*!*/);
+    --tw-ring-shadow: 0 0 transparent;  */
     font-size: 16px;
     visibility: inherit;
     font-family:
@@ -467,8 +461,4 @@
   .show-desktop:hover {
     background-color: hsla(0, 0%, 100%, 0.2);
   }
-
-  /* .preview {
-    background-color: red;
-  } */
 </style>
