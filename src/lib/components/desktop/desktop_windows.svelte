@@ -3,6 +3,7 @@
   import Notepad2 from "@/apps/Notepad/notepad.svelte";
   import { getFs, type TaskManagerItem } from "./file_system.svelte";
   import { type InstalledPrograms } from "./utils";
+  import FileExplorer from "@/apps/File_Explorer/file_explorer.svelte";
 
   const fs = getFs();
 </script>
@@ -16,6 +17,10 @@
   <Notepad2 {...task} />
 {/snippet}
 
+{#snippet renderFileExplorer(task: TaskManagerItem)}
+  <FileExplorer {...task} />
+{/snippet}
+
 {#each fs.getTasks() as window (window.id)}
   {@const programId = window.programId as InstalledPrograms}
 
@@ -23,5 +28,7 @@
     {@render renderCalculator(window)}
   {:else if programId === "Notepad"}
     {@render renderNotepad(window)}
+  {:else if programId === "File_Explorer"}
+    {@render renderFileExplorer(window)}
   {/if}
 {/each}

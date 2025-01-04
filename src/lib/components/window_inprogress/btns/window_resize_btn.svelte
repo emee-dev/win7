@@ -1,8 +1,8 @@
 <script lang="ts">
   import { cn } from "@/utils";
   import screenfull from "screenfull";
-  import type { ResizeBtnProps } from ".";
-  import { getWindowContext } from "./ctx.svelte";
+  import type { ResizeBtnProps } from "..";
+  import { getWindowContext } from "../ctx.svelte";
 
   const ctx = getWindowContext();
 

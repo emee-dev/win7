@@ -11,6 +11,9 @@ importers:
       7.css:
         specifier: ^0.17.0
         version: 0.17.0
+      '@fortawesome/fontawesome-free':
+        specifier: ^6.7.2
+        version: 6.7.2
       '@tailwindcss/typography':
         specifier: ^0.5.15
         version: 0.5.15(tailwindcss@3.4.16(ts-node@10.9.2(@types/node@22.10.2)(typescript@5.7.2)))
@@ -41,6 +44,9 @@ importers:
       selecto:
         specifier: ^1.26.3
         version: 1.26.3
+      svelte-awesome:
+        specifier: ^3.3.5
+        version: 3.3.5(svelte@5.8.0)
       tsx:
         specifier: ^4.19.2
         version: 4.19.2
@@ -627,6 +633,10 @@ packages:
 
   '@floating-ui/utils@0.2.8':
     resolution: {integrity: sha512-kym7SodPp8/wloecOpcmSnWJsK7M0E5Wg8UcFA+uO4B9s5d0ywXOEro/8HM9x0rW+TljRzul/14UYz3TleT3ig==}
+
+  '@fortawesome/fontawesome-free@6.7.2':
+    resolution: {integrity: sha512-JUOtgFW6k9u4Y+xeIaEiLr3+cjoUPiAuLXoyKOJSia6Duzb7pq+A76P9ZdPDoAoxHdHzq6gE9/jKBGXlZT8FbA==}
+    engines: {node: '>=6'}
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -1904,6 +1914,11 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
 
+  svelte-awesome@3.3.5:
+    resolution: {integrity: sha512-RIi+OI6CEn+fTdYy7UOgImEUWvdQSwP9SiMC44UKyFO+8+gjj+NgTG67hI8j2rTHQVvCP820Uj+4UoZG8CCUfA==}
+    peerDependencies:
+      svelte: '>= 3.43.1 < 6'
+
   svelte-check@4.1.1:
     resolution: {integrity: sha512-NfaX+6Qtc8W/CyVGS/F7/XdiSSyXz+WGYA9ZWV3z8tso14V2vzjfXviKaTFEzB7g8TqfgO2FOzP6XT4ApSTUTw==}
     engines: {node: '>= 18.0.0'}
@@ -2505,6 +2520,8 @@ snapshots:
       '@floating-ui/utils': 0.2.8
 
   '@floating-ui/utils@0.2.8': {}
+
+  '@fortawesome/fontawesome-free@6.7.2': {}
 
   '@humanfs/core@0.19.1': {}
 
@@ -3851,6 +3868,10 @@ snapshots:
       has-flag: 4.0.0
 
   supports-preserve-symlinks-flag@1.0.0: {}
+
+  svelte-awesome@3.3.5(svelte@5.8.0):
+    dependencies:
+      svelte: 5.8.0
 
   svelte-check@4.1.1(svelte@5.8.0)(typescript@5.7.2):
     dependencies:

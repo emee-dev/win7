@@ -1,7 +1,7 @@
 <script lang="ts">
   import { cn } from "@/utils";
-  import type { CloseBtnProps } from ".";
-  import { getWindowContext } from "./ctx.svelte";
+  import type { CloseBtnProps } from "..";
+  import { getWindowContext } from "../ctx.svelte";
 
   const ctx = getWindowContext();
 

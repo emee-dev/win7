@@ -39,6 +39,7 @@
 	},
 	"dependencies": {
 		"7.css": "^0.17.0",
+		"@fortawesome/fontawesome-free": "^6.7.2",
 		"@tailwindcss/typography": "^0.5.15",
 		"@thisux/sveltednd": "^0.0.16",
 		"buffer": "^6.0.3",
@@ -49,6 +50,7 @@
 		"process": "^0.11.10",
 		"screenfull": "^6.0.2",
 		"selecto": "^1.26.3",
+		"svelte-awesome": "^3.3.5",
 		"tsx": "^4.19.2"
 	}
 }

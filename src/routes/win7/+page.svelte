@@ -2,14 +2,12 @@
   import { ContextMenu } from "@/components/context_menu_inprogress";
   import { DesktopWindows, os } from "@/components/desktop";
   import DesktopIcons from "@/components/desktop/desktop_icons.svelte";
+  import { menuItems } from "@/components/desktop/utils";
   import { Selecto } from "@/components/selecto";
   import { Win7ContextMenu } from "@/components/ui/popup_menu";
   import { StartMenu } from "@/components/ui/startmenu";
   import Taskbar from "@/components/ui/taskbar/taskbar.svelte";
   import { onMount } from "svelte";
-  import { menuItems } from "@/components/desktop/utils";
-  import Window from "@/components/window/window.svelte";
-  import Notepad from "@/apps/Notepad/notepad.svelte";
 
   let desktop: HTMLElement;
 
@@ -18,6 +16,35 @@
   let mouseCoordinates = $state({ x: 0, y: 0 });
 
   let isStartMenuOpen = $state(false);
+
+  // const windows7Folders = [
+  //   "C:\\Users\\[Username]\\Desktop",
+  //   "C:\\Users\\[Username]\\Documents",
+  //   "C:\\Users\\[Username]\\Downloads",
+  //   "C:\\Users\\[Username]\\Pictures",
+  //   "C:\\Users\\[Username]\\Music",
+  //   "C:\\Users\\[Username]\\Videos",
+  //   "C:\\Users\\[Username]",
+  //   "C:\\Users\\Public",
+  //   "C:\\Program Files",
+  //   "C:\\Program Files (x86)", // For 64-bit systems
+  //   "C:\\Windows",
+  //   "C:\\Users\\[Username]\\Favorites",
+  //   "C:\\Users\\[Username]\\AppData", // Hidden system folder
+  //   "C:\\Users\\[Username]\\AppData\\Local",
+  //   "C:\\Users\\[Username]\\AppData\\Roaming",
+  //   "C:\\Users\\[Username]\\AppData\\LocalLow",
+  //   "C:\\Users\\[Username]\\Links", // Shortcuts like 'My Documents'
+  //   "C:\\Users\\[Username]\\Saved Games",
+  //   "C:\\Users\\[Username]\\Searches",
+  //   "C:\\Recycle Bin",
+  //   "C:\\Network",
+  //   "C:\\Control Panel",
+  //   "C:\\Libraries\\Documents",
+  //   "C:\\Libraries\\Music",
+  //   "C:\\Libraries\\Pictures",
+  //   "C:\\Libraries\\Videos",
+  // ];
 
   onMount(() => {
     fs.mount({
@@ -28,6 +55,7 @@
         "C:/Users/:root",
         "C:/Users/:root/Desktop",
         "C:/Users/:root/Desktop/New folder",
+        "C:/Users/:root/Documents",
       ],
       files: [
         {
@@ -89,6 +117,21 @@
           <button
             class="ml-auto"
             onclick={() => {
+              fs.launchTask({
+                id: crypto.randomUUID(),
+                label: "File_Explorer",
+                taskStatus: "running",
+                windowStatus: "inview",
+                pinnedToTaskbar: false,
+                programId: "File_Explorer",
+              });
+            }}
+          >
+            Start File_Explorer
+          </button>
+          <!-- <button
+            class="ml-auto"
+            onclick={() => {
               let { column, row } = fs.placeNextIcon();
 
               // Create an executable shortcut
@@ -131,7 +174,7 @@
             }}
           >
             Add new icon
-          </button>
+          </button> -->
           <button
             onclick={() => {
               fs.launchTask({
@@ -158,12 +201,19 @@
             }}
             >Start Notepad
           </button>
-          <button
+          <!-- <button
             onclick={() => {
               // console.log("Folders", fs.getFolder("C:/Users/:root/Desktop"));
               console.log("Folders", fs.getFolder("C:/Users/:root/Desktop"));
             }}
             >Log fs
+          </button> -->
+          <button
+            onclick={() => {
+              // console.log("Folders", fs.getFolder("C:/Users/:root/Desktop"));
+              fs.serializeFs();
+            }}
+            >Serialize FS
           </button>
         </div>
 

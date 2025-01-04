@@ -1,6 +1,6 @@
 <script lang="ts">
   import { cn } from "@/utils";
-  import type { MinimizeBtnProps } from ".";
+  import type { MinimizeBtnProps } from "..";
 
   let { onminimize, class: className }: MinimizeBtnProps = $props();
 

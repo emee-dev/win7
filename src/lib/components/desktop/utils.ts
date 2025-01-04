@@ -57,7 +57,7 @@ export type NonVariantPrograms =
   | "Calculator"
   | "Notepad"
   | "MyComputer"
-  | "File_Manager";
+  | "File_Explorer";
 
 export type InstalledPrograms = VariantPrograms | NonVariantPrograms;
 
@@ -69,7 +69,7 @@ export const getIconByProgramId = (program: InstalledPrograms) => {
     MyComputer: "/img/mycomputer.webp",
     Notepad: "/img/notepad.webp",
     RecycleBin: "/img/recycle_empty.png",
-    File_Manager: "/img/recycle_empty.png",
+    File_Explorer: "/img/file_explorer.webp",
     // RecycleBinFilled: "/img/recycle_filled.png",
   } as Record<InstalledPrograms, string>;
 

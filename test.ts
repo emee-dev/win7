@@ -1,47 +1,76 @@
-// /**
-//  * Extracts the path and the last folder or file name with extension.
-//  *
-//  * @param path_like - The full path of the file or folder.
-//  * @returns An object with `path` (directory) and `filename_ext` (file or folder name).
-//  */
-// export const extractPath = (path_like) => {
-//   const regex = /^(.*[\/])([^\/]+)$/;
+class UndoRedo {
+  //   private operations = $state<string[]>([]);
+  //   private currentValue = $state<string | null>(null);
+  private operations: string[] = [];
+  private currentValue: string | null = null;
 
-//   const match = path_like.match(regex);
-//   if (!match) {
-//     return null;
-//   }
+  peek() {
+    return this.currentValue;
+  }
 
-//   const path = match[1];
-//   const filename_ext = match[2];
+  append(args: string) {
+    // Make sure currentValue is always at the end of operations array
+    // To avoid confusing undo redo(s)
 
-//   return { path, filename_ext };
-// };
+    let currentItemIndex = this.operations.indexOf(this.currentValue as string);
 
-function collapseDesktopFolders(dir) {
-  const desktopFolders = dir.filter((path) => /\/Desktop(\/|$)/.test(path));
+    // If current item is not the last item and it exists in the operations array
+    if (
+      this.operations.at(-1) !== this.currentValue &&
+      currentItemIndex !== -1
+    ) {
+      let updateItems = this.operations.slice(0, currentItemIndex);
+      updateItems.push(args);
 
-  const collapsedFolders = desktopFolders.reduce((result, path) => {
-    const parent = result.find((p) => path.startsWith(p + "/"));
-    if (!parent) {
-      result.push(path);
+      this.operations = updateItems;
+      this.currentValue = args;
+
+      return;
     }
-    return result;
-  }, []);
 
-  return collapsedFolders;
+    this.operations.push(args);
+    this.currentValue = args;
+  }
+
+  forward() {
+    let itemIndex = this.operations.indexOf(this.currentValue as string);
+
+    let nextValue = this.operations?.at(itemIndex + 1);
+
+    // Update current value
+    this.currentValue = nextValue as string;
+  }
+
+  rewind() {
+    let itemIndex = this.operations.indexOf(this.currentValue as string);
+
+    if (!itemIndex || itemIndex === -1) {
+      return;
+    }
+
+    let previousValue = this.operations.at(itemIndex - 1);
+
+    // Update current value
+    this.currentValue = previousValue as string;
+  }
+
+  // TODO check if currentItem is at start -> [0....] of operations array
+  isRewindPossible() {}
+
+  // TODO check if currentItem is at end of operations array
+  isForwardPossible() {}
 }
 
-const dir = [
-  "C:",
-  "C:/Users",
-  "C:/Users/:root",
-  "C:/Users/:root/Desktop",
-  "C:/Users/:root/Desktop/New folder",
-  "C:/Users/:root/Desktop/Abc",
-  "C:/Users/:root/Desktop/Abc/Opp/SK",
-  "C:/Users/:root/Desktop/Op/Opp/SK",
-];
+const ac = new UndoRedo();
 
-const result = collapseDesktopFolders(dir);
-console.log(result);
+ac.append("/C:");
+console.log("Normal 1: ", ac.peek());
+
+ac.append("/Users");
+console.log("Normal 2: ", ac.peek());
+
+ac.rewind();
+console.log("Exp '/C:':- ", ac.peek());
+
+ac.forward();
+console.log("Exp '/Users:':- ", ac.peek());

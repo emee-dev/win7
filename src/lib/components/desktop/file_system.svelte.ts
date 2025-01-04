@@ -1,19 +1,17 @@
-import { getContext, setContext, untrack } from "svelte";
-import type { SvelteHTMLElements } from "svelte/elements";
+import { getContext, setContext } from "svelte";
 import {
   extractPath,
   getDesktopIcon,
   isFolderOnDesktop,
-  // getProgramIcon,
   isMountedToDesktop,
   type InstalledPrograms,
 } from "./utils";
-import { DesktopIcons } from ".";
 
 class Item {
   public name: string;
+  public full_path?: string;
 
-  constructor(name: string) {
+  constructor(name: string, full_path?: string) {
     if (new.target === Item) {
       throw new Error(
         "Item is an abstract class and cannot be instantiated directly."
@@ -23,6 +21,7 @@ class Item {
       throw new Error("Invalid name provided.");
     }
     this.name = name;
+    this.full_path = full_path;
   }
 }
 
@@ -37,9 +36,10 @@ class FileItem extends Item {
   constructor(
     name: string,
     mimetype: string,
-    content: string | Executable | null = null
+    content: string | Executable | null = null,
+    full_path?: string
   ) {
-    super(name);
+    super(name, full_path);
     if (!/\.\w+$/.test(name)) {
       throw new Error(
         `Invalid file name '${name}'. A valid file extension is required.`
@@ -53,8 +53,8 @@ class FileItem extends Item {
 class Directory extends Item {
   public children: Map<string, Directory | FileItem>;
 
-  constructor(name: string) {
-    super(name);
+  constructor(name: string, full_path?: string) {
+    super(name, full_path);
     this.children = new Map();
   }
 
@@ -63,7 +63,6 @@ class Directory extends Item {
   }
 
   private validatePath(path: string): void {
-    // if (this.isFilePath(path)) {
     if (Directory.isFilePath(path)) {
       throw new Error(
         `Invalid path '${path}'. Paths must not contain file extensions.`
@@ -80,12 +79,14 @@ class Directory extends Item {
       if (!nextItem) {
         return null;
       }
+
       if (nextItem instanceof Directory) {
         currentDir = nextItem;
       } else {
         return nextItem;
       }
     }
+
     return currentDir;
   }
 
@@ -97,7 +98,8 @@ class Directory extends Item {
 
     for (const part of parts) {
       if (!currentDir.children.has(part)) {
-        currentDir.children.set(part, new Directory(part));
+        // currentDir.children.set(part, new Directory(part, parts.join("")));
+        currentDir.children.set(part, new Directory(part, path));
       }
 
       const nextItem = currentDir.children.get(part);
@@ -179,7 +181,7 @@ class Directory extends Item {
 
     currentDir.children.set(
       fileName,
-      new FileItem(fileName, mimetype, textContent)
+      new FileItem(fileName, mimetype, textContent, path)
     );
   }
 
@@ -234,6 +236,16 @@ class Directory extends Item {
       throw new Error(`Path '${pathLike}' does not point to a file.`);
     }
     return file;
+  }
+
+  readRaw(pathLike: string) {
+    const dir = this.traversePath(pathLike) as Directory | null;
+
+    if (!dir) {
+      return null;
+    }
+
+    return Array.from(dir.children.values());
   }
 
   readDir(pathLike: string): string[] | null {
@@ -337,16 +349,19 @@ class Win7FileSystem {
   private desktopFiles = $state<(DesktopExecutable | DesktopFileOrFolder)[]>(
     []
   );
-  private taskManager = $state<TaskManagerItem[]>([]);
+  private taskManager = $state<TaskManagerItem[]>([
+    {
+      id: crypto.randomUUID(),
+      label: "File_Explorer",
+      taskStatus: "running",
+      windowStatus: "inview",
+      pinnedToTaskbar: false,
+      programId: "File_Explorer",
+    },
+  ]);
 
   constructor(su: string) {
     const root = new Directory(su);
-
-    // root.insertPath("C:");
-    // root.insertPath("C:/Users");
-    // root.insertPath(`C:/Users/${su}`);
-    // root.insertPath(`C:/Users/${su}/Desktop`);
-    // root.insertPath(`C:/Users/${su}/Desktop/New folder`);
 
     this.fs = root;
     this.SU = su;
@@ -356,6 +371,12 @@ class Win7FileSystem {
     return this.fs;
   }
 
+  /**
+   *
+   * @param args
+   * @returns
+   * Mounts directories and files to the file system.
+   */
   mount(args: {
     desktop: HTMLElement;
     dir: string[];
@@ -547,13 +568,32 @@ class Win7FileSystem {
   terminateTask(taskId: string) {
     let modified = this.taskManager.filter((item) => item.id !== taskId);
 
-    console.log("modified", modified);
-
     this.taskManager = modified;
+  }
+
+  // Serialize fs to string
+  public serializeFs() {
+    // let rootNode = this.fs?.children;
+
+    // for (let [key, dir] of rootNode?.entries()!) {
+    //   if (dir instanceof Directory) {
+    //     // console.log("sub folder", dir.children.entries().next().value);
+    //     console.log("parent folder", rootNode?.entries());
+    //     console.log("sub folder", dir.children.entries());
+    //   }
+    // }
+
+    // if (rootNode?.next()) {
+    //   console.log("rootNode?.next().value", rootNode?.next());
+    // }
+
+    return;
   }
 }
 
 const FS_IDENTIFIER = Symbol("windows7_fs");
+
+export { Directory, FileItem };
 
 export function initFs(su: string = ":root") {
   return setContext(FS_IDENTIFIER, new Win7FileSystem(su));

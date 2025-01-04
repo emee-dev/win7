@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { createRawSnippet, mount, onMount } from "svelte";
   import { type HeadProps } from ".";
   import { NOT_SELECTABLE } from "../selecto";
 
@@ -29,7 +28,6 @@
   class="drag-handle h-6 w-full absolute top-0 z-30"
   style="pointer-events: none;"
 >
-  <!-- class={`active-drag-area h-full w-[calc(100%-120px)] absolute left-0 ${NOT_SELECTABLE}`} -->
   <div
     class={`active-drag-area h-full w-[calc(100%-${dragAreaAndControlsWidth}px)] absolute left-0 ${NOT_SELECTABLE}`}
     style="pointer-events: auto;"

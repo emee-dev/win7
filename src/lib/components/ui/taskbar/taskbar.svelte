@@ -41,7 +41,7 @@
   <div
     class={`taskbar-item group relative ${window.windowStatus === "inview" && "opened"}`}
     style={`--icon: url('${getIconByProgramId(window.programId)}');`}
-    onclick={() => toggleWindowView(window.windowId, window.windowStatus)}
+    onclick={() => toggleWindowView(window.id, window.windowStatus)}
   >
     <div
       class="window hidden group-hover:block right-[50%] h-[180px] translate-x-[50%] absolute shadow-none bottom-[calc(40px)] bg-neutral-400"
@@ -70,7 +70,7 @@
   </div>
 
   <div id="taskbar-items">
-    {#each fs.getTasks() as item (item.windowId)}
+    {#each fs.getTasks() as item (item.id)}
       {@render taskBarItem(item)}
     {/each}
   </div>

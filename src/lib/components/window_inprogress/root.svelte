@@ -42,7 +42,7 @@
       return;
     }
 
-    const currentTask = tasks.find((task) => task.windowId === rest.windowId);
+    const currentTask = tasks.find((task) => task.id === rest.windowId);
 
     if (!currentTask) {
       return;

@@ -2,9 +2,9 @@ import type { Component, Snippet } from "svelte";
 import type { SvelteHTMLElements } from "svelte/elements";
 import Content from "./window_content.svelte";
 import Head from "./window_head.svelte";
-import MinimizeBtn from "./window_minimize_btn.svelte";
-import ResizeBtn from "./window_resize_btn.svelte";
-import CloseBtn from "./window_close_btn.svelte";
+import MinimizeBtn from "./btns/window_minimize_btn.svelte";
+import ResizeBtn from "./btns/window_resize_btn.svelte";
+import CloseBtn from "./btns/window_close_btn.svelte";
 import Root from "./root.svelte";
 
 type Placement = {
