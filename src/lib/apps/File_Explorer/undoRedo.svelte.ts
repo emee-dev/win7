@@ -1,5 +1,11 @@
 import { getContext, setContext } from "svelte";
 
+// type HistoryItem = {
+//   id: string;
+//   currentValue: string;
+//   [index: string]: string;
+// };
+
 class History {
   private operations: string[] = $state<string[]>([]);
   private currentValue: string | null = $state<string | null>(null);
@@ -7,7 +13,9 @@ class History {
   private canForward: boolean = $state<boolean>(false);
 
   private updateRewindAndForwardStates() {
-    const currentIndex = this.operations.indexOf(this.currentValue as string);
+    const currentIndex = this.operations.lastIndexOf(
+      this.currentValue as string
+    );
 
     this.canRewind = currentIndex > 0;
     this.canForward =
@@ -25,7 +33,7 @@ class History {
   append(nextValue: string) {
     const operations = this.operations;
     const currentValue = this.currentValue as string;
-    const itemIndex = operations.indexOf(currentValue);
+    const itemIndex = operations.lastIndexOf(currentValue);
 
     // Check to be sure that currentValue is the last item in operations[]
     if (
@@ -41,7 +49,9 @@ class History {
   }
 
   forward() {
-    const currentIndex = this.operations.indexOf(this.currentValue as string);
+    const currentIndex = this.operations.lastIndexOf(
+      this.currentValue as string
+    );
 
     if (
       this.canForward &&
@@ -54,7 +64,9 @@ class History {
   }
 
   rewind() {
-    const currentIndex = this.operations.indexOf(this.currentValue as string);
+    const currentIndex = this.operations.lastIndexOf(
+      this.currentValue as string
+    );
     if (this.canRewind && currentIndex > 0) {
       this.currentValue = this.operations[currentIndex - 1];
       this.updateRewindAndForwardStates();

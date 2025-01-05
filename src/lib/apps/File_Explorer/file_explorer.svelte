@@ -64,7 +64,7 @@
     const items = fs.fs!.readRaw(history.peek());
 
     if (!items) {
-      return console.log("Folder is potentially empty.");
+      return;
     }
 
     const formatted = items.map((item) => {
