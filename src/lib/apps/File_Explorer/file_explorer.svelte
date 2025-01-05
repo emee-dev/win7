@@ -125,7 +125,7 @@
   ];
 </script>
 
-<Window title="File Explorer" showBarMenu={false}>
+<Window title="File Explorer" showBarMenu>
   <div class="px-1 grid grid-cols-[220px_1fr] h-full">
     <div class="sidebar w-[220px] h-full bg-green-300">
       <ul class="tree-view">
@@ -190,7 +190,25 @@
         <button type="submit"> Load Path </button>
       </form>
       <div class="flex flex-col">
-        <span>Folders</span>
+        <span class="px-2 font-medium text-base">Folders</span>
+
+        <div>
+          <div class="bg-blue-300">
+            {#if history.isRewindPossible()}
+              <span>Can Rewind</span>
+            {:else}
+              <span>Cannot Rewind</span>
+            {/if}
+          </div>
+
+          <div class="bg-green-300">
+            {#if history.isForwardPossible()}
+              <span>Can Forward</span>
+            {:else}
+              <span>Cannot Forward</span>
+            {/if}
+          </div>
+        </div>
 
         {#if folderItems.length > 0}
           <div class="flex flex-wrap gap-2 p-3">

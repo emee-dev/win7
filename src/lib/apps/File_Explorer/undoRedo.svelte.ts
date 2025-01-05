@@ -3,11 +3,16 @@ import { getContext, setContext } from "svelte";
 class History {
   private operations: string[] = $state<string[]>([]);
   private currentValue: string | null = $state<string | null>(null);
+  private canRewind: boolean = $state<boolean>(false);
+  private canForward: boolean = $state<boolean>(false);
 
-  // constructor() {
-  //   this.currentValue = null;
-  //   this.operations = [];
-  // }
+  private updateRewindAndForwardStates() {
+    const currentIndex = this.operations.indexOf(this.currentValue as string);
+
+    this.canRewind = currentIndex > 0;
+    this.canForward =
+      currentIndex >= 0 && currentIndex < this.operations.length - 1;
+  }
 
   peek() {
     return this.currentValue;
@@ -17,59 +22,52 @@ class History {
     return this.operations;
   }
 
-  append(args: string) {
-    // Make sure currentValue is always at the end of operations array
-    // To avoid confusing undo redo(s)
+  append(nextValue: string) {
+    const operations = this.operations;
+    const currentValue = this.currentValue as string;
+    const itemIndex = operations.indexOf(currentValue);
 
-    // let currentItemIndex = this.operations?.indexOf(
-    //   this.currentValue as string
-    // );
+    // Check to be sure that currentValue is the last item in operations[]
+    if (
+      operations.length > itemIndex + 1 &&
+      operations.at(-1) !== operations.at(itemIndex)
+    ) {
+      this.operations = operations.slice(0, itemIndex + 1);
+    }
 
-    // // If current item is not the last item and it exists in the operations array
-    // if (
-    //   this.operations?.at(-1) !== this.currentValue &&
-    //   currentItemIndex !== -1
-    // ) {
-    //   let updateItems = this.operations.slice(0, currentItemIndex);
-    //   updateItems.push(args);
-
-    //   this.operations = updateItems;
-    //   this.currentValue = args;
-
-    //   return;
-    // }
-
-    this.currentValue = args;
-    this.operations.push(args);
+    this.operations.push(nextValue);
+    this.currentValue = nextValue;
+    this.updateRewindAndForwardStates();
   }
 
   forward() {
-    let itemIndex = this.operations.indexOf(this.currentValue as string);
+    const currentIndex = this.operations.indexOf(this.currentValue as string);
 
-    let nextValue = this.operations?.at(itemIndex + 1);
-
-    // Update current value
-    this.currentValue = nextValue as string;
+    if (
+      this.canForward &&
+      currentIndex >= 0 &&
+      currentIndex < this.operations.length - 1
+    ) {
+      this.currentValue = this.operations[currentIndex + 1];
+      this.updateRewindAndForwardStates();
+    }
   }
 
   rewind() {
-    let itemIndex = this.operations.indexOf(this.currentValue as string);
-
-    if (!itemIndex || itemIndex === -1) {
-      return;
+    const currentIndex = this.operations.indexOf(this.currentValue as string);
+    if (this.canRewind && currentIndex > 0) {
+      this.currentValue = this.operations[currentIndex - 1];
+      this.updateRewindAndForwardStates();
     }
-
-    let previousValue = this.operations.at(itemIndex - 1);
-
-    // Update current value
-    this.currentValue = previousValue as string;
   }
 
-  // TODO check if currentItem is at start -> [0....] of operations array
-  isRewindPossible() {}
+  isRewindPossible(): boolean {
+    return this.canRewind;
+  }
 
-  // TODO check if currentItem is at end of operations array
-  isForwardPossible() {}
+  isForwardPossible(): boolean {
+    return this.canForward;
+  }
 }
 
 const HISTORY_KEY = Symbol("history");

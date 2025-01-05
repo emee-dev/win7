@@ -301,14 +301,18 @@
         <!-- svelte-ignore a11y_consider_explicit_label, a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
         <div class="navigation flex">
           <div
-            class="button round mr-1 flex items-center justify-center"
+            class="button round mr-1 flex items-center justify-center {history.isRewindPossible()
+              ? 'active'
+              : ''}"
             onclick={() => history.rewind()}
           >
             <Icon data={arrowLeft} scale={1.2} />
           </div>
 
           <div
-            class="button round flex items-center justify-center active"
+            class="button round flex items-center justify-center {history.isForwardPossible()
+              ? 'active'
+              : ''}"
             onclick={() => history.forward()}
           >
             <Icon data={arrowRight} scale={1.2} />
@@ -372,7 +376,7 @@
     >
       {#if showBarMenu}
         <!-- Show file explorer specific bar menu -->
-        <!-- <Win7BarMenu {menuItems} /> -->
+        <!-- <BarMenu {menuItems} /> -->
       {/if}
       <BarMenu {menuItems} />
 

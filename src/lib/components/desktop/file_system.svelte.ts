@@ -599,7 +599,6 @@ class Win7FileSystem {
 
   // Serialize fs to string
   public serializeFs() {
-   
     return;
   }
 }
