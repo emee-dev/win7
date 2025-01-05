@@ -4,10 +4,10 @@ class History {
   private operations: string[] = $state<string[]>([]);
   private currentValue: string | null = $state<string | null>(null);
 
-  constructor() {
-    this.currentValue = null;
-    this.operations = [];
-  }
+  // constructor() {
+  //   this.currentValue = null;
+  //   this.operations = [];
+  // }
 
   peek() {
     return this.currentValue;
@@ -39,8 +39,8 @@ class History {
     //   return;
     // }
 
-    this.operations.push(args);
     this.currentValue = args;
+    this.operations.push(args);
   }
 
   forward() {

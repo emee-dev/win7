@@ -5,8 +5,8 @@
   let { isStartMenuOpen = $bindable(false) }: { isStartMenuOpen: boolean } =
     $props();
 
-  let leftCaret = `\\23F4`;
-  let rightCaret = `\\23F5`;
+  const leftCaret = `\\23F4`;
+  const rightCaret = `\\23F5`;
 
   function handleClickOutside(event: any) {
     isStartMenuOpen = false;

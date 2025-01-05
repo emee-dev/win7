@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { setHistory } from "@/apps/File_Explorer/undoRedo.svelte";
   import { ContextMenu } from "@/components/context_menu_inprogress";
   import { DesktopWindows, os } from "@/components/desktop";
   import DesktopIcons from "@/components/desktop/desktop_icons.svelte";
@@ -11,7 +12,8 @@
 
   let desktop: HTMLElement;
 
-  const fs = os.initFs(":root");
+  const fs = os.initFs("Guest");
+  const history = setHistory();
 
   let mouseCoordinates = $state({ x: 0, y: 0 });
 
@@ -52,17 +54,22 @@
       dir: [
         "C:",
         "C:/Users",
-        "C:/Users/:root",
-        "C:/Users/:root/Desktop",
-        "C:/Users/:root/Desktop/New folder",
-        "C:/Users/:root/Documents",
+        "C:/Users/{{root_user}}",
+        "C:/Users/{{root_user}}/Desktop",
+        "C:/Users/{{root_user}}/Downloads",
+        "C:/Users/{{root_user}}/Documents",
+        "C:/Users/{{root_user}}/Music",
+        "C:/Users/{{root_user}}/Pictures",
+        "C:/Users/{{root_user}}/Videos",
+        "C:/Users/{{root_user}}/Desktop/New folder",
+        "C:/Users/{{root_user}}/Documents",
       ],
       files: [
         {
           fileName: "MyComputer.exe",
           programId: "MyComputer",
           type: "executable",
-          mount_to: "C:/Users/:root/Desktop/MyComputer.exe",
+          mount_to: "C:/Users/{{root_user}}/Desktop/MyComputer.exe",
         },
         {
           fileName: "npm.txt",
@@ -70,7 +77,7 @@
           type: "file_or_folder",
           textContent: "the following is my npm private keys.",
           mimetype: "application/text",
-          mount_to: "C:/Users/:root/Desktop/npm.txt",
+          mount_to: "C:/Users/{{root_user}}/Desktop/npm.txt",
         },
         {
           fileName: "exam.txt",
@@ -78,7 +85,7 @@
           type: "file_or_folder",
           textContent: "the following is my npm private keys.",
           mimetype: "application/text",
-          mount_to: "C:/Users/:root/Desktop/exam.txt",
+          mount_to: "C:/Users/{{root_user}}/Desktop/exam.txt",
         },
       ],
     });

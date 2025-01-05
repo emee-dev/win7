@@ -2,6 +2,7 @@ import { getContext, setContext } from "svelte";
 import {
   extractPath,
   getDesktopIcon,
+  interpolate,
   isFolderOnDesktop,
   isMountedToDesktop,
   type InstalledPrograms,
@@ -225,7 +226,11 @@ class Directory extends Item {
     return Array.from(this.children.keys());
   }
 
-  readFile(pathLike: string): FileItem | null {
+  readFile(pathLike: string | null): FileItem | null {
+    if (!pathLike) {
+      return null;
+    }
+
     if (!Directory.isFilePath(pathLike)) {
       throw new Error(
         `Invalid file path '${pathLike}'. A file path must end with a file extension.`
@@ -238,7 +243,11 @@ class Directory extends Item {
     return file;
   }
 
-  readRaw(pathLike: string) {
+  readRaw(pathLike: string | null) {
+    if (!pathLike) {
+      return null;
+    }
+
     const dir = this.traversePath(pathLike) as Directory | null;
 
     if (!dir) {
@@ -248,7 +257,11 @@ class Directory extends Item {
     return Array.from(dir.children.values());
   }
 
-  readDir(pathLike: string): string[] | null {
+  readDir(pathLike: string | null): string[] | null {
+    if (!pathLike) {
+      return null;
+    }
+
     if (Directory.isFilePath(pathLike)) {
       throw new Error(
         `Invalid directory path '${pathLike}'. A directory path must not contain a file extension.`
@@ -338,7 +351,7 @@ const MARGIN = 2;
 const ICON_STEP = ICON_SIZE + MARGIN;
 
 class Win7FileSystem {
-  private SU: string = "";
+  private user: string = "";
   private desktop: HTMLElement | null = null;
   fs: Directory | null = null;
 
@@ -357,18 +370,25 @@ class Win7FileSystem {
       windowStatus: "inview",
       pinnedToTaskbar: false,
       programId: "File_Explorer",
+      meta: {
+        folder_path: "C:",
+      },
     },
   ]);
 
-  constructor(su: string) {
-    const root = new Directory(su);
+  constructor(user_name: string) {
+    const root = new Directory(user_name);
 
     this.fs = root;
-    this.SU = su;
+    this.user = user_name;
   }
 
   private getfs(): Directory | null {
     return this.fs;
+  }
+
+  getUser(): string {
+    return this.user;
   }
 
   /**
@@ -390,17 +410,19 @@ class Win7FileSystem {
     }
 
     args.dir.forEach((path) => {
+      const new_path = interpolate(path, { root_user: this.getUser() });
+
       // Here we check if the folder exists on the desktop path
-      const isDesktopFolder = isFolderOnDesktop(path, "/Desktop");
+      const isDesktopFolder = isFolderOnDesktop(new_path, "/Desktop");
 
       const desktopFiles = this.getDesktopFiles();
 
       // Simply mount the folder to fs.
       if (!isDesktopFolder) {
-        return dir.insertPath(path);
+        return dir.insertPath(new_path);
       }
 
-      // Prevent adding duplicate files.
+      // Prevent adding duplicate files by comparing the value of isDesktopFolder
       if (desktopFiles.find((icon) => icon.label === isDesktopFolder)) {
         return;
       }
@@ -416,7 +438,7 @@ class Win7FileSystem {
         placement: { column, row },
       });
 
-      return dir.insertPath(path);
+      return dir.insertPath(new_path);
     });
 
     if (!args.files) {
@@ -424,9 +446,14 @@ class Win7FileSystem {
     }
 
     for (let file of args.files) {
-      let { column, row } = this.placeNextIcon();
+      const { column, row } = this.placeNextIcon();
 
-      let data = extractPath(file.mount_to);
+      const new_mount_path = interpolate(file.mount_to, {
+        root_user: this.getUser(),
+      });
+
+      // const data = extractPath(file.mount_to);
+      const data = extractPath(new_mount_path);
 
       if (!data) {
         throw new Error("Unable to parse file or file path.");
@@ -457,8 +484,6 @@ class Win7FileSystem {
         });
       }
     }
-
-    // args.files.forEach((file) => {});
   }
 
   getFolder(path: any): any {
@@ -468,7 +493,8 @@ class Win7FileSystem {
   // Desktop
   createIcon(args: DesktopIcon) {
     const desktopIcon = args as DesktopIcon & ExtraIconProps;
-    const CWD = `C:/Users/${this.SU}/Desktop`;
+    const CWD = `C:/Users/${this.getUser()}/Desktop`;
+
     const fs = this.getfs();
     const file_path = `${CWD}/${desktopIcon.label}` as DesktopFolderPath;
 
@@ -573,20 +599,7 @@ class Win7FileSystem {
 
   // Serialize fs to string
   public serializeFs() {
-    // let rootNode = this.fs?.children;
-
-    // for (let [key, dir] of rootNode?.entries()!) {
-    //   if (dir instanceof Directory) {
-    //     // console.log("sub folder", dir.children.entries().next().value);
-    //     console.log("parent folder", rootNode?.entries());
-    //     console.log("sub folder", dir.children.entries());
-    //   }
-    // }
-
-    // if (rootNode?.next()) {
-    //   console.log("rootNode?.next().value", rootNode?.next());
-    // }
-
+   
     return;
   }
 }

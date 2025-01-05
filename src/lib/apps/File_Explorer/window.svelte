@@ -210,6 +210,19 @@
   <div class="bottom-resize-handle w-full h-1 absolute z-30 bottom-0"></div>
 {/snippet}
 
+{#snippet breadCrumbs(history: ReturnType<typeof getHistory>)}
+  {@const breadCrumbs =
+    history.peek() === null ? [] : history.peek()!.split("/")}
+
+  {#if breadCrumbs.length > 0}
+    {#each breadCrumbs as item}
+      <span class="first:ml-[5px] m-0 text-[13px] tracking-tight">{item}</span>
+    {/each}
+  {:else}
+    <span class="first:ml-[5px] m-0 text-[13px] tracking-tight">C:</span>
+  {/if}
+{/snippet}
+
 <div
   class="background absolute select-none"
   bind:this={windowUi}
@@ -312,11 +325,7 @@
               style="--icon: url('/img/mycomputer.webp')"
               onclick={() => (isAddressFocused = true)}
             >
-              {#each [1, 2, 4, 5, 6, 7] as item}
-                <span class="first:ml-[5px] m-0 text-[13px] tracking-tight"
-                  >Computer</span
-                >
-              {/each}
+              {@render breadCrumbs(history)}
             </div>
           {:else}
             <div

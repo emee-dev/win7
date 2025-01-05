@@ -5,15 +5,16 @@
     getFs,
     type TaskManagerItem,
   } from "@/components/desktop/file_system.svelte";
-  import { getIconByProgramId } from "@/components/desktop/utils";
+  import { getIconByProgramId, interpolate } from "@/components/desktop/utils";
   import Window from "./window.svelte";
   import { Window as WindowWIP } from "@/components/window_inprogress";
   import Icon from "svelte-awesome";
   import arrowLeft from "svelte-awesome/icons/arrowLeft";
   import { onMount, untrack } from "svelte";
-  import { setHistory } from "./undoRedo.svelte";
+  import { getHistory } from "./undoRedo.svelte";
 
   const fs = getFs();
+  const history = getHistory();
 
   type NotepadProps = {
     placement?: {
@@ -27,6 +28,9 @@
     id: windowId,
     programId,
     placement = $bindable({ x: 0, y: 0 }),
+    meta = {
+      folder_path: "C:",
+    },
   }: NotepadProps = $props();
 
   type FileType = {
@@ -34,16 +38,16 @@
     mimetype?: string | null;
     content?: string | null;
     type: "File";
+    path?: string;
   };
-
-  const history = setHistory();
 
   type FolderType = {
     name: string;
     type: "Folder";
+    path?: string;
   };
 
-  type CurrentRender = FileType | FolderType;
+  type Folder = FileType | FolderType;
 
   const onclose = () => {
     fs.terminateTask(windowId);
@@ -54,18 +58,16 @@
     fs.modifyTask(windowId, { windowStatus: "minimized" });
   };
 
-  // let currentPath = $state("C:");
-  let folderItems = $state<CurrentRender[]>([]);
+  let folderItems = $state<Folder[]>([]);
 
   $effect(() => {
-    // const items = fs.fs!.readRaw(currentPath || "Null Folder");
-    const items = fs.fs!.readRaw(history.peek() || "Null Folder");
+    const items = fs.fs!.readRaw(history.peek());
 
     if (!items) {
       return console.log("Folder is potentially empty.");
     }
 
-    let formatted = items.map((item) => {
+    const formatted = items.map((item) => {
       if (item instanceof FileItem) {
         return {
           name: item.name,
@@ -73,52 +75,55 @@
           mimetype: item.mimetype,
           content: item.content as string,
           path: item.full_path,
-          // path: `/${item.name}`,
         };
       } else {
         return {
           name: item.name,
           type: "Folder",
           path: item.full_path,
-          // path: `/${item.name}`,
         };
       }
     }) as (FileType | FolderType)[];
-
-    console.log("formatted", formatted);
 
     untrack(() => (folderItems = formatted));
   });
 
   $inspect(history.peek()).with((t, v) => console.log("peek()", v));
   $inspect(history.getHistory()).with((t, v) => console.log("getHistory()", v));
+
+  const quickAccess = [
+    {
+      icon: "",
+      label: "Desktop",
+      path: "C:/Users/{{root_user}}/Desktop",
+    },
+    {
+      icon: "",
+      label: "Downloads",
+      path: "C:/Users/{{root_user}}/Downloads",
+    },
+    {
+      icon: "",
+      label: "Documents",
+      path: "C:/Users/{{root_user}}/Documents",
+    },
+    {
+      icon: "",
+      label: "Music",
+      path: "C:/Users/{{root_user}}/Music",
+    },
+    {
+      icon: "",
+      label: "Pictures",
+      path: "C:/Users/{{root_user}}/Pictures",
+    },
+    {
+      icon: "",
+      label: "Videos",
+      path: "C:/Users/{{root_user}}/Videos",
+    },
+  ];
 </script>
-
-<!-- <WindowWIP
-  {windowId}
-  showBarMenu
-  bind:placement
-  style="width: 700px; height: 400px;"
-  interactjs={{ min: { height: 300, width: 400 } }}
->
-  <WindowWIP.Head title={label} icon={getIconByProgramId(programId)}>
-    <WindowWIP.MinimizeBtn {onminimize} />
-    <WindowWIP.ResizeBtn />
-    <WindowWIP.CloseBtn {onclose} />
-  </WindowWIP.Head>
-
-  <WindowWIP.Content>
-    <div
-      class="h-[calc(100%_-_28px)] overflow-hidden px-1 min-h-full [&>*]:min-w-[375px]"
-    >
-      <textarea
-        spellcheck="false"
-        class="h-full pt-1 text-balance has-scrollbar flex-1 w-full"
-        bind:value={text}
-      ></textarea>
-    </div>
-  </WindowWIP.Content>
-</WindowWIP> -->
 
 <Window title="File Explorer" showBarMenu={false}>
   <div class="px-1 grid grid-cols-[220px_1fr] h-full">
@@ -127,13 +132,19 @@
         <li>
           <details open>
             <summary> Quick access </summary>
+
             <ul>
-              <li>Desktop</li>
-              <li>Downloads</li>
-              <li>Documents</li>
-              <li>Music</li>
-              <li>Pictures</li>
-              <li>Videos</li>
+              {#each quickAccess as item}
+                <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
+                <li
+                  onclick={() =>
+                    history.append(
+                      interpolate(item.path, { root_user: fs.getUser() })
+                    )}
+                >
+                  {item.label}
+                </li>
+              {/each}
             </ul>
           </details>
         </li>
@@ -179,22 +190,37 @@
         <button type="submit"> Load Path </button>
       </form>
       <div class="flex flex-col">
-        Folders
+        <span>Folders</span>
 
-        {#if !folderItems || folderItems.length === 0}
-          <div class="w-full">Empty folers</div>
-        {:else}
-          <div class="flex flex-wrap gap-x-3">
+        {#if folderItems.length > 0}
+          <div class="flex flex-wrap gap-2 p-3">
             {#each folderItems as item (item.name)}
+              <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
               <div
-                class="w-[180px] h-[70px] bg-red-200 rounded-md"
+                class="w-[200px] h-[25%] flex program rounded-sm"
+                onclick={(e) => {}}
                 ondblclick={() => {
                   console.log("Item", `/${item.name}`);
                 }}
               >
-                {item.name.toLowerCase()}
+                <div class="size-[55px] object-center">
+                  <img
+                    src="/img/text_file.webp"
+                    alt="abc"
+                    class="size-full object-fill"
+                  />
+                </div>
+
+                <div class=" mt-2 w-[calc(100%-50px)] flex flex-col gap-y-1">
+                  <span class="truncate">{item.name.toLowerCase()}</span>
+                  <span>12/22/2222</span>
+                </div>
               </div>
             {/each}
+          </div>
+        {:else}
+          <div class="w-full justify-center flex">
+            <span>This folder is empty</span>
           </div>
         {/if}
       </div>
@@ -203,20 +229,23 @@
 </Window>
 
 <style>
-  textarea {
-    overflow: auto;
-    overflow-y: scroll;
-    font:
-      normal 13px "Lucida Console",
-      Monaco,
-      Courier,
-      Monospace;
-    resize: none;
-    padding: 0;
-    margin: 0;
-    line-height: 1.5; /* Ensure even line height */
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
+  .program {
     box-sizing: border-box;
+    border: 1px solid transparent;
+    position: relative;
+  }
+
+  :global(.program.active) {
+    border-color: #7da2ce;
+    background: linear-gradient(0deg, #c1dcfc, #dcebfc);
+    -webkit-box-shadow: inset 0 0 0 1px hsla(0, 0%, 100%, 0.6666666667);
+    box-shadow: inset 0 0 0 1px hsla(0, 0%, 100%, 0.6666666667);
+  }
+
+  .program:not(.active):hover {
+    border-color: #b8d6fc;
+    background: linear-gradient(0deg, #f2f7fe, #fcfdfe);
+    -webkit-box-shadow: inset 0 0 0 1px hsla(0, 0%, 100%, 0.6666666667);
+    box-shadow: inset 0 0 0 1px hsla(0, 0%, 100%, 0.6666666667);
   }
 </style>

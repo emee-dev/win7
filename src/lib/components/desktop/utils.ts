@@ -160,28 +160,6 @@ export const isMountedToDesktop = (path: string): boolean => {
   }
 };
 
-// /**
-//  * Checks if a folder exists and is mounted to the desktop path.
-//  *
-//  * @param folderPath - The path to check.
-//  * @param desktopPath - The base desktop path.
-//  * @returns The folder name if it exists in the desktop path, otherwise false.
-//  */
-// export const isFolderOnDesktop = (folderPath: string, desktopPath: string) => {
-//   // Normalize desktopPath to ensure it matches `/Desktop` only
-//   const normalizedDesktopPath = desktopPath.replace(/[\\/]+$/, "");
-
-//   // Regex to match immediate folders within the desktop path
-//   const desktopRegex = new RegExp(`^.*[\\/]Desktop[\\/]([^\\/]+)$`);
-
-//   const match = folderPath.match(desktopRegex);
-//   if (match) {
-//     return match[1]; // Return the immediate folder name
-//   }
-
-//   return false;
-// };
-
 export const isFolderOnDesktop = (
   folderPath: string,
   desktopPath: string
@@ -206,3 +184,14 @@ export const isFolderOnDesktop = (
 
   return null;
 };
+
+type Variables = "root_user";
+
+export function interpolate(
+  template: string,
+  variables: Record<Variables, string>
+) {
+  return template.replace(/{{(.*?)}}/g, (_, key: Variables) => {
+    return key in variables ? variables[key] : `{{${key}}}`;
+  });
+}
