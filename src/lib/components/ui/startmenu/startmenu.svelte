@@ -1,4 +1,8 @@
 <script lang="ts">
+  import {
+    getIconByProgramId,
+    type InstalledPrograms,
+  } from "@/components/desktop/utils";
   import type { Action } from "svelte/action";
 
   let isFeaturedView = $state(true);
@@ -7,6 +11,26 @@
 
   const leftCaret = `\\23F4`;
   const rightCaret = `\\23F5`;
+
+  const installed: InstalledPrograms[] = [
+    "Calculator",
+    "File_Explorer",
+    "MyComputer",
+    "Notepad",
+    "RecycleBin",
+  ];
+
+  type FeaturedPrograms = {
+    id: string;
+    label: InstalledPrograms;
+  };
+
+  const featuredItems = installed.map((item) => {
+    return {
+      id: crypto.randomUUID(),
+      label: item,
+    };
+  });
 
   function handleClickOutside(event: any) {
     isStartMenuOpen = false;
@@ -37,21 +61,26 @@
   };
 </script>
 
-{#snippet featuredPrograms(title: string)}
-  <div data-icon="player" class="program featured flex items-center active">
-    {title}
+{#snippet featuredPrograms(args: FeaturedPrograms)}
+  <div
+    data-icon="player"
+    class="program featured flex items-center active"
+    style=" --icon: url('{getIconByProgramId(args.label)}');"
+  >
+    {args.label.replace("_", " ")}
   </div>
 {/snippet}
 
-{#snippet mainPrograms(title: string)}
-  <div data-icon="player" class="program flex items-center">
-    {title}
+{#snippet mainPrograms(args: FeaturedPrograms)}
+  <div
+    data-icon="player"
+    class="program flex items-center"
+    style=" --icon: url('{getIconByProgramId(args.label)}');"
+  >
+    {args.label}
   </div>
 {/snippet}
 
-<!-- oncontextmenu={(ev) => {
-  ev.preventDefault();
-}} -->
 <div
   use:clicks
   onclick_outside={handleClickOutside}
@@ -62,12 +91,12 @@
     <div class="programs-list has-scrollbar">
       {#if isFeaturedView}
         <!-- There can only be 8 featured items at a time. -->
-        {#each [1, 2, 3, 4, 5, 6, 7, 8]}
-          {@render featuredPrograms("Windows Media Player")}
+        {#each featuredItems as program (program.id)}
+          {@render featuredPrograms(program)}
         {/each}
       {:else}
-        {#each Array(20).fill(null)}
-          {@render mainPrograms("Windows Media Player")}
+        {#each featuredItems as normalProgram}
+          {@render mainPrograms(normalProgram)}
         {/each}
       {/if}
     </div>
@@ -141,7 +170,6 @@
       sans-serif;
     --window-color: rgba(170, 209, 251, 0.65);
     user-select: none;
-    --tw-ring-inset: var(--tw-empty,);
     z-index: 99;
     position: absolute;
     bottom: 40px;
@@ -198,7 +226,6 @@
     border: 1px solid transparent;
     padding-left: 28px;
     text-align: left;
-    --icon: url("/img/player.webp");
   }
 
   .program::before {

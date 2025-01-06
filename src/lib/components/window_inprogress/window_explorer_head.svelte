@@ -95,7 +95,11 @@
         class="button round mr-1 flex items-center justify-center {history.isRewindPossible()
           ? 'active'
           : ''}"
-        onclick={() => history.rewind()}
+        onclick={() => {
+          if (history.isRewindPossible()) {
+            history.rewind();
+          }
+        }}
       >
         <Icon data={arrowLeft} scale={1.2} />
       </div>
@@ -104,7 +108,11 @@
         class="button round flex items-center justify-center {history.isForwardPossible()
           ? 'active'
           : ''}"
-        onclick={() => history.forward()}
+        onclick={() => {
+          if (history.isForwardPossible()) {
+            history.forward();
+          }
+        }}
       >
         <Icon data={arrowRight} scale={1.2} />
       </div>
@@ -140,13 +148,13 @@
             history.append(input.trim());
           }}
         >
-          <!-- value="/Computer/:C/Users" -->
           <input
             class="size-full bg-transparent outline-none border-none text-[13px] leading-4 tracking-wider font-medium"
             type="text"
             name="path"
             bind:this={ctx.searchBar}
             onfocus={resetCursor}
+            autocomplete="off"
             value={history.peek()}
             onblur={() => (ctx.isAddressFocused = false)}
           />

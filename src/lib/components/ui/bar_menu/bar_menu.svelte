@@ -36,12 +36,9 @@
 
 {#snippet menuItem(menuItem: MenuProps)}
   {@const isDisabled = menuItem?.isDisabled || null}
-  <!-- {@const divider = menuItem?.hasDivider || null} -->
 
   <!-- svelte-ignore a11y_click_events_have_key_events -->
-
   <li role="menuitem" aria-disabled={isDisabled} onclick={menuItem.onclick}>
-    <!-- <span class="menuitem">{menuItem.label}</span> -->
     {menuItem.label}
   </li>
 {/snippet}

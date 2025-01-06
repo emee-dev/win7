@@ -482,6 +482,7 @@ class Win7FileSystem {
           label: data.filename_ext,
           executeBy: file.executeBy as InstalledPrograms,
           placement: { column, row },
+          textContent: file.textContent,
         });
       }
     }
@@ -492,12 +493,10 @@ class Win7FileSystem {
       return null;
     }
 
-    // return this.fs?.readDir(path);
     return this.fs.readRaw(path);
   }
 
-  // Desktop
-  createIcon(args: DesktopIcon) {
+  createDesktopIcon(args: DesktopIcon) {
     const desktopIcon = args as DesktopIcon & ExtraIconProps;
     const CWD = `C:/Users/${this.getUser()}/Desktop`;
 
@@ -513,7 +512,12 @@ class Win7FileSystem {
     if ("executeBy" in desktopIcon) {
       // Checks if it is a typeof file and not a folder.
       if (Directory.isFilePath(file_path)) {
-        fs.createFile(CWD, desktopIcon.label, "", "");
+        fs.createFile(
+          CWD,
+          desktopIcon.label,
+          "plain/text",
+          desktopIcon?.textContent || ""
+        );
       } else {
         fs.insertPath(file_path);
       }

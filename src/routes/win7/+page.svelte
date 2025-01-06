@@ -13,7 +13,6 @@
   let desktop: HTMLElement;
 
   const fs = os.initFs("Guest");
-  const history = setHistory();
 
   let mouseCoordinates = $state({ x: 0, y: 0 });
 
@@ -88,6 +87,30 @@
           mount_to: "C:/Users/{{root_user}}/Desktop/exam.txt",
         },
       ],
+      // files: [
+      //   {
+      //     fileName: "MyComputer.exe",
+      //     programId: "MyComputer",
+      //     type: "executable",
+      //     mount_to: "C:/Users/{{root_user}}/Desktop/MyComputer.exe",
+      //   },
+      //   {
+      //     fileName: "npm.txt",
+      //     executeBy: "Notepad",
+      //     type: "file",
+      //     textContent: "the following is my npm private keys.",
+      //     mimetype: "application/text",
+      //     mount_to: "C:/Users/{{root_user}}/Desktop/npm.txt",
+      //   },
+      //   {
+      //     fileName: "exam.txt",
+      //     executeBy: "Notepad",
+      //     type: "file",
+      //     textContent: "the following is my npm private keys.",
+      //     mimetype: "application/text",
+      //     mount_to: "C:/Users/{{root_user}}/Desktop/exam.txt",
+      //   },
+      // ],
     });
   });
 

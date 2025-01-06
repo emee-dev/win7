@@ -7,19 +7,23 @@
   import { Window } from "@/components/window_inprogress";
   import { getWindowContext } from "@/components/window_inprogress/ctx.svelte";
   import { onMount, untrack } from "svelte";
-  import { getHistory } from "./undoRedo.svelte";
+  import { setHistory } from "./undoRedo.svelte";
   import { formatFs, type Folder } from "./utils";
 
   const fs = getFs();
-  const history = getHistory();
-  const ctx = getWindowContext();
+  const history = setHistory();
 
-  type NotepadProps = {
+  // const ctx = getWindowContext();
+
+  export type FileExplorerProps = TaskManagerItem & {
+    meta: {
+      folder_path: string;
+    };
     placement?: {
       x: number;
       y: number;
     };
-  } & TaskManagerItem;
+  };
 
   let {
     label,
@@ -27,7 +31,7 @@
     programId,
     placement = $bindable({ x: 0, y: 0 }),
     meta = $bindable({ folder_path: "C:" }),
-  }: NotepadProps = $props();
+  }: FileExplorerProps = $props();
 
   const quickAccess = [
     {
@@ -36,7 +40,7 @@
       path: "C:/Users/{{root_user}}/Desktop",
     },
     {
-      icon: "",
+      icon: "/img/file_explorer_downloads.webp",
       label: "Downloads",
       path: "C:/Users/{{root_user}}/Downloads",
     },
@@ -90,7 +94,7 @@
 <Window
   {windowId}
   bind:placement
-  showBarMenu={false}
+  showBarMenu
   style="width: 700px; height: 400px;"
   interactjs={{
     min: { width: 700, height: 400 },
@@ -120,7 +124,13 @@
         <ul class="tree-view">
           <li>
             <details open>
-              <summary> Quick access </summary>
+              <summary class="flex items-center gap-x-1">
+                <img
+                  src="/img/file_explorer_libraries.webp"
+                  alt="abc"
+                  class="size-[15px] object-fill"
+                /> Quick access
+              </summary>
 
               <ul>
                 {#each quickAccess as item}
@@ -130,7 +140,13 @@
                       history.append(
                         interpolate(item.path, { root_user: fs.getUser() })
                       )}
+                    class="flex items-center gap-x-1"
                   >
+                    <img
+                      src={item.icon}
+                      alt="abc"
+                      class="size-[15px] object-fill"
+                    />
                     {item.label}
                   </li>
                 {/each}
@@ -161,20 +177,22 @@
                   class="w-[200px] h-[25%] flex program rounded-sm"
                   onclick={(e) => {}}
                   ondblclick={() => {
-                    console.log("Item", `/${item.name}`);
+                    if (item.type === "Folder") {
+                      history.append(item.path as string);
+                    }
                   }}
                 >
                   <div class="size-[55px] object-center">
                     <img
-                      src="/img/text_file.webp"
-                      alt="abc"
+                      src={item.icon}
+                      alt="folder icon"
                       class="size-full object-fill"
                     />
                   </div>
 
                   <div class=" mt-2 w-[calc(100%-50px)] flex flex-col gap-y-1">
-                    <span class="truncate">{item.name.toLowerCase()}</span>
-                    <span>12/22/2222</span>
+                    <span class="truncate">{item.name}</span>
+                    <!-- <span>12/22/2222</span> -->
                   </div>
                 </div>
               {/each}

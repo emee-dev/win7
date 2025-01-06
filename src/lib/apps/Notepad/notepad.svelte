@@ -4,8 +4,9 @@
     type TaskManagerItem,
   } from "@/components/desktop/file_system.svelte";
   import { getIconByProgramId } from "@/components/desktop/utils";
-  import Window from "@/components/window/window.svelte";
-  import { Window as WindowWIP } from "@/components/window_inprogress";
+  // import Window from "@/components/window/window.svelte";
+  import { Window } from "@/components/window_inprogress";
+  import { onMount } from "svelte";
 
   let text = $state(
     `Svelte is a UI framework that uses a compiler to let you write
@@ -17,18 +18,19 @@ rank Svelte as the framework they’re most excited about using.`.trim()
 
   const fs = getFs();
 
-  type NotepadProps = {
+  type NotepadProps = TaskManagerItem & {
     placement?: {
       x: number;
       y: number;
     };
-  } & TaskManagerItem;
+  };
 
   let {
     label,
     id: windowId,
     programId,
     placement = $bindable({ x: 0, y: 0 }),
+    meta = $bindable({ file_path: "" }),
   }: NotepadProps = $props();
 
   const onclose = () => {
@@ -39,22 +41,32 @@ rank Svelte as the framework they’re most excited about using.`.trim()
   const onminimize = () => {
     fs.modifyTask(windowId, { windowStatus: "minimized" });
   };
+
+  onMount(() => {
+    if (!meta.file_path) {
+      return;
+    }
+
+    console.log("meta.file_path", meta.file_path);
+
+    console.log("read", fs.fs?.readFile(meta.file_path));
+  });
 </script>
 
-<WindowWIP
+<Window
   {windowId}
   showBarMenu
   bind:placement
   style="width: 700px; height: 400px;"
   interactjs={{ min: { height: 300, width: 400 } }}
 >
-  <WindowWIP.Head title={label} icon={getIconByProgramId(programId)}>
-    <WindowWIP.MinimizeBtn {onminimize} />
-    <WindowWIP.ResizeBtn />
-    <WindowWIP.CloseBtn {onclose} />
-  </WindowWIP.Head>
+  <Window.Head title={label} icon={getIconByProgramId("Notepad")}>
+    <Window.MinimizeBtn {onminimize} />
+    <Window.ResizeBtn />
+    <Window.CloseBtn {onclose} />
+  </Window.Head>
 
-  <WindowWIP.Content>
+  <Window.Content>
     <div
       class="h-[calc(100%_-_28px)] overflow-hidden px-1 min-h-full [&>*]:min-w-[375px]"
     >
@@ -64,8 +76,8 @@ rank Svelte as the framework they’re most excited about using.`.trim()
         bind:value={text}
       ></textarea>
     </div>
-  </WindowWIP.Content>
-</WindowWIP>
+  </Window.Content>
+</Window>
 
 <style>
   textarea {
