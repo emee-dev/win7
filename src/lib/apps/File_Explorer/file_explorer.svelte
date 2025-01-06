@@ -1,20 +1,18 @@
 <script lang="ts">
   import {
-    Directory,
-    FileItem,
     getFs,
     type TaskManagerItem,
   } from "@/components/desktop/file_system.svelte";
   import { getIconByProgramId, interpolate } from "@/components/desktop/utils";
-  import Window from "./window.svelte";
-  import { Window as WindowWIP } from "@/components/window_inprogress";
-  import Icon from "svelte-awesome";
-  import arrowLeft from "svelte-awesome/icons/arrowLeft";
+  import { Window } from "@/components/window_inprogress";
+  import { getWindowContext } from "@/components/window_inprogress/ctx.svelte";
   import { onMount, untrack } from "svelte";
   import { getHistory } from "./undoRedo.svelte";
+  import { formatFs, type Folder } from "./utils";
 
   const fs = getFs();
   const history = getHistory();
+  const ctx = getWindowContext();
 
   type NotepadProps = {
     placement?: {
@@ -28,68 +26,8 @@
     id: windowId,
     programId,
     placement = $bindable({ x: 0, y: 0 }),
-    meta = {
-      folder_path: "C:",
-    },
+    meta = $bindable({ folder_path: "C:" }),
   }: NotepadProps = $props();
-
-  type FileType = {
-    name: string;
-    mimetype?: string | null;
-    content?: string | null;
-    type: "File";
-    path?: string;
-  };
-
-  type FolderType = {
-    name: string;
-    type: "Folder";
-    path?: string;
-  };
-
-  type Folder = FileType | FolderType;
-
-  const onclose = () => {
-    fs.terminateTask(windowId);
-    console.log("windowId", windowId);
-  };
-
-  const onminimize = () => {
-    fs.modifyTask(windowId, { windowStatus: "minimized" });
-  };
-
-  let folderItems = $state<Folder[]>([]);
-
-  $effect(() => {
-    const items = fs.fs!.readRaw(history.peek());
-
-    if (!items) {
-      return;
-    }
-
-    const formatted = items.map((item) => {
-      if (item instanceof FileItem) {
-        return {
-          name: item.name,
-          type: "File",
-          mimetype: item.mimetype,
-          content: item.content as string,
-          path: item.full_path,
-        };
-      } else {
-        return {
-          name: item.name,
-          type: "Folder",
-          path: item.full_path,
-        };
-      }
-    }) as (FileType | FolderType)[];
-
-    untrack(() => (folderItems = formatted));
-  });
-
-  $inspect(history.peek()).with((t, v) => console.log("peek()", v));
-  $inspect(history.getHistory()).with((t, v) => console.log("getHistory()", v));
 
   const quickAccess = [
     {
@@ -123,127 +61,133 @@
       path: "C:/Users/{{root_user}}/Videos",
     },
   ];
+
+  let folderItems = $state<Folder[]>([]);
+
+  const onclose = () => {
+    fs.terminateTask(windowId);
+    console.log("windowId", windowId);
+  };
+
+  const onminimize = () => {
+    fs.modifyTask(windowId, { windowStatus: "minimized" });
+  };
+
+  onMount(() => {
+    const items = fs.getFolder(history.append(meta.folder_path));
+    const formatted = formatFs(items);
+    folderItems = formatted;
+  });
+
+  $effect(() => {
+    const currentHistory = history.peek();
+    const items = fs.getFolder(currentHistory);
+    const formatted = formatFs(items);
+    untrack(() => (folderItems = formatted));
+  });
 </script>
 
-<Window title="File Explorer" showBarMenu>
-  <div class="px-1 grid grid-cols-[220px_1fr] h-full">
-    <div class="sidebar w-[220px] h-full bg-green-300">
-      <ul class="tree-view">
-        <li>
-          <details open>
-            <summary> Quick access </summary>
+<Window
+  {windowId}
+  bind:placement
+  showBarMenu={false}
+  style="width: 700px; height: 400px;"
+  interactjs={{
+    min: { width: 700, height: 400 },
+  }}
+>
+  <Window.ExplorerHead title={label} icon={getIconByProgramId(programId)}>
+    {#snippet minimize()}
+      <Window.MinimizeBtn {onminimize} />
+    {/snippet}
 
-            <ul>
-              {#each quickAccess as item}
-                <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
-                <li
-                  onclick={() =>
-                    history.append(
-                      interpolate(item.path, { root_user: fs.getUser() })
-                    )}
-                >
-                  {item.label}
-                </li>
-              {/each}
-            </ul>
-          </details>
-        </li>
-      </ul>
-      <ul class="tree-view">
-        <li>
-          <details open>
-            <summary> Computer </summary>
-            <ul>
-              <li>System (C:)</li>
-              <li>DVD RW Drive (Z:)</li>
-            </ul>
-          </details>
-        </li>
-      </ul>
-    </div>
-    <div class="folder_viewflex-1 h-full">
-      <form
-        class="flex flex-col"
-        onsubmit={(e) => {
-          e.preventDefault();
+    {#snippet restore()}
+      <Window.ResizeBtn />
+    {/snippet}
 
-          const form = new FormData(e.currentTarget);
+    {#snippet close()}
+      <Window.CloseBtn {onclose} />
+    {/snippet}
+  </Window.ExplorerHead>
 
-          const input = form.get("path") as string;
-
-          if (!input) {
-            return console.log("input is empty");
-          }
-
-          // currentPath = currentPath + input.trim();
-          // currentPath = input.trim();
-          history.append(input.trim());
-        }}
+  <Window.Content>
+    <div
+      class="px-1 grid grid-cols-[180px_1fr] h-full border-t-[1px] border-neutral-500/60"
+    >
+      <div
+        class="sidebar w-[180px] border-r-[1px] h-full border-neutral-500/40"
       >
-        <input
-          type="text"
-          name="path"
-          autocomplete="off"
-          placeholder="Enter folder eg /Desktop"
-        />
+        <ul class="tree-view">
+          <li>
+            <details open>
+              <summary> Quick access </summary>
 
-        <button type="submit"> Load Path </button>
-      </form>
-      <div class="flex flex-col">
-        <span class="px-2 font-medium text-base">Folders</span>
+              <ul>
+                {#each quickAccess as item}
+                  <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
+                  <li
+                    onclick={() =>
+                      history.append(
+                        interpolate(item.path, { root_user: fs.getUser() })
+                      )}
+                  >
+                    {item.label}
+                  </li>
+                {/each}
+              </ul>
+            </details>
+          </li>
+        </ul>
+        <ul class="tree-view">
+          <li>
+            <details open>
+              <summary> Computer </summary>
+              <ul>
+                <li>System (C:)</li>
+                <li>DVD RW Drive (Z:)</li>
+              </ul>
+            </details>
+          </li>
+        </ul>
+      </div>
+      <div class="folder_view flex-1 h-full">
+        <div class="flex flex-col">
+          <span class="px-2 py-1 font-medium text-base">Folders</span>
+          {#if folderItems.length > 0}
+            <div class="flex flex-wrap gap-2 p-3">
+              {#each folderItems as item (item.name)}
+                <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+                <div
+                  class="w-[200px] h-[25%] flex program rounded-sm"
+                  onclick={(e) => {}}
+                  ondblclick={() => {
+                    console.log("Item", `/${item.name}`);
+                  }}
+                >
+                  <div class="size-[55px] object-center">
+                    <img
+                      src="/img/text_file.webp"
+                      alt="abc"
+                      class="size-full object-fill"
+                    />
+                  </div>
 
-        <div>
-          <div class="bg-blue-300">
-            {#if history.isRewindPossible()}
-              <span>Can Rewind</span>
-            {:else}
-              <span>Cannot Rewind</span>
-            {/if}
-          </div>
-
-          <div class="bg-green-300">
-            {#if history.isForwardPossible()}
-              <span>Can Forward</span>
-            {:else}
-              <span>Cannot Forward</span>
-            {/if}
-          </div>
+                  <div class=" mt-2 w-[calc(100%-50px)] flex flex-col gap-y-1">
+                    <span class="truncate">{item.name.toLowerCase()}</span>
+                    <span>12/22/2222</span>
+                  </div>
+                </div>
+              {/each}
+            </div>
+          {:else}
+            <div class="w-full justify-center flex">
+              <span>This folder is empty</span>
+            </div>
+          {/if}
         </div>
-
-        {#if folderItems.length > 0}
-          <div class="flex flex-wrap gap-2 p-3">
-            {#each folderItems as item (item.name)}
-              <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-              <div
-                class="w-[200px] h-[25%] flex program rounded-sm"
-                onclick={(e) => {}}
-                ondblclick={() => {
-                  console.log("Item", `/${item.name}`);
-                }}
-              >
-                <div class="size-[55px] object-center">
-                  <img
-                    src="/img/text_file.webp"
-                    alt="abc"
-                    class="size-full object-fill"
-                  />
-                </div>
-
-                <div class=" mt-2 w-[calc(100%-50px)] flex flex-col gap-y-1">
-                  <span class="truncate">{item.name.toLowerCase()}</span>
-                  <span>12/22/2222</span>
-                </div>
-              </div>
-            {/each}
-          </div>
-        {:else}
-          <div class="w-full justify-center flex">
-            <span>This folder is empty</span>
-          </div>
-        {/if}
       </div>
     </div>
-  </div>
+  </Window.Content>
 </Window>
 
 <style>

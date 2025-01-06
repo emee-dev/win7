@@ -21,7 +21,9 @@
   {...rest}
   role="menu"
   tabindex="-1"
-  oncontextmenu={(e) => context.handleRightClick(e)}
+  oncontextmenu={(e) => {
+    context.handleRightClick(e);
+  }}
 >
   {@render children?.()}
 </div>

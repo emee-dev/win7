@@ -9,6 +9,10 @@ class WindowState {
   disableResize = $state(false);
   position: WindowProps["placement"] = { x: 0, y: 0 };
   windowUi: HTMLElement | null = $state(null);
+
+  // Explorer
+  isAddressFocused = $state(false);
+  searchBar: HTMLElement | null = $state(null);
 }
 
 export function setWindowContext() {

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { ContextMenu, Label } from "bits-ui";
   import type { MenuProps } from ".";
 
   const { menuItems }: { menuItems: MenuProps[] } = $props();
@@ -10,10 +9,9 @@
   {@const divider = menuItem?.hasDivider || null}
 
   <!-- svelte-ignore a11y_click_events_have_key_events -->
-
   <li
     role="menuitem"
-    class={divider}
+    class="{divider}  outline-none"
     aria-haspopup="true"
     aria-disabled={isDisabled}
     onclick={menuItem.onclick}
@@ -27,7 +25,7 @@
     {#if menuItem.subMenu}
       <ul role="menu">
         {#each menuItem.subMenu as subMenuItem (subMenuItem.label)}
-          <li role="menuitem" onclick={(e) => subMenuItem.onclick?.()}>
+          <li role="menuitem" onclick={() => subMenuItem.onclick?.()}>
             <span class="menuitem">{subMenuItem.label}</span>
           </li>
         {/each}
@@ -44,7 +42,7 @@
 
   <li
     role="menuitem"
-    class={divider}
+    class="{divider} outline-none"
     aria-disabled={isDisabled}
     onclick={menuItem.onclick}
   >
@@ -56,7 +54,7 @@
   </li>
 {/snippet}
 
-<ul role="menu" style="width: 200px" class="can-hover select-none">
+<ul role="menu" style="width: 200px" class="can-hover select-none outline-none">
   {#each menuItems as item (item.label)}
     {#if item.subMenu}
       {@render nestedMenuItem(item)}

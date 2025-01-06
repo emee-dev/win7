@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import { type HeadProps } from ".";
   import { NOT_SELECTABLE } from "../selecto";
 
@@ -12,10 +13,10 @@
   $effect(() => {
     if (!controls) return;
 
-    let childNodes = controls.children;
+    const childNodes = controls.children;
 
     if (childNodes.length === 2) {
-      dragAreaAndControlsWidth = 90;
+      dragAreaAndControlsWidth = 150;
     }
 
     if (childNodes.length === 3) {
@@ -28,8 +29,9 @@
   class="drag-handle h-6 w-full absolute top-0 z-30"
   style="pointer-events: none;"
 >
+  <!-- class="active-drag-area h-full ester w-[calc(100%-${dragAreaAndControlsWidth}px)] absolute left-0 ${NOT_SELECTABLE}" -->
   <div
-    class={`active-drag-area h-full w-[calc(100%-${dragAreaAndControlsWidth}px)] absolute left-0 ${NOT_SELECTABLE}`}
+    class="active-drag-area h-full w-[calc(100%-{dragAreaAndControlsWidth}px)] absolute left-0 {NOT_SELECTABLE}"
     style="pointer-events: auto;"
   ></div>
 </div>

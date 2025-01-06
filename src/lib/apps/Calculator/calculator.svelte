@@ -146,6 +146,7 @@
 >
   <Window.Head title={label} icon={getIconByProgramId(programId)}>
     <Window.MinimizeBtn {onminimize} />
+    <Window.ResizeBtn />
     <Window.CloseBtn {onclose} />
   </Window.Head>
 

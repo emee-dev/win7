@@ -34,9 +34,12 @@
 <!-- style="background: green;" -->
 <div class="root">
   <div class="bg-red-300 w-3" data-croffle-ref="element$0">
-    <div class="target bg-green-400 size-[90px]" data-croffle-ref="targetRef">
-      Target
-    </div>
+    <div
+    class="target bg-green-400 size-[90px]"
+    data-croffle-ref="targetRef"
+  >
+    Target
+  </div>
   </div>
 </div>
 

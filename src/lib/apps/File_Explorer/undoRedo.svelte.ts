@@ -46,6 +46,8 @@ class History {
     this.operations.push(nextValue);
     this.currentValue = nextValue;
     this.updateRewindAndForwardStates();
+
+    return this.currentValue;
   }
 
   forward() {

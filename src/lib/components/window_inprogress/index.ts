@@ -2,6 +2,7 @@ import type { Component, Snippet } from "svelte";
 import type { SvelteHTMLElements } from "svelte/elements";
 import Content from "./window_content.svelte";
 import Head from "./window_head.svelte";
+import ExplorerHead from "./window_explorer_head.svelte";
 import MinimizeBtn from "./btns/window_minimize_btn.svelte";
 import ResizeBtn from "./btns/window_resize_btn.svelte";
 import CloseBtn from "./btns/window_close_btn.svelte";
@@ -35,6 +36,18 @@ export type HeadProps = {
   title?: string;
 };
 
+export type ExplorerHeadProps = {
+  // children: Snippet<[]>;
+
+  minimize?: Snippet<[]>;
+  restore?: Snippet<[]>;
+  close?: Snippet<[]>;
+
+  class?: string;
+  icon: string;
+  title?: string;
+};
+
 export type ContentProps = {
   children: Snippet<[]>;
   class?: string;
@@ -57,6 +70,7 @@ export type CloseBtnProps = {
 
 type RootWithDotNotationProps = RootProps & {
   Head: __sveltets_2_IsomorphicComponent<HeadProps>;
+  ExplorerHead: __sveltets_2_IsomorphicComponent<ExplorerHeadProps>;
   Content: __sveltets_2_IsomorphicComponent<ContentProps>;
   MinimizeBtn: __sveltets_2_IsomorphicComponent<MinimizeBtnProps>;
   ResizeBtn: __sveltets_2_IsomorphicComponent<ResizeBtnProps>;
@@ -72,9 +86,9 @@ const RootWithDotNotation: RootWithDotNotationProps = Root as any;
 // This is a custom implementation, awaiting an official solution.
 RootWithDotNotation.Head = Head;
 
-// @ts-expect-error Adding Content as a dot notation property on Root.
-// This is a custom implementation, awaiting an official solution.
+// @ts-expect-error
 RootWithDotNotation.Content = Content;
+
 // @ts-expect-error
 RootWithDotNotation.MinimizeBtn = MinimizeBtn;
 
@@ -83,5 +97,8 @@ RootWithDotNotation.ResizeBtn = ResizeBtn;
 
 // @ts-expect-error
 RootWithDotNotation.CloseBtn = CloseBtn;
+
+// @ts-expect-error
+RootWithDotNotation.ExplorerHead = ExplorerHead;
 
 export { RootWithDotNotation as Window, type WindowProps };

@@ -20,6 +20,9 @@ importers:
       '@thisux/sveltednd':
         specifier: ^0.0.16
         version: 0.0.16(svelte@5.8.0)
+      bits-ui:
+        specifier: 1.0.0-next.73
+        version: 1.0.0-next.73(svelte@5.8.0)
       buffer:
         specifier: ^6.0.3
         version: 6.0.3
@@ -50,6 +53,9 @@ importers:
       tsx:
         specifier: ^4.19.2
         version: 4.19.2
+      zod:
+        specifier: ^3.24.1
+        version: 3.24.1
     devDependencies:
       '@eslint/compat':
         specifier: ^1.2.3
@@ -69,9 +75,6 @@ importers:
       autoprefixer:
         specifier: ^10.4.20
         version: 10.4.20(postcss@8.4.49)
-      bits-ui:
-        specifier: 1.0.0-next.73
-        version: 1.0.0-next.73(svelte@5.8.0)
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -2220,6 +2223,9 @@ packages:
   zimmerframe@1.1.2:
     resolution: {integrity: sha512-rAbqEGa8ovJy4pyBxZM70hg4pE6gDgaQ0Sl9M3enG3I0d6H4XSAM3GeNGLKnsBpuijUow064sf7ww1nutC5/3w==}
 
+  zod@3.24.1:
+    resolution: {integrity: sha512-muH7gBL9sI1nciMZV67X5fTKKBLtwpZ5VBp1vsOQzj1MhrBZ4wlVCm3gedKZWLp0Oyel8sIGfeiz54Su+OVT+A==}
+
 snapshots:
 
   7.css@0.17.0: {}
@@ -4164,3 +4170,5 @@ snapshots:
   yocto-queue@0.1.0: {}
 
   zimmerframe@1.1.2: {}
+
+  zod@3.24.1: {}

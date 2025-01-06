@@ -11,6 +11,7 @@
   import type { FocusEventHandler } from "svelte/elements";
   import BarMenu from "./bar_menu.svelte";
   import { getHistory } from "./undoRedo.svelte";
+  import { getWindowContext } from "@/components/window_inprogress/ctx.svelte";
 
   const { children, title, showBarMenu = true }: WindowProps = $props();
 
@@ -18,6 +19,8 @@
   let position = $state({ x: 0, y: 0 });
   let windowInstance = $state<ReturnType<typeof Interact> | null>(null);
   let isFullscreen = $state(false);
+
+  const ctx = getWindowContext();
 
   const history = getHistory();
 
@@ -183,23 +186,23 @@
       });
   });
 
-  let isAddressFocused = $state(false);
-  let searchBar: HTMLInputElement;
+  // let isAddressFocused = $state(false);
+  // let searchBar: HTMLInputElement;
 
   $effect(() => {
-    if (isAddressFocused && searchBar) {
-      searchBar.focus();
+    if (ctx.isAddressFocused && ctx.searchBar) {
+      ctx.searchBar.focus();
       // searchBar.scrollIntoView();
     }
   });
 
-  type OnFocus = FocusEvent & { currentTarget: EventTarget & HTMLInputElement };
+  // type OnFocus = FocusEvent & { currentTarget: EventTarget & HTMLInputElement };
 
-  const resetCursor = (ev: OnFocus) => {
-    const val = ev?.currentTarget?.value;
-    ev.currentTarget.value = "";
-    ev.currentTarget.value = val;
-  };
+  // const resetCursor = (ev: OnFocus) => {
+  //   const val = ev?.currentTarget?.value;
+  //   ev.currentTarget.value = "";
+  //   ev.currentTarget.value = val;
+  // };
 </script>
 
 <!-- <svelte:window on:drag={dragMoveListener} /> -->
@@ -332,27 +335,41 @@
               {@render breadCrumbs(history)}
             </div>
           {:else}
-            <div
+            <form
               class="addr w-[85%] icon pt-[3px] pr-0 pb-[3px] pl-[24px]"
               style="--icon: url('/img/mycomputer.webp')"
+              onsubmit={(e) => {
+                e.preventDefault();
+
+                const form = new FormData(e.currentTarget);
+
+                const input = form.get("path") as string;
+
+                if (!input) {
+                  return console.log("input is empty");
+                }
+
+                history.append(input.trim());
+              }}
             >
+              <!-- value="/Computer/:C/Users" -->
               <input
                 class="size-full bg-transparent outline-none border-none text-[13px] leading-4 tracking-wider font-medium"
                 type="text"
+                name="path"
                 bind:this={searchBar}
                 onfocus={resetCursor}
-                value="/Computer/:C/Users"
+                value={history.peek()}
                 onblur={() => (isAddressFocused = false)}
               />
-            </div>
+            </form>
           {/if}
 
           <div
             class="addr max-w-[20px] icon pt-[3px] pr-0 pb-[3px] pl-[24px]"
-            style="--icon: url('/img/player.webp')"
-          >
-            abac
-          </div>
+            style="--icon: url('/img/file_explorer_toggle.webp')"
+            onclick={() => (isAddressFocused = !isAddressFocused)}
+          ></div>
         </div>
 
         <!-- Search bar -->

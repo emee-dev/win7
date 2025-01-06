@@ -1,6 +1,6 @@
 <script lang="ts">
   import { setHistory } from "@/apps/File_Explorer/undoRedo.svelte";
-  import { ContextMenu } from "@/components/context_menu_inprogress";
+  import { ContextMenu } from "@/components/context_menu";
   import { DesktopWindows, os } from "@/components/desktop";
   import DesktopIcons from "@/components/desktop/desktop_icons.svelte";
   import { menuItems } from "@/components/desktop/utils";
@@ -100,18 +100,8 @@
 </script>
 
 <Selecto>
-  <ContextMenu.Root>
-    <ContextMenu.Trigger
-      oncontextmenu={(e) => {
-        // Prevent accidental context menu on elements other than the desktop
-        if (e.target !== desktop) {
-          e.stopPropagation();
-          e.preventDefault();
-
-          return;
-        }
-      }}
-    >
+  <ContextMenu>
+    <ContextMenu.Trigger>
       <main
         class="desktop relative h-screen scrollbar-hide overflow-hidden select-none"
         bind:this={desktop}
@@ -131,6 +121,12 @@
                 windowStatus: "inview",
                 pinnedToTaskbar: false,
                 programId: "File_Explorer",
+                // meta: {
+                //   // folder_path: "C:/Users",
+                // },
+                meta: {
+                  folder_path: "C:/Users",
+                },
               });
             }}
           >
@@ -208,16 +204,8 @@
             }}
             >Start Notepad
           </button>
-          <!-- <button
-            onclick={() => {
-              // console.log("Folders", fs.getFolder("C:/Users/:root/Desktop"));
-              console.log("Folders", fs.getFolder("C:/Users/:root/Desktop"));
-            }}
-            >Log fs
-          </button> -->
           <button
             onclick={() => {
-              // console.log("Folders", fs.getFolder("C:/Users/:root/Desktop"));
               fs.serializeFs();
             }}
             >Serialize FS
@@ -235,7 +223,7 @@
     <ContextMenu.Content class="z-50 w-full max-w-[229px] outline-none">
       <Win7ContextMenu {menuItems} />
     </ContextMenu.Content>
-  </ContextMenu.Root>
+  </ContextMenu>
 </Selecto>
 
 <style>

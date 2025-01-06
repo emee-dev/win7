@@ -27,5 +27,7 @@
 {@render children?.()}
 
 <svelte:window
-  on:contextmenu|preventDefault={(e: OnContextMenu) => e.preventDefault()}
+  on:contextmenu|preventDefault={(e: OnContextMenu) => {
+    e.preventDefault();
+  }}
 />

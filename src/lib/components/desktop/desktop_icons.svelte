@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ContextMenu } from "@/components/context_menu_inprogress";
+  // import { ContextMenu } from "bits-ui";
   import { os } from "@/components/desktop";
   import type {
     DesktopIcon,
@@ -9,6 +9,7 @@
   import { Win7ContextMenu } from "@/components/ui/popup_menu";
   import { cn } from "@/utils";
   import type { SvelteHTMLElements } from "svelte/elements";
+  import { ContextMenu } from "@/components/context_menu";
 
   type IconProps = DesktopIcon & SvelteHTMLElements["div"] & ExtraIconProps;
 
@@ -30,34 +31,30 @@
 {/snippet}
 
 {#each fs.getDesktopFiles() as item (item.id)}
-  <ContextMenu.Root>
-    <ContextMenu.Trigger
-      ondblclick={(ev) => {
-        ev.preventDefault();
-
-        console.log("Trigger", item);
-      }}
-    >
+  <ContextMenu>
+    <ContextMenu.Trigger>
       {@render Icon(item as IconProps)}
-      <!-- {@render Icon({
-        file_path: "/DD",
-        id: crypto.randomUUID(),
-        label: "MyComputer.exe",
-        programId: "MyComputer",
-        type: "executable",
-      } as IconProps)} -->
     </ContextMenu.Trigger>
-    <ContextMenu.Content class="z-50 w-full max-w-[229px] outline-none">
+    <ContextMenu.Content
+      class="z-50 w-full max-w-[229px] outline-none first:bg-red-400"
+    >
       <Win7ContextMenu
-        menuItems={[{ label: "Icon rename" }, { label: "Icon Delete" }]}
+        menuItems={[
+          {
+            label: "Open",
+            onclick() {},
+          },
+          { label: "Pin to Taskbar" },
+          { label: "Delete" },
+          { label: "Rename" },
+        ]}
       />
     </ContextMenu.Content>
-  </ContextMenu.Root>
+  </ContextMenu>
 {/each}
 
 <style>
   .item {
-    /* visibility: inherit; */
     font-family:
       Segoe UI,
       sans-serif;
@@ -70,8 +67,6 @@
     box-sizing: border-box;
     border: 1px solid transparent;
     border-radius: 3px;
-    /* touch-action: manipulation; */
-    /* padding: 4px 2px; */
   }
 
   .item:hover {
@@ -84,10 +79,6 @@
     width: 100%;
     height: calc(100% - 20px);
     min-height: 40px;
-
-    /* height: 40px; */
-    /* width: 40px; */
-
     position: relative;
   }
 

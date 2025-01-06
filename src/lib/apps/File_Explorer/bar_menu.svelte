@@ -48,19 +48,11 @@
 
 <ul role="menubar" class="can-hover h-[28px] flex items-center">
   <div class="left flex items-center gap-x-2 pl-3">
-    <div class="font-medium text-sm">Organize</div>
-    <div class="font-medium text-sm">New Folder</div>
+    <div class="font-medium text-[12px] font-segoe">Organize</div>
+    <div class="font-medium text-[12px] font-segoe">New Folder</div>
   </div>
 
   <div class="right ml-auto pr-3">
-    <div class="font-medium text-sm">Spale</div>
+    <div class="font-medium text-[12px] font-segoe">Toggle</div>
   </div>
-
-  <!-- {#each menuItems as item (item.label)}
-    {#if item.subMenu}
-      {@render nestedMenuItem(item)}
-    {:else}
-      {@render menuItem(item)}
-    {/if}
-  {/each} -->
 </ul>

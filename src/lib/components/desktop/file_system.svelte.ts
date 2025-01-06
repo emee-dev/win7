@@ -1,4 +1,5 @@
 import { getContext, setContext } from "svelte";
+import { z } from "zod";
 import {
   extractPath,
   getDesktopIcon,
@@ -363,17 +364,17 @@ class Win7FileSystem {
     []
   );
   private taskManager = $state<TaskManagerItem[]>([
-    {
-      id: crypto.randomUUID(),
-      label: "File_Explorer",
-      taskStatus: "running",
-      windowStatus: "inview",
-      pinnedToTaskbar: false,
-      programId: "File_Explorer",
-      meta: {
-        folder_path: "C:",
-      },
-    },
+    // {
+    //   id: crypto.randomUUID(),
+    //   label: "File_Explorer",
+    //   taskStatus: "running",
+    //   windowStatus: "inview",
+    //   pinnedToTaskbar: false,
+    //   programId: "File_Explorer",
+    //   meta: {
+    //     folder_path: "C:",
+    //   },
+    // },
   ]);
 
   constructor(user_name: string) {
@@ -486,8 +487,13 @@ class Win7FileSystem {
     }
   }
 
-  getFolder(path: any): any {
-    return this.fs?.readDir(path);
+  getFolder(path: string | null) {
+    if (!this.fs) {
+      return null;
+    }
+
+    // return this.fs?.readDir(path);
+    return this.fs.readRaw(path);
   }
 
   // Desktop
@@ -573,6 +579,15 @@ class Win7FileSystem {
   }
 
   launchTask(task: TaskManagerItem) {
+    // Make sure meta is not an empty object to avoid overwriting default bindings/values
+    const metaHasProperties = task.meta
+      ? Object.keys(task.meta).length > 0
+      : false;
+
+    if (!metaHasProperties) {
+      task.meta = undefined;
+    }
+
     this.taskManager.push(task);
   }
 
