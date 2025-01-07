@@ -20,7 +20,7 @@
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
     ondblclick={() => {
-      if (Directory.isFilePath(props.file_path)) {
+      if (Directory.isFile(props.file_path)) {
         // Check if is an installed program
         if ("programId" in props) {
           fs.launchTask({
@@ -48,7 +48,7 @@
         }
       }
 
-      if (!Directory.isFilePath(props.file_path)) {
+      if (Directory.isFolder(props.file_path)) {
         fs.launchTask({
           id: crypto.randomUUID(),
           label: "File_Explorer",
