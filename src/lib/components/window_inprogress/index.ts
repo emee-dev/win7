@@ -50,7 +50,14 @@ export type ExplorerHeadProps = {
 
 export type ContentProps = {
   children: Snippet<[]>;
-  class?: string;
+  /**
+   * It is the parent of `wrapperClass`
+   */
+  parentClass?: string;
+  /**
+   * It houses the contents of `<Window.Content />`
+   */
+  wrapperClass?: string;
 };
 
 export type MinimizeBtnProps = {

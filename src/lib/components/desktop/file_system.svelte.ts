@@ -1,283 +1,12 @@
 import { getContext, setContext } from "svelte";
-import { z } from "zod";
+import { Directory, FileItem } from "./fs/directory";
 import {
   extractPath,
   getDesktopIcon,
+  getParentFolderInfo,
   interpolate,
-  isFolderOnDesktop,
-  isMountedToDesktop,
   type InstalledPrograms,
 } from "./utils";
-
-class Item {
-  public name: string;
-  public full_path?: string;
-
-  constructor(name: string, full_path?: string) {
-    if (new.target === Item) {
-      throw new Error(
-        "Item is an abstract class and cannot be instantiated directly."
-      );
-    }
-    if (!name || typeof name !== "string" || name.trim().length === 0) {
-      throw new Error("Invalid name provided.");
-    }
-    this.name = name;
-    this.full_path = full_path;
-  }
-}
-
-type Executable = {
-  icon: string;
-};
-
-class FileItem extends Item {
-  public mimetype: string;
-  public content: string | Executable | null;
-
-  constructor(
-    name: string,
-    mimetype: string,
-    content: string | Executable | null = null,
-    full_path?: string
-  ) {
-    super(name, full_path);
-    if (!/\.\w+$/.test(name)) {
-      throw new Error(
-        `Invalid file name '${name}'. A valid file extension is required.`
-      );
-    }
-    this.mimetype = mimetype;
-    this.content = content;
-  }
-}
-
-class Directory extends Item {
-  public children: Map<string, Directory | FileItem>;
-
-  constructor(name: string, full_path?: string) {
-    super(name, full_path);
-    this.children = new Map();
-  }
-
-  public static isFilePath(path: string): boolean {
-    return /\.\w+$/.test(path);
-  }
-
-  private validatePath(path: string): void {
-    if (Directory.isFilePath(path)) {
-      throw new Error(
-        `Invalid path '${path}'. Paths must not contain file extensions.`
-      );
-    }
-  }
-
-  protected traversePath(path: string): Directory | FileItem | null {
-    const parts = path.split("/").filter((part) => part.length > 0);
-    let currentDir: Directory = this;
-
-    for (const part of parts) {
-      const nextItem = currentDir.children.get(part);
-      if (!nextItem) {
-        return null;
-      }
-
-      if (nextItem instanceof Directory) {
-        currentDir = nextItem;
-      } else {
-        return nextItem;
-      }
-    }
-
-    return currentDir;
-  }
-
-  insertPath(path: string): void {
-    this.validatePath(path);
-
-    const parts = path.split("/").filter((part) => part.length > 0);
-    let currentDir: Directory = this;
-
-    for (const part of parts) {
-      if (!currentDir.children.has(part)) {
-        // currentDir.children.set(part, new Directory(part, parts.join("")));
-        currentDir.children.set(part, new Directory(part, path));
-      }
-
-      const nextItem = currentDir.children.get(part);
-
-      if (nextItem instanceof Directory) {
-        currentDir = nextItem;
-      } else {
-        throw new Error(`Path conflict: '${part}' is not a directory.`);
-      }
-    }
-  }
-
-  modifyPath(path: string, new_path: string): void {
-    this.validatePath(path);
-    this.validatePath(new_path);
-
-    const oldParts = path.split("/").filter((part) => part.length > 0);
-    const newParts = new_path.split("/").filter((part) => part.length > 0);
-
-    let currentDir: Directory = this;
-
-    let lastPart = oldParts[oldParts.length - 1];
-    let newName = newParts[newParts.length - 1];
-
-    for (const part of oldParts) {
-      if (!currentDir.children.has(part)) {
-        throw new Error(`Directory '${part}' does not exist.`);
-      }
-
-      if (currentDir.children.get(lastPart)) {
-        let oldContents = currentDir.children.get(lastPart);
-
-        currentDir.children.set(newName, oldContents as Directory | FileItem);
-
-        // Delete the previous key, effectively renaming it.
-        currentDir.children.delete(lastPart);
-        return;
-      }
-
-      const nextItem = currentDir.children.get(part);
-
-      if (nextItem instanceof Directory) {
-        currentDir = nextItem;
-      } else {
-        throw new Error(`Path conflict: '${part}' is not a directory.`);
-      }
-    }
-  }
-
-  createFile(
-    path: string,
-    fileName: string,
-    mimetype: string,
-    textContent: string | null = null
-  ): void {
-    if (!/\.\w+$/.test(fileName)) {
-      throw new Error(
-        `Invalid file name '${fileName}'. A valid file extension is required.`
-      );
-    }
-
-    const parts = path.split("/").filter((part) => part.length > 0);
-    let currentDir: Directory = this;
-
-    for (const part of parts) {
-      const nextItem = currentDir.children.get(part);
-      if (nextItem instanceof Directory) {
-        currentDir = nextItem;
-      } else if (nextItem === undefined) {
-        throw new Error(`Directory '${part}' does not exist.`);
-      } else {
-        throw new Error(`Path conflict: '${part}' is not a directory.`);
-      }
-    }
-
-    if (currentDir.children.has(fileName)) {
-      throw new Error(`File '${fileName}' already exists.`);
-    }
-
-    currentDir.children.set(
-      fileName,
-      new FileItem(fileName, mimetype, textContent, path)
-    );
-  }
-
-  modifyFile(
-    path: string,
-    fileName: string,
-    mimetype: string,
-    textContent: string | null = null
-  ): void {
-    if (!/\.\w+$/.test(fileName)) {
-      throw new Error(
-        `Invalid file name '${fileName}'. A valid file extension is required.`
-      );
-    }
-
-    const parts = path.split("/").filter((part) => part.length > 0);
-    let currentDir: Directory = this;
-
-    for (const part of parts) {
-      const nextItem = currentDir.children.get(part);
-      if (nextItem instanceof Directory) {
-        currentDir = nextItem;
-      } else if (nextItem === undefined) {
-        throw new Error(`Directory '${part}' does not exist.`);
-      } else {
-        throw new Error(`Path conflict: '${part}' is not a directory.`);
-      }
-    }
-
-    if (!currentDir.children.has(fileName)) {
-      throw new Error(`File '${fileName}' does not exist.`);
-    }
-
-    currentDir.children.set(
-      fileName,
-      new FileItem(fileName, mimetype, textContent)
-    );
-  }
-
-  listContents(): string[] {
-    return Array.from(this.children.keys());
-  }
-
-  readFile(pathLike: string | null): FileItem | null {
-    if (!pathLike) {
-      return null;
-    }
-
-    if (!Directory.isFilePath(pathLike)) {
-      throw new Error(
-        `Invalid file path '${pathLike}'. A file path must end with a file extension.`
-      );
-    }
-    const file = this.traversePath(pathLike) as FileItem | null;
-    if (file && !(file instanceof FileItem)) {
-      throw new Error(`Path '${pathLike}' does not point to a file.`);
-    }
-    return file;
-  }
-
-  readRaw(pathLike: string | null) {
-    if (!pathLike) {
-      return null;
-    }
-
-    const dir = this.traversePath(pathLike) as Directory | null;
-
-    if (!dir) {
-      return null;
-    }
-
-    return Array.from(dir.children.values());
-  }
-
-  readDir(pathLike: string | null): string[] | null {
-    if (!pathLike) {
-      return null;
-    }
-
-    if (Directory.isFilePath(pathLike)) {
-      throw new Error(
-        `Invalid directory path '${pathLike}'. A directory path must not contain a file extension.`
-      );
-    }
-
-    const dir = this.traversePath(pathLike) as Directory | null;
-
-    if (!dir) {
-      return null;
-    }
-
-    return dir.listContents();
-  }
-}
 
 type Placement = {
   column: number;
@@ -305,12 +34,18 @@ export type DesktopExecutable = IconProps & {
   programId: InstalledPrograms;
 };
 
-export type DesktopFileOrFolder = IconProps & {
-  type: "file_or_folder";
+export type DesktopFile = IconProps &
+  MountableFile & {
+    type: "file";
+    executeBy: InstalledPrograms;
+  };
+
+export type DesktopFolder = IconProps & {
+  type: "folder";
   executeBy: InstalledPrograms;
 };
 
-export type DesktopIcon = DesktopExecutable | DesktopFileOrFolder;
+export type DesktopIcon = DesktopExecutable | DesktopFile | DesktopFolder;
 
 // For managing executable files.
 export type TaskManagerItem = {
@@ -333,18 +68,18 @@ export type TaskManagerItem = {
   pinnedToTaskbar: boolean;
 };
 
-type ExecutableFile = {
+type MountableProgram = {
   fileName: string;
   type: "executable";
   programId: InstalledPrograms;
   mount_to: string;
 };
 
-type NonExecutableFile = Omit<ExecutableFile, "programId" | "type"> & {
+type MountableFile = Omit<MountableProgram, "programId" | "type"> & {
   executeBy: string;
   mimetype: string;
   textContent: string;
-  type: "file_or_folder";
+  type: "file";
 };
 
 const ICON_SIZE = 70;
@@ -360,21 +95,19 @@ class Win7FileSystem {
   public currentRow = $state(0); // Tracks horizontal position (left to right)
   public currentColumn = $state(0); // Tracks vertical position (top to bottom)
 
-  private desktopFiles = $state<(DesktopExecutable | DesktopFileOrFolder)[]>(
-    []
-  );
+  private desktopFiles = $state<
+    (DesktopExecutable | DesktopFile | DesktopFolder)[]
+  >([]);
+
   private taskManager = $state<TaskManagerItem[]>([
-    // {
-    //   id: crypto.randomUUID(),
-    //   label: "File_Explorer",
-    //   taskStatus: "running",
-    //   windowStatus: "inview",
-    //   pinnedToTaskbar: false,
-    //   programId: "File_Explorer",
-    //   meta: {
-    //     folder_path: "C:",
-    //   },
-    // },
+    {
+      id: crypto.randomUUID(),
+      label: "Plyr_Video",
+      taskStatus: "running",
+      windowStatus: "inview",
+      pinnedToTaskbar: false,
+      programId: "Plyr_Video",
+    },
   ]);
 
   constructor(user_name: string) {
@@ -401,7 +134,7 @@ class Win7FileSystem {
   mount(args: {
     desktop: HTMLElement;
     dir: string[];
-    files?: (ExecutableFile | NonExecutableFile)[];
+    files?: (MountableProgram | MountableFile)[];
   }) {
     const dir = this.fs;
     this.desktop = args.desktop;
@@ -411,81 +144,71 @@ class Win7FileSystem {
     }
 
     args.dir.forEach((path) => {
-      const new_path = interpolate(path, { root_user: this.getUser() });
+      const replaceVariables = interpolate(path, { root_user: this.getUser() });
 
       // Here we check if the folder exists on the desktop path
-      const isDesktopFolder = isFolderOnDesktop(new_path, "/Desktop");
+      const { isOnDesktop, label } = getParentFolderInfo(replaceVariables);
 
       const desktopFiles = this.getDesktopFiles();
 
       // Simply mount the folder to fs.
-      if (!isDesktopFolder) {
-        return dir.insertPath(new_path);
+      if (!isOnDesktop) {
+        return dir.insertPath(replaceVariables);
       }
 
-      // Prevent adding duplicate files by comparing the value of isDesktopFolder
-      if (desktopFiles.find((icon) => icon.label === isDesktopFolder)) {
+      // Prevent adding duplicate files
+      if (desktopFiles.find((icon) => icon.label === label)) {
         return;
       }
 
       const { column, row } = this.placeNextIcon();
 
       // Make sure the the desktop folders to mount are unique.
-      this.createIcon({
+      this.createDesktopIcon({
         id: crypto.randomUUID(),
-        type: "file_or_folder",
-        label: isDesktopFolder,
+        type: "folder",
+        label: label as string,
         executeBy: "File_Manager" as InstalledPrograms,
         placement: { column, row },
       });
 
-      return dir.insertPath(new_path);
+      return dir.insertPath(replaceVariables);
     });
 
     if (!args.files) {
       return;
     }
 
-    for (let file of args.files) {
-      const { column, row } = this.placeNextIcon();
-
-      const new_mount_path = interpolate(file.mount_to, {
+    args.files.forEach((file) => {
+      const replaceVariables = interpolate(file.mount_to, {
         root_user: this.getUser(),
       });
 
-      // const data = extractPath(file.mount_to);
-      const data = extractPath(new_mount_path);
+      const noneDesktopItem = extractPath(replaceVariables);
 
-      if (!data) {
-        throw new Error("Unable to parse file or file path.");
-      }
-
-      if (!isMountedToDesktop(data.path)) {
+      if (!noneDesktopItem) {
         return;
       }
 
-      if ("programId" in file) {
-        this.createIcon({
-          type: "executable",
-          id: crypto.randomUUID(),
-          label: data.filename_ext,
-          programId: file.programId as InstalledPrograms,
-          placement: { column, row },
-        });
+      if (Directory.isFolder(replaceVariables)) {
+        return;
       }
 
-      // Can be executed by programs and have it's content read.
-      if ("executeBy" in file) {
-        this.createIcon({
-          id: crypto.randomUUID(),
-          type: "file_or_folder",
-          label: data.filename_ext,
-          executeBy: file.executeBy as InstalledPrograms,
-          placement: { column, row },
-          textContent: file.textContent,
-        });
+      const { isOnDesktop, label: desktopFile } =
+        getParentFolderInfo(replaceVariables);
+
+      if (!isOnDesktop) {
+        dir.createFile(
+          noneDesktopItem.path,
+          noneDesktopItem.filename_ext as string,
+          "text/plain",
+          ""
+        );
+        return;
       }
-    }
+
+      this.mountDesktopIcon(file);
+    });
   }
 
   getFolder(path: string | null) {
@@ -496,41 +219,22 @@ class Win7FileSystem {
     return this.fs.readRaw(path);
   }
 
-  createDesktopIcon(args: DesktopIcon) {
+  /**
+   *
+   * @param args
+   * @returns
+   * Helper method for creating icons on the desktop by end users.
+   */
+  createDesktopIcon<T extends DesktopIcon>(args: T) {
+    const fs = this.getfs();
     const desktopIcon = args as DesktopIcon & ExtraIconProps;
     const CWD = `C:/Users/${this.getUser()}/Desktop`;
-
-    const fs = this.getfs();
     const file_path = `${CWD}/${desktopIcon.label}` as DesktopFolderPath;
 
     if (!fs) {
       throw new Error(
         "File system was not initialized. Did you forget to call os.setFs()."
       );
-    }
-
-    if ("executeBy" in desktopIcon) {
-      // Checks if it is a typeof file and not a folder.
-      if (Directory.isFilePath(file_path)) {
-        fs.createFile(
-          CWD,
-          desktopIcon.label,
-          "plain/text",
-          desktopIcon?.textContent || ""
-        );
-      } else {
-        fs.insertPath(file_path);
-      }
-
-      this.desktopFiles.push({
-        id: desktopIcon.id,
-        label: desktopIcon.label,
-        type: "file_or_folder",
-        executeBy: desktopIcon.executeBy,
-        placement: desktopIcon.placement,
-        file_path: file_path,
-        icon: getDesktopIcon(file_path),
-      } as DesktopFileOrFolder & ExtraIconProps);
     }
 
     if ("programId" in desktopIcon) {
@@ -545,6 +249,106 @@ class Win7FileSystem {
         file_path: file_path,
         icon: getDesktopIcon(file_path),
       } as DesktopExecutable & ExtraIconProps);
+    }
+
+    if ("executeBy" in desktopIcon && desktopIcon.type === "file") {
+      // Checks if it is a typeof file and not a folder.
+      if (!Directory.isFile(file_path)) {
+        return;
+      }
+
+      fs.createFile(
+        CWD,
+        desktopIcon.label,
+        "plain/text",
+        desktopIcon?.textContent || ""
+      );
+
+      this.desktopFiles.push({
+        id: desktopIcon.id,
+        label: desktopIcon.label,
+        type: "file",
+        executeBy: desktopIcon.executeBy,
+        placement: desktopIcon.placement,
+        file_path: file_path,
+        icon: getDesktopIcon(file_path),
+      } as DesktopFile & ExtraIconProps);
+    }
+
+    if ("executeBy" in desktopIcon && desktopIcon.type === "folder") {
+      // Checks if it is a typeof file and not a folder.
+      if (!Directory.isFolder(file_path)) {
+        return;
+      }
+
+      fs.insertPath(file_path);
+      this.desktopFiles.push({
+        id: desktopIcon.id,
+        label: desktopIcon.label,
+        type: "folder",
+        executeBy: desktopIcon.executeBy,
+        placement: desktopIcon.placement,
+        file_path: file_path,
+        icon: getDesktopIcon(file_path),
+      } as DesktopFolder & ExtraIconProps);
+    }
+  }
+
+  private mountDesktopIcon<T extends MountableFile | MountableProgram>(
+    args: T
+  ) {
+    const fs = this.getfs();
+    const CWD = `C:/Users/${this.getUser()}/Desktop`;
+    const { column, row } = this.placeNextIcon();
+
+    const replaceVariables = interpolate(args.mount_to, {
+      root_user: this.getUser(),
+    });
+
+    const { isOnDesktop, label } = getParentFolderInfo(replaceVariables);
+
+    if (!label || !isOnDesktop) {
+      return;
+    }
+
+    const file_path = `${CWD}/${label}` as DesktopFolderPath;
+
+    if (!fs) {
+      throw new Error(
+        "File system was not initialized. Did you forget to call os.setFs()."
+      );
+    }
+
+    if ("programId" in args && args.type === "executable") {
+      fs.createFile(CWD, label, "application/executable", null);
+
+      this.desktopFiles.push({
+        id: crypto.randomUUID(),
+        label: label,
+        type: "executable",
+        programId: args.programId,
+        placement: { column, row },
+        file_path: file_path,
+        icon: getDesktopIcon(file_path),
+      } as DesktopExecutable & ExtraIconProps);
+    }
+
+    if ("executeBy" in args && args.type === "file") {
+      if (!Directory.isFile(file_path)) {
+        return;
+      }
+
+      fs.createFile(CWD, label, "plain/text", args?.textContent || "");
+
+      this.desktopFiles.push({
+        id: crypto.randomUUID(),
+        label: label,
+        type: "file",
+        executeBy: args.executeBy,
+        placement: { column, row },
+        file_path: file_path,
+        icon: getDesktopIcon(file_path),
+      } as DesktopFile & ExtraIconProps);
     }
   }
 
@@ -577,7 +381,11 @@ class Win7FileSystem {
     return { column, row };
   }
 
-  // Task manager
+  /**
+   *
+   * @returns
+   * Returns all active programs.
+   */
   getTasks() {
     return this.taskManager;
   }
@@ -614,11 +422,6 @@ class Win7FileSystem {
     let modified = this.taskManager.filter((item) => item.id !== taskId);
 
     this.taskManager = modified;
-  }
-
-  // Serialize fs to string
-  public serializeFs() {
-    return;
   }
 }
 

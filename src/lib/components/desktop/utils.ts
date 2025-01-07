@@ -57,11 +57,10 @@ export type NonVariantPrograms =
   | "Calculator"
   | "Notepad"
   | "MyComputer"
-  | "File_Explorer";
+  | "File_Explorer"
+  | "Plyr_Video";
 
 export type InstalledPrograms = VariantPrograms | NonVariantPrograms;
-
-// const abc: ProgramVariants = "";
 
 export const getIconByProgramId = (program: InstalledPrograms) => {
   const installedPrograms = {
@@ -70,6 +69,7 @@ export const getIconByProgramId = (program: InstalledPrograms) => {
     Notepad: "/img/notepad.webp",
     RecycleBin: "/img/recycle_empty.png",
     File_Explorer: "/img/file_explorer.webp",
+    Plyr_Video: "/img/plyr_video.png",
     // RecycleBinFilled: "/img/recycle_filled.png",
   } as Record<InstalledPrograms, string>;
 
@@ -79,21 +79,21 @@ export const getIconByProgramId = (program: InstalledPrograms) => {
 export const getDesktopIcon = (path_like: string): string => {
   const fileIcons = {
     txt: "/img/text_file.webp",
-    mp4: "/img/video-file.webp",
-    mkv: "/img/video-file.webp",
-    avi: "/img/video-file.webp",
-    mov: "/img/video-file.webp",
-    webm: "/img/video-file.webp",
-    jpg: "/img/image-file.webp",
-    jpeg: "/img/image-file.webp",
-    png: "/img/image-file.webp",
-    gif: "/img/image-file.webp",
-    bmp: "/img/image-file.webp",
-    mp3: "/img/audio-file.webp",
-    wav: "/img/audio-file.webp",
-    flac: "/img/audio-file.webp",
-    ogg: "/img/audio-file.webp",
-    aac: "/img/audio-file.webp",
+    mp4: "/img/media_file.webp",
+    mkv: "/img/media_file.webp",
+    avi: "/img/media_file.webp",
+    mov: "/img/media_file.webp",
+    webm: "/img/media_file.webp",
+    jpg: "/img/media_file.webp",
+    jpeg: "/img/media_file.webp",
+    png: "/img/media_file.webp",
+    gif: "/img/media_file.webp",
+    bmp: "/img/media_file.webp",
+    mp3: "/img/media_file.webp",
+    wav: "/img/media_file.webp",
+    flac: "/img/media_file.webp",
+    ogg: "/img/media_file.webp",
+    aac: "/img/media_file.webp",
   } as Record<string, string>;
 
   const defaultIcons = {
@@ -152,38 +152,47 @@ export const extractPath = (path_like: string) => {
   return { path, filename_ext };
 };
 
-export const isMountedToDesktop = (path: string): boolean => {
-  if (path.endsWith("/Desktop") || path.endsWith("/Desktop/")) {
-    return true;
-  } else {
-    return false;
+// export const isMountedToDesktop = (path: string): boolean => {
+//   if (path.endsWith("/Desktop") || path.endsWith("/Desktop/")) {
+//     return true;
+//   } else {
+//     return false;
+//   }
+// };
+
+// export const isFolderOnDesktop = (folderPath: string, desktopPath: string) => {
+//   const desktopIndex = folderPath.indexOf(desktopPath);
+
+//   // "/Desktop" not found
+//   if (desktopIndex === -1) {
+//     return null;
+//   }
+
+//   // Extract the part of the path after /Desktop
+//   const remainingPath = folderPath.slice(desktopIndex + desktopPath.length);
+
+//   // Check if the remaining path starts with a separator and extract the immediate folder
+//   const match = remainingPath.match(/^\/([^\/]+)/);
+
+//   return match?.[1];
+// };
+
+export function getParentFolderInfo(path: string) {
+  const regex = /\/desktop\/([^\/]+?)(?=\/|$)/i;
+  const match = path.match(regex);
+
+  if (!match) {
+    return {
+      isOnDesktop: false,
+      label: null,
+    };
   }
-};
 
-export const isFolderOnDesktop = (
-  folderPath: string,
-  desktopPath: string
-): string | null => {
-  const desktopIndex = folderPath.indexOf(desktopPath);
-
-  // "/Desktop" not found
-  if (desktopIndex === -1) {
-    return null;
-  }
-
-  // Extract the part of the path after /Desktop
-  const remainingPath = folderPath.slice(desktopIndex + desktopPath.length);
-
-  // Check if the remaining path starts with a separator and extract the immediate folder
-  const match = remainingPath.match(/^\/([^\/]+)/);
-
-  if (match) {
-    // Immediate folder name
-    return match[1];
-  }
-
-  return null;
-};
+  return {
+    isOnDesktop: true,
+    label: match[1],
+  };
+}
 
 type Variables = "root_user";
 

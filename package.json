@@ -39,18 +39,21 @@
 	"dependencies": {
 		"7.css": "^0.17.0",
 		"@fortawesome/fontawesome-free": "^6.7.2",
+		"@sveu/actions": "^1.1.0",
 		"@tailwindcss/typography": "^0.5.15",
 		"@thisux/sveltednd": "^0.0.16",
+		"bits-ui": "1.0.0-next.73",
 		"buffer": "^6.0.3",
 		"class-variance-authority": "^0.7.1",
 		"cssom": "^0.5.0",
-		"bits-ui": "1.0.0-next.73",
 		"interactjs": "^1.10.27",
 		"moveable": "^0.53.0",
+		"plyr": "^3.7.8",
 		"process": "^0.11.10",
 		"screenfull": "^6.0.2",
 		"selecto": "^1.26.3",
 		"svelte-awesome": "^3.3.5",
+		"svelte-file-dropzone": "^2.0.9",
 		"tsx": "^4.19.2",
 		"zod": "^3.24.1"
 	}

@@ -1,6 +1,11 @@
 <script lang="ts">
   import Moveable from "moveable";
   import { onMount } from "svelte";
+  import Dropzone from "svelte-file-dropzone";
+  import { dropzone, type DropzoneParameter } from "@sveu/actions";
+  // @ts-ignore
+  import Plyr from "plyr";
+  import "plyr/dist/plyr.css";
 
   const draggable = true;
   const throttleDrag = 1;
@@ -9,6 +14,7 @@
   const throttleDragRotate = 0;
 
   let moveable$0: Moveable;
+  let player: Plyr;
 
   onMount(() => {
     moveable$0 = new Moveable(
@@ -24,23 +30,95 @@
     );
   });
 
+  onMount(() => {
+    player = new Plyr("#player", {
+      title: "Example Title",
+      // blankVideo:
+      //   "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    });
+  });
+
   $effect(() => {
     moveable$0.on("drag", (e) => {
       e.target.style.transform = e.transform;
     });
   });
+
+  let over_dropzone = $state(false);
+
+  let files_data = $state<File[]>([]);
+
+  function hover(data: CustomEvent<boolean>) {
+    over_dropzone = data.detail;
+  }
+
+  function on_file_drop(data: CustomEvent<File[]>) {
+    const files = data.detail;
+
+    if (!files) {
+      return;
+    }
+
+    files_data = files;
+
+    // files_data = files.map((file: File) => ({
+    //   name: file.name,
+    //   size: file.size,
+    //   type: file.type,
+    //   last_modified: file.lastModified,
+    // }));
+  }
+
+  $inspect(files_data).with((t, v) => console.log("files", v));
 </script>
 
 <!-- style="background: green;" -->
 <div class="root">
   <div class="bg-red-300 w-3" data-croffle-ref="element$0">
-    <div
-    class="target bg-green-400 size-[90px]"
-    data-croffle-ref="targetRef"
-  >
-    Target
+    <div class="target bg-green-400 size-[90px]" data-croffle-ref="targetRef">
+      Target
+    </div>
   </div>
-  </div>
+
+  <div class="bg-red-300 size-[200px]"></div>
+</div>
+
+<!-- svelte-ignore event_directive_deprecated -->
+<div
+  use:dropzone
+  on:hover={hover}
+  on:files={on_file_drop}
+  class="flex flex-col h-[80px] bg-green-400 mt-6 w-full min-h-200px justify-center items-center"
+>
+  <p>Custom Icon Dropzone</p>
+</div>
+
+<div class="flex flex-wrap justify-center items-center">
+  {#each files_data as file}
+    {#if file.name.endsWith(".png")}
+      <img src={URL.createObjectURL(file)} alt="ahc" />
+    {:else}
+      <div class="flex flex-col justify-center items-center">
+        <div>File Name: {file.name}</div>
+        <div>File Size: {file.size}</div>
+        <div>File Type: {file.type}</div>
+        <div>
+          File Last Modified: {new Intl.DateTimeFormat("en-US").format(
+            file.last_modified
+          )}
+        </div>
+      </div>
+    {/if}
+  {/each}
+</div>
+
+<div class="size-[350px]">
+  <!-- svelte-ignore a11y_media_has_caption -->
+  <video
+    src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+    id="player"
+    controls
+  ></video>
 </div>
 
 <style>

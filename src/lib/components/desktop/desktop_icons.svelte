@@ -36,11 +36,6 @@
         if ("executeBy" in props) {
           fs.launchTask({
             id: crypto.randomUUID(),
-            // label: props.programId,
-            // taskStatus: "running",
-            // windowStatus: "inview",
-            // pinnedToTaskbar: false,
-            // programId: props.programId,
             label: props.executeBy,
             taskStatus: "running",
             windowStatus: "inview",

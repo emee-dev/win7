@@ -1,9 +1,10 @@
 <script lang="ts">
   import { cva } from "class-variance-authority";
   import type { ButtonProps } from ".";
+  import "7.css/dist/7.scoped.css";
 
   // Define the button styles using CVA
-  const buttonVariants = cva("button", {
+  const buttonVariants = cva("button win7", {
     variants: {
       variant: {
         default: "",
@@ -31,6 +32,10 @@
   }: ButtonProps = $props();
 </script>
 
-<button {...rest} {type} class={buttonVariants({ variant, size })} {disabled}>
-  {@render children?.()}
-</button>
+<div class="win7">
+  <button {...rest} {type} class={buttonVariants({ variant, size })} {disabled}>
+    {@render children?.()}
+  </button>
+</div>
+
+<style></style>

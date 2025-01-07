@@ -9,6 +9,13 @@
   import { StartMenu } from "@/components/ui/startmenu";
   import Taskbar from "@/components/ui/taskbar/taskbar.svelte";
   import { onMount } from "svelte";
+  import { Button } from "@/components/ui/button";
+  // import "7.css/dist/7.css";
+  import "7.css/dist/gui/tabs.css";
+  import "7.css/dist/gui/window.css";
+  import "7.css/dist/gui/scrollbar.css";
+  import "7.css/dist/gui/menu.css";
+  import "7.css/dist/gui/searchbox.css";
 
   let desktop: HTMLElement;
 
@@ -73,7 +80,7 @@
         {
           fileName: "npm.txt",
           executeBy: "Notepad",
-          type: "file_or_folder",
+          type: "file",
           textContent: "the following is my npm private keys.",
           mimetype: "application/text",
           mount_to: "C:/Users/{{root_user}}/Desktop/npm.txt",
@@ -81,36 +88,20 @@
         {
           fileName: "exam.txt",
           executeBy: "Notepad",
-          type: "file_or_folder",
+          type: "file",
           textContent: "the following is my npm private keys.",
           mimetype: "application/text",
           mount_to: "C:/Users/{{root_user}}/Desktop/exam.txt",
         },
+        {
+          fileName: "exam.txt",
+          executeBy: "Notepad",
+          type: "file",
+          textContent: "the following is my npm private keys.",
+          mimetype: "application/text",
+          mount_to: "C:/Users/{{root_user}}/Documents/exam.txt",
+        },
       ],
-      // files: [
-      //   {
-      //     fileName: "MyComputer.exe",
-      //     programId: "MyComputer",
-      //     type: "executable",
-      //     mount_to: "C:/Users/{{root_user}}/Desktop/MyComputer.exe",
-      //   },
-      //   {
-      //     fileName: "npm.txt",
-      //     executeBy: "Notepad",
-      //     type: "file",
-      //     textContent: "the following is my npm private keys.",
-      //     mimetype: "application/text",
-      //     mount_to: "C:/Users/{{root_user}}/Desktop/npm.txt",
-      //   },
-      //   {
-      //     fileName: "exam.txt",
-      //     executeBy: "Notepad",
-      //     type: "file",
-      //     textContent: "the following is my npm private keys.",
-      //     mimetype: "application/text",
-      //     mount_to: "C:/Users/{{root_user}}/Desktop/exam.txt",
-      //   },
-      // ],
     });
   });
 
@@ -134,7 +125,7 @@
         <DesktopIcons />
 
         <div class="flex">
-          <button
+          <Button
             class="ml-auto"
             onclick={() => {
               fs.launchTask({
@@ -144,9 +135,6 @@
                 windowStatus: "inview",
                 pinnedToTaskbar: false,
                 programId: "File_Explorer",
-                // meta: {
-                //   // folder_path: "C:/Users",
-                // },
                 meta: {
                   folder_path: "C:/Users",
                 },
@@ -154,7 +142,7 @@
             }}
           >
             Start File_Explorer
-          </button>
+          </Button>
           <!-- <button
             class="ml-auto"
             onclick={() => {
@@ -229,7 +217,7 @@
           </button>
           <button
             onclick={() => {
-              fs.serializeFs();
+              // fs.serializeFs();
             }}
             >Serialize FS
           </button>

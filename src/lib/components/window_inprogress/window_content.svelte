@@ -2,6 +2,8 @@
   import { Win7BarMenu } from "@/components/ui/bar_menu";
   import { getWindowContext } from "./ctx.svelte";
   import { type MenuProps } from "../context_menu";
+  import { cn } from "@/utils";
+  import type { ContentProps } from ".";
 
   const ctx = getWindowContext();
 
@@ -51,17 +53,19 @@
     },
   ]);
 
-  let { children } = $props();
+  let { children, parentClass, wrapperClass }: ContentProps = $props();
 </script>
 
 <!-- The content inside window-body -->
 <div
-  class="window-body flex-1 flex flex-col overflow-auto"
+  class={cn("window-body flex-1 flex flex-col overflow-auto", parentClass)}
   style="height: 100%;"
 >
   {#if ctx.showBarMenu}
     <Win7BarMenu {menuItems} />
   {/if}
 
-  <div class="content-area flex-1 bg-white p-0">{@render children?.()}</div>
+  <div class={cn("content-area flex-1 bg-white p-0", wrapperClass)}>
+    {@render children?.()}
+  </div>
 </div>
