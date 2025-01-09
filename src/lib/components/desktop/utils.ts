@@ -1,4 +1,5 @@
-import type { MenuProps } from "@/components/context_menu";
+import { mediaAssets } from "@/const";
+import type { MenuProps } from "../ui/popup_menu";
 
 export const menuItems: MenuProps[] = [
   {
@@ -64,13 +65,20 @@ export type InstalledPrograms = VariantPrograms | NonVariantPrograms;
 
 export const getIconByProgramId = (program: InstalledPrograms) => {
   const installedPrograms = {
-    Calculator: "/img/calculator.webp",
-    MyComputer: "/img/mycomputer.webp",
-    Notepad: "/img/notepad.webp",
-    RecycleBin: "/img/recycle_empty.png",
-    File_Explorer: "/img/file_explorer.webp",
-    Plyr_Video: "/img/plyr_video.png",
+    // Calculator: "/img/calculator.webp",
+    Calculator: mediaAssets.CalculatorIcon,
+    // MyComputer: "/img/mycomputer.webp",
+    MyComputer: mediaAssets.MyComputerIcon,
+    // Notepad: "/img/notepad.webp",
+    Notepad: mediaAssets.NotepadIcon,
+    // RecycleBin: "/img/recycle_empty.png",
+    RecycleBin: mediaAssets.RecycleEmpty,
+    // File_Explorer: "/img/file_explorer.webp",
+    File_Explorer: mediaAssets.FileExplorerIcon,
+    // Plyr_Video: "/img/plyr_video.png",
+    Plyr_Video: mediaAssets.PlyrVideo,
     // RecycleBinFilled: "/img/recycle_filled.png",
+    // RecycleBinFilled: mediaAssets.RecycleFilled,
   } as Record<InstalledPrograms, string>;
 
   return installedPrograms[program];
@@ -78,27 +86,31 @@ export const getIconByProgramId = (program: InstalledPrograms) => {
 
 export const getDesktopIcon = (path_like: string): string => {
   const fileIcons = {
-    txt: "/img/text_file.webp",
-    mp4: "/img/media_file.webp",
-    mkv: "/img/media_file.webp",
-    avi: "/img/media_file.webp",
-    mov: "/img/media_file.webp",
-    webm: "/img/media_file.webp",
-    jpg: "/img/media_file.webp",
-    jpeg: "/img/media_file.webp",
-    png: "/img/media_file.webp",
-    gif: "/img/media_file.webp",
-    bmp: "/img/media_file.webp",
-    mp3: "/img/media_file.webp",
-    wav: "/img/media_file.webp",
-    flac: "/img/media_file.webp",
-    ogg: "/img/media_file.webp",
-    aac: "/img/media_file.webp",
+    // txt: "/img/text_file.webp",
+    // mp4: "/img/media_file.webp",
+    txt: mediaAssets.TextFileIcon,
+    mp4: mediaAssets.MediaFile,
+    mkv: mediaAssets.MediaFile,
+    avi: mediaAssets.MediaFile,
+    mov: mediaAssets.MediaFile,
+    webm: mediaAssets.MediaFile,
+    jpg: mediaAssets.MediaFile,
+    jpeg: mediaAssets.MediaFile,
+    png: mediaAssets.MediaFile,
+    gif: mediaAssets.MediaFile,
+    bmp: mediaAssets.MediaFile,
+    mp3: mediaAssets.MediaFile,
+    wav: mediaAssets.MediaFile,
+    flac: mediaAssets.MediaFile,
+    ogg: mediaAssets.MediaFile,
+    aac: mediaAssets.MediaFile,
   } as Record<string, string>;
 
   const defaultIcons = {
-    folder: "/img/folder_with_folders.png",
-    emptyFolder: "/img/folder_empty.webp",
+    // folder: "/img/folder_with_folders.png",
+    folder: mediaAssets.FolderWithFile,
+    // emptyFolder: "/img/folder_empty.webp",
+    emptyFolder: mediaAssets.FolderEmpty,
     unknown: "/img/unknown-file.webp",
   };
 

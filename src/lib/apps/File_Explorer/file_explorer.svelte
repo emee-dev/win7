@@ -9,6 +9,7 @@
   import { onMount, untrack } from "svelte";
   import { setHistory } from "./undoRedo.svelte";
   import { formatFs, type Folder } from "./utils";
+  import { mediaAssets } from "@/const";
 
   const fs = getFs();
   const history = setHistory();
@@ -38,7 +39,8 @@
       path: "C:/Libraries/Desktop",
     },
     {
-      icon: "/img/file_explorer_downloads.webp",
+      // icon: "/img/file_explorer_downloads.webp",
+      icon: mediaAssets.FileExplorerDownloads,
       label: "Downloads",
       path: "C:/Libraries/Downloads",
     },
@@ -123,9 +125,10 @@
           <li>
             <details open>
               <summary class="flex items-center gap-x-1">
+                <!-- src="/img/file_explorer_libraries.webp" -->
                 <img
-                  src="/img/file_explorer_libraries.webp"
-                  alt="abc"
+                  src={mediaAssets.FileExplorerLibraries}
+                  alt="file explorer libs"
                   class="size-[15px] object-fill"
                 /> Quick access
               </summary>

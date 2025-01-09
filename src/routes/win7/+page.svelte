@@ -1,36 +1,30 @@
 <script lang="ts">
-  import { setHistory } from "@/apps/File_Explorer/undoRedo.svelte";
-  // import { ContextMenu } from "@/components/context_menu";
-  import * as ContextMenu from "$lib/components/ui/context-menu/index";
+  import "7.css/dist/gui/global.css";
+  import "7.css/dist/gui/menu.css";
+  import "7.css/dist/gui/progressbar.css";
+  import "7.css/dist/gui/scrollbar.css";
+  import "7.css/dist/gui/searchbox.css";
+  import "7.css/dist/gui/tabs.css";
+  import "7.css/dist/gui/treeview.css";
+  import "7.css/dist/gui/window.css";
   import { DesktopWindows, os } from "@/components/desktop";
   import DesktopIcons from "@/components/desktop/desktop_icons.svelte";
-  import { menuItems } from "@/components/desktop/utils";
-  import { Selecto } from "@/components/selecto";
-  import { Win7ContextMenu, type MenuProps } from "@/components/ui/popup_menu";
-  import { StartMenu } from "@/components/ui/startmenu";
-  import Taskbar from "@/components/ui/taskbar/taskbar.svelte";
-  import { onDestroy, onMount } from "svelte";
-  import { Button } from "@/components/ui/button";
-  import { useDropzone, type DropzoneParameter } from "@/hooks/Dropzone";
-  // import "7.css/dist/7.css";
-  import "7.css/dist/gui/tabs.css";
-  import "7.css/dist/gui/window.css";
-  import "7.css/dist/gui/scrollbar.css";
-  import "7.css/dist/gui/menu.css";
-  import "7.css/dist/gui/searchbox.css";
-  import "7.css/dist/gui/treeview.css";
-  import "7.css/dist/gui/progressbar.css";
-  import "7.css/dist/gui/global.css";
   import type {
     DesktopFile,
     ExtraIconProps,
   } from "@/components/desktop/file_system.svelte";
   import { FolderDatabase, persistItem } from "@/components/desktop/indexeddb";
+  import { menuItems } from "@/components/desktop/utils";
+  import { Selecto } from "@/components/selecto";
+  import { Button } from "@/components/ui/button";
+  import * as ContextMenu from "@/components/ui/context-menu/index";
+  import { type MenuProps } from "@/components/ui/popup_menu";
   import { listItem } from "@/components/ui/popup_menu/popup_menu.svelte";
-  import { windows7Folders } from "./utils";
-  import { Label } from "bits-ui";
-  import FileExplorer from "@/apps/File_Explorer/file_explorer.svelte";
-  import Calculator from "@/apps/Calculator/calculator.svelte";
+  import { StartMenu } from "@/components/ui/startmenu";
+  import Taskbar from "@/components/ui/taskbar/taskbar.svelte";
+  import { mediaAssets, windows7Folders } from "@/const";
+  import { useDropzone } from "@/hooks/Dropzone";
+  import { onDestroy, onMount } from "svelte";
 
   let desktop: HTMLElement;
   let db: FolderDatabase | null;
@@ -91,7 +85,7 @@
     mouseCoordinates.y = ev.clientY;
   };
 
-  const Icon = "/img/bg.jpg";
+  // const Icon = "/img/bg.jpg";
 
   // const desktopPath = `C:/Users/{{root_user}}/Desktop`;
   const desktopPath = "C:/Libraries/Desktop";
@@ -182,7 +176,7 @@
         class="desktop relative h-screen scrollbar-hide overflow-hidden select-none"
         bind:this={desktop}
         onmousemove={onMouseMove}
-        style="--icon: url('{Icon}');"
+        style="--icon: url('{mediaAssets.DesktopBackground}');"
         use:useDropzone
         onhover={hover}
         onfiles={on_file_drop}
@@ -205,7 +199,7 @@
                 playsinline
                 bind:this={videoElement}
               >
-                <source src="/boot_sample.mp4" type="video/mp4" />
+                <source src={mediaAssets.Bootvideo} type="video/mp4" />
               </video>
             </div>
           </div>

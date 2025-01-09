@@ -5,6 +5,7 @@
     getIconByProgramId,
     type InstalledPrograms,
   } from "@/components/desktop/utils";
+  import { mediaAssets } from "@/const";
   import type { Action } from "svelte/action";
 
   const fs = os.getFs();
@@ -167,8 +168,9 @@
   <div class="links">
     <div class="account">
       <div class="img no-name">
+        <!-- src="/img/startmenu_guest.webp" -->
         <img
-          src="/img/startmenu_guest.webp"
+          src={mediaAssets.StartMenuGuest}
           alt="profile_img"
           width="50"
           height="50"

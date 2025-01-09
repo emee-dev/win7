@@ -8,6 +8,7 @@
     type TaskManagerItem,
   } from "@/components/desktop/file_system.svelte";
   import { getIconByProgramId } from "@/components/desktop/utils";
+  import { mediaAssets } from "@/const";
 
   const fs = getFs();
 
@@ -66,7 +67,7 @@
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 <div id="taskbar" class="">
   <div id="start-button" class="mr-6 ml-5" onclick={() => toggleStartMenu()}>
-    <span class="icon"></span>
+    <span class="icon" style="--icon: url('{mediaAssets.StartButton}');"></span>
   </div>
 
   <div id="taskbar-items">
@@ -78,7 +79,11 @@
   <div id="taskbar-tray">
     <!-- Action center icon -->
     <div class="taskbar-item">
-      <img src="/img/action_center_flag.webp" style="width: 20px;" alt="" />
+      <img
+        src={mediaAssets.ActionCenterFlag}
+        style="width: 20px;"
+        alt="action center flag"
+      />
     </div>
 
     <!-- Battery -->
@@ -165,7 +170,6 @@
   }
 
   #start-button > span {
-    --icon: url("/img/startbutton.webp");
     --tw-shadow: 0 0 transparent;
     --tw-ring-offset-width: 0px;
     --tw-ring-offset-color: #fff;
@@ -193,7 +197,7 @@
   #start-button > span:hover {
     --window-color: rgba(170, 209, 251, 0.65);
     --window-color-inactive: rgba(170, 209, 251, 0.3);
-    --icon: url("/img/startbutton.webp");
+    /* --icon: url("/img/startbutton.webp"); */
     --tw-shadow: 0 0 transparent;
     --tw-ring-offset-width: 0px;
     --tw-ring-offset-color: #fff;

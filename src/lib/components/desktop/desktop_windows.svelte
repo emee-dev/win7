@@ -17,7 +17,7 @@
   <Calculator {...task} />
 {/snippet}
 
-{#snippet renderNotepad(task: TaskManagerItem)}
+{#snippet renderNotepad(task: TaskManagerItem & { file_path: string })}
   <Notepad {...task} />
 {/snippet}
 

@@ -1,17 +1,15 @@
 <script lang="ts">
-  import * as ContextMenu from "$lib/components/ui/context-menu/index";
+  import * as ContextMenu from "@/components/ui/context-menu/index";
   import { os } from "@/components/desktop";
   import type {
-    DesktopFile,
     DesktopIcon,
     ExtraIconProps,
-    TaskManagerItem,
   } from "@/components/desktop/file_system.svelte";
   import { Directory } from "@/components/desktop/file_system.svelte";
   import { SELECTABLE_ITEM } from "@/components/selecto";
   import { cn } from "@/utils";
-  import type { MenuProps } from "../context_menu";
   import { listItem } from "../ui/popup_menu/popup_menu.svelte";
+  import type { MenuProps } from "../ui/popup_menu";
 
   type IconProps = DesktopIcon & ExtraIconProps;
 
