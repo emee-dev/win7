@@ -14,7 +14,6 @@
   type IconProps = DesktopIcon & ExtraIconProps;
 
   let props: IconProps = $props();
-
   const fs = os.getFs();
 
   let isOpen = $state(false);
@@ -52,8 +51,6 @@
             });
           }
 
-          console.log("file", props);
-
           if ("executeBy" in props && props.type === "file") {
             fs.launchTask({
               id: crypto.randomUUID(),
@@ -66,18 +63,6 @@
               meta: props?.meta as Record<string, string>,
             } as any);
           }
-
-          // if ("executeBy" in props) {
-          //   fs.launchTask({
-          //     id: crypto.randomUUID(),
-          //     label: props.executeBy,
-          //     taskStatus: "running",
-          //     windowStatus: "inview",
-          //     pinnedToTaskbar: false,
-          //     executeBy: props.executeBy,
-          //     meta: props?.meta as Record<string, string>,
-          //   });
-          // }
         }
 
         if (Directory.isFolder(props.file_path)) {

@@ -1,5 +1,6 @@
 import { getContext, setContext } from "svelte";
 import { Directory, FileItem } from "./fs/directory";
+import { FolderDatabase, getAllDbEntities, type FileEntity } from "./indexeddb";
 import {
   extractPath,
   findHandler,
@@ -8,7 +9,6 @@ import {
   interpolate,
   type InstalledPrograms,
 } from "./utils";
-import { getAllFolders, type FolderDatabase } from "./indexeddb";
 
 type Placement = {
   column: number;
@@ -22,7 +22,7 @@ export type IconProps = {
   id: string;
   label: string;
   placement?: Placement;
-  meta?: Record<string, unknown>;
+  meta?: Record<string, string>;
   ondblclick?: (meta: any) => void;
 };
 
@@ -40,7 +40,6 @@ export type DesktopFile = IconProps &
   MountableFile & {
     type: "file";
     executeBy: InstalledPrograms;
-    // meta?: Record<string, unknown> | undefined;
   };
 
 export type DesktopFolder = IconProps & {
@@ -57,16 +56,6 @@ export type TaskManagerItem = {
   taskStatus: "running" | "paused";
   windowStatus: "minimized" | "inview";
   programId: InstalledPrograms;
-  /**
-   * Depending on the program, meta will have program specific properties
-   *
-   * eg for handling text files by notepad, there will be a meta.file_path
-   * eg for handling video files by video player, there will be a meta.file_path
-   * eg for handling image files by image viewer, there will be a meta.file_path
-   *
-   * programId will specify the handling program.
-   *
-   */
   meta?: Record<string, string>;
   pinnedToTaskbar: boolean;
 };
@@ -80,7 +69,6 @@ type MountableProgram = {
 };
 
 type MountableFile = Pick<MountableProgram, "mount_to"> & {
-  // executeBy: string;
   mimetype: string;
   textContent: string;
   type: "file";
@@ -94,6 +82,7 @@ class Win7FileSystem {
   private user: string = "";
   private desktop: HTMLElement | null = null;
   fs: Directory | null = null;
+  folderDB: FolderDatabase | null = null;
 
   // For placing icons on the desktop
   public currentRow = $state(0); // Tracks horizontal position (left to right)
@@ -104,18 +93,19 @@ class Win7FileSystem {
   >([]);
 
   private taskManager = $state<TaskManagerItem[]>([
-    {
-      id: crypto.randomUUID(),
-      label: "Plyr_Video",
-      taskStatus: "running",
-      windowStatus: "inview",
-      pinnedToTaskbar: false,
-      programId: "Plyr_Video",
-    },
+    // {
+    //   id: crypto.randomUUID(),
+    //   label: "Plyr_Video",
+    //   taskStatus: "running",
+    //   windowStatus: "inview",
+    //   pinnedToTaskbar: false,
+    //   programId: "Plyr_Video",
+    // },
   ]);
 
   constructor(user_name: string) {
     const root = new Directory(user_name);
+    this.folderDB = new FolderDatabase();
 
     this.fs = root;
     this.user = user_name;
@@ -147,15 +137,11 @@ class Win7FileSystem {
     let files = args.files || [];
     let folders = args.dir || [];
 
-    // if (!args.db) {
-    //   return;
-    // }
-
     if (!dir) {
       return;
     }
 
-    let persistedFiles = await getAllFolders(args.db);
+    let persistedFiles = await getAllDbEntities(args.db);
 
     if (persistedFiles && persistedFiles.length > 0) {
       persistedFiles.forEach((element) => {
@@ -165,7 +151,8 @@ class Win7FileSystem {
             mimetype: element.blob.type,
             mount_to: element.path,
             type: "file",
-          } as MountableFile & { executeBy: string });
+            storage: "indexeddb",
+          } as MountableFile & { executeBy: string; storage: "indexeddb" });
         }
       });
     }
@@ -315,7 +302,6 @@ class Win7FileSystem {
     }
 
     if ("executeBy" in desktopIcon && desktopIcon.type === "folder") {
-      // Checks if it is a typeof file and not a folder.
       if (!Directory.isFolder(file_path)) {
         return;
       }
@@ -341,11 +327,11 @@ class Win7FileSystem {
     const CWD = `C:/Libraries/Desktop`;
     const { column, row } = this.placeNextIcon();
 
-    // const replaceVariables = interpolate(args.mount_to, {
-    //   root_user: this.getUser(),
-    // });
+    const replaceVariables = interpolate(args.mount_to, {
+      root_user: this.getUser(),
+    });
 
-    const { isOnDesktop, label } = getParentFolderInfo(args.mount_to);
+    const { isOnDesktop, label } = getParentFolderInfo(replaceVariables);
 
     if (!label || !isOnDesktop) {
       return;
@@ -407,11 +393,33 @@ class Win7FileSystem {
         placement: { column, row },
         file_path: file_path,
         icon: getDesktopIcon(file_path),
+        meta: {
+          storage: "indexeddb",
+        },
       } as DesktopFile & ExtraIconProps);
     }
   }
 
-  private mountIndexedDbData(db: string) {}
+  async getPersistedFileByPath(
+    filePath: string
+  ): Promise<FileEntity | undefined | null> {
+    try {
+      if (!this.folderDB) {
+        return null;
+      }
+
+      const fileItem = await this.folderDB.folders
+        .where("path")
+        .equals(filePath)
+        .and((item) => item.type === "file")
+        .first();
+
+      return fileItem as FileEntity;
+    } catch (error) {
+      console.error("Error fetching file:", error);
+      return undefined;
+    }
+  }
 
   getDesktopFiles() {
     return this.desktopFiles;

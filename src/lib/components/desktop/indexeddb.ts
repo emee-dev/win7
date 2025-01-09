@@ -1,18 +1,17 @@
 import Dexie from "dexie";
 
-type FileItem = {
+export type FileEntity = {
   blob: Blob;
   path: string;
   type: "file";
-  // storage: "window7fs" | "indexeddb";
   storage: "indexeddb";
 };
 
-type Dir = Pick<FileItem, "path" | "storage"> & {
+type Dir = Pick<FileEntity, "path" | "storage"> & {
   type: "dir";
 };
 
-export type DBEntity = Dir | FileItem;
+export type DBEntity = Dir | FileEntity;
 
 class FolderDatabase extends Dexie {
   folders: Dexie.Table<DBEntity, string>;
@@ -27,7 +26,7 @@ class FolderDatabase extends Dexie {
   }
 }
 
-// Function to add a folder path
+// TODO employ better error propagation and handling.
 export const persistItem = async <T extends DBEntity>(
   db: FolderDatabase,
   args: T
@@ -42,13 +41,13 @@ export const persistItem = async <T extends DBEntity>(
         type: "file",
         storage: "indexeddb",
       });
+    } else {
+      await db.folders.add({
+        path: args.path,
+        type: "dir",
+        storage: "indexeddb",
+      });
     }
-
-    await db.folders.add({
-      path: args.path,
-      type: "dir",
-      storage: "indexeddb",
-    });
   } catch (error) {
     if ((error as typeof Dexie.ModifyError).name === "ConstraintError") {
       console.error("This folder path already exists.");
@@ -60,13 +59,10 @@ export const persistItem = async <T extends DBEntity>(
   }
 };
 
-export async function getAllFolders(db: FolderDatabase) {
+export async function getAllDbEntities(db: FolderDatabase) {
   try {
     const entities = await db.folders.toArray();
 
-    console.log("folders", entities);
-
-    // return folders.map((folder) => folder.path);
     return entities;
   } catch (error) {
     console.error("Failed to retrieve folders:", error);

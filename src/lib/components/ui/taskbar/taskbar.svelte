@@ -19,7 +19,6 @@
   });
 
   const toggleStartMenu = () => {
-    console.log("isStartMenuOpen", isStartMenuOpen);
     isStartMenuOpen = !isStartMenuOpen;
   };
 

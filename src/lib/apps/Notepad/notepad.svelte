@@ -23,6 +23,9 @@ rank Svelte as the framework they’re most excited about using.`.trim()
       y: number;
     };
     file_path: string;
+    meta?: {
+      storage?: "indexeddb";
+    };
   };
 
   let {
@@ -31,7 +34,7 @@ rank Svelte as the framework they’re most excited about using.`.trim()
     programId,
     file_path,
     placement = $bindable({ x: 0, y: 0 }),
-    // meta = $bindable({ file_path: "" }),
+    meta,
     ...rest
   }: NotepadProps = $props();
 
@@ -44,15 +47,13 @@ rank Svelte as the framework they’re most excited about using.`.trim()
     fs.modifyTask(windowId, { windowStatus: "minimized" });
   };
 
-  // $inspect(rest.pr).with((t, v) => console.log("rest", rest));
-
   onMount(() => {
     console.log("file_path", file_path);
     // if (!meta || !meta.file_path) {
     //   return;
     // }
 
-    // @ts-expect-error
+    
     if (meta?.storage === "indexeddb") {
       // Read from indexeddb
     }

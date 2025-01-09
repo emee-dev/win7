@@ -14,7 +14,11 @@
     ExtraIconProps,
   } from "@/components/desktop/file_system.svelte";
   import { FolderDatabase, persistItem } from "@/components/desktop/indexeddb";
-  import { menuItems } from "@/components/desktop/utils";
+  import {
+    findHandler,
+    getDesktopIcon,
+    menuItems,
+  } from "@/components/desktop/utils";
   import { Selecto } from "@/components/selecto";
   import { Button } from "@/components/ui/button";
   import * as ContextMenu from "@/components/ui/context-menu/index";
@@ -25,7 +29,7 @@
   import { mediaAssets, windows7Folders } from "@/const";
   import { useDropzone } from "@/hooks/Dropzone";
   import { onDestroy, onMount } from "svelte";
-  import {hasWindow} from "std-env"
+  import { hasWindow } from "std-env";
 
   let desktop: HTMLElement;
   let db: FolderDatabase | null;
@@ -86,9 +90,6 @@
     mouseCoordinates.y = ev.clientY;
   };
 
-  // const Icon = "/img/bg.jpg";
-
-  // const desktopPath = `C:/Users/{{root_user}}/Desktop`;
   const desktopPath = "C:/Libraries/Desktop";
 
   let over_dropzone = $state(false);
@@ -123,7 +124,19 @@
 
       let file_path = `${desktopPath}/${file.name}`;
 
-      // Create a file
+      // Two things to do.
+      // 1. Persist file in indexeddb.
+      // 2. store metadata in fs for temp reference.
+      // 3. If on desktop also push into desktop icons array
+
+      // console.log("persist", {
+      //   blob,
+      //   type: "file",
+      //   storage: "indexeddb",
+      //   path: file_path,
+      // });
+
+      // persist user created files
       await persistItem(db as FolderDatabase, {
         blob,
         type: "file",
@@ -131,12 +144,24 @@
         path: file_path,
       });
 
-      fs.createDesktopIcon({
+      // fs.fs!.createFile(file_path, file.name, file.type, null);
+
+      // In order to handle dblclicks on such icons
+      // We need to let the executable know what type of
+      // file it is processing.
+      
+      // @ts-expect-error it is a prototype
+      fs.getDesktopFiles().push({
         id: crypto.randomUUID(),
         label: file.name,
         type: "file",
-        executeBy: "Plyr_Video",
+        executeBy: findHandler(file_path),
         placement: { column, row },
+        file_path: file_path,
+        meta: {
+          storage: "indexeddb",
+        },
+        icon: getDesktopIcon(file_path),
       } as DesktopFile & ExtraIconProps);
 
       files_data = files;
@@ -156,8 +181,8 @@
       return;
     }
 
-    if(!hasWindow) {
-      return
+    if (!hasWindow) {
+      return;
     }
 
     const handler = () => {
