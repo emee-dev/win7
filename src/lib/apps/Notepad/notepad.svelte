@@ -52,6 +52,11 @@ rank Svelte as the framework they’re most excited about using.`.trim()
     //   return;
     // }
 
+    // @ts-expect-error
+    if (meta?.storage === "indexeddb") {
+      // Read from indexeddb
+    }
+
     // console.log("meta.file_path", meta.file_path);
 
     // console.log("read", fs.fs?.readFile(meta.file_path));

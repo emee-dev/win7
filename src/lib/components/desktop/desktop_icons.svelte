@@ -54,6 +54,8 @@
             });
           }
 
+          console.log("file", props);
+
           if ("executeBy" in props && props.type === "file") {
             fs.launchTask({
               id: crypto.randomUUID(),

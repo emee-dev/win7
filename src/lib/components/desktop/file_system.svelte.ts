@@ -293,7 +293,6 @@ class Win7FileSystem {
     if ("executeBy" in desktopIcon && desktopIcon.type === "file") {
       // Checks if it is a typeof file and not a folder.
       if (!Directory.isFile(file_path)) {
-        console.log("Not a file", file_path);
         return;
       }
 
@@ -342,11 +341,11 @@ class Win7FileSystem {
     const CWD = `C:/Libraries/Desktop`;
     const { column, row } = this.placeNextIcon();
 
-    const replaceVariables = interpolate(args.mount_to, {
-      root_user: this.getUser(),
-    });
+    // const replaceVariables = interpolate(args.mount_to, {
+    //   root_user: this.getUser(),
+    // });
 
-    const { isOnDesktop, label } = getParentFolderInfo(replaceVariables);
+    const { isOnDesktop, label } = getParentFolderInfo(args.mount_to);
 
     if (!label || !isOnDesktop) {
       return;
@@ -375,7 +374,25 @@ class Win7FileSystem {
       } as DesktopExecutable & ExtraIconProps);
     }
 
-    if ("executeBy" in args && args.type === "file") {
+    // if ("executeBy" in args && args.type === "file") {
+    //   if (!Directory.isFile(file_path)) {
+    //     return;
+    //   }
+
+    //   fs.createFile(CWD, label, "text/plain", args?.textContent || "");
+
+    //   this.desktopFiles.push({
+    //     id: crypto.randomUUID(),
+    //     label: label,
+    //     type: "file",
+    //     executeBy: findHandler(file_path),
+    //     placement: { column, row },
+    //     file_path: file_path,
+    //     icon: getDesktopIcon(file_path),
+    //   } as DesktopFile & ExtraIconProps);
+    // }
+
+    if (args.type === "file") {
       if (!Directory.isFile(file_path)) {
         return;
       }

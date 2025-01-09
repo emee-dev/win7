@@ -6,7 +6,7 @@
   import DesktopIcons from "@/components/desktop/desktop_icons.svelte";
   import { menuItems } from "@/components/desktop/utils";
   import { Selecto } from "@/components/selecto";
-  import { Win7ContextMenu } from "@/components/ui/popup_menu";
+  import { Win7ContextMenu, type MenuProps } from "@/components/ui/popup_menu";
   import { StartMenu } from "@/components/ui/startmenu";
   import Taskbar from "@/components/ui/taskbar/taskbar.svelte";
   import { onDestroy, onMount } from "svelte";
@@ -27,15 +27,19 @@
   } from "@/components/desktop/file_system.svelte";
   import { FolderDatabase, persistItem } from "@/components/desktop/indexeddb";
   import { listItem } from "@/components/ui/popup_menu/popup_menu.svelte";
-  import type { MenuProps } from "@/components/context_menu";
   import { windows7Folders } from "./utils";
+  import { Label } from "bits-ui";
+  import FileExplorer from "@/apps/File_Explorer/file_explorer.svelte";
+  import Calculator from "@/apps/Calculator/calculator.svelte";
 
   let desktop: HTMLElement;
   let db: FolderDatabase | null;
+  let videoElement: HTMLVideoElement;
   const fs = os.initFs("Guest");
 
   let mouseCoordinates = $state({ x: 0, y: 0 });
   let isStartMenuOpen = $state(false);
+  let hasBootEnded = $state(true);
 
   onMount(() => {
     db = new FolderDatabase();
@@ -89,7 +93,8 @@
 
   const Icon = "/img/bg.jpg";
 
-  const desktopPath = `C:/Users/{{root_user}}/Desktop`;
+  // const desktopPath = `C:/Users/{{root_user}}/Desktop`;
+  const desktopPath = "C:/Libraries/Desktop";
 
   let over_dropzone = $state(false);
 
@@ -121,12 +126,14 @@
       // Persist custom/user created files in indexeddb
       let { column, row } = fs.placeNextIcon();
 
+      let file_path = `${desktopPath}/${file.name}`;
+
       // Create a file
-      await persistItem(db, {
+      await persistItem(db as FolderDatabase, {
         blob,
         type: "file",
         storage: "indexeddb",
-        path: `${desktopPath}/${file.name}`,
+        path: file_path,
       });
 
       fs.createDesktopIcon({
@@ -148,13 +155,29 @@
   const onItemClick = (d: MenuProps) => {
     isOpen = !isOpen;
   };
+
+  $effect(() => {
+    if (!videoElement) {
+      return;
+    }
+
+    const handler = () => {
+      hasBootEnded = true;
+    };
+
+    videoElement.addEventListener("ended", handler);
+
+    return () => {
+      videoElement.removeEventListener("ended", handler);
+    };
+  });
   // $inspect(files_data).with((t, v) => console.log("files", v));
 </script>
 
 <Selecto>
-  <!-- controlledOpen={isOpen} -->
   <ContextMenu.Root open={isOpen} onOpenChange={(v) => (isOpen = v)}>
     <ContextMenu.Trigger oncontextmenu={(e) => e.stopPropagation()}>
+      <!-- svelte-ignore a11y_media_has_caption -->
       <main
         class="desktop relative h-screen scrollbar-hide overflow-hidden select-none"
         bind:this={desktop}
@@ -167,6 +190,26 @@
         {#each fs.getDesktopFiles() as item (item.id)}
           <DesktopIcons {...item as any} />
         {/each}
+
+        <DesktopWindows />
+
+        {#if !hasBootEnded}
+          <div
+            class="absolute z-[9999999] flex items-center justify-center bg-black size-full"
+          >
+            <div class="w-[50%] h-auto">
+              <video
+                class="object-fill"
+                muted
+                autoplay
+                playsinline
+                bind:this={videoElement}
+              >
+                <source src="/boot_sample.mp4" type="video/mp4" />
+              </video>
+            </div>
+          </div>
+        {/if}
 
         <div class="flex ml-[200px]">
           {#if over_dropzone}
@@ -243,16 +286,11 @@
           </Button>
         </div>
 
-        <DesktopWindows />
-
-        <!-- <Notepad {...fs.getTasks?.()[0]} /> -->
-
         <StartMenu bind:isStartMenuOpen />
         <Taskbar bind:isStartMenuOpen />
       </main>
     </ContextMenu.Trigger>
     <ContextMenu.Content class="z-50 w-full max-w-[229px] outline-none">
-      <!-- <Win7ContextMenu {menuItems} /> -->
       <ul
         role="menu"
         style="width: 200px"
