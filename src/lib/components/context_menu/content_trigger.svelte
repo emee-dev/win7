@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { type TriggerProps } from "./index";
   import { cn } from "@/utils";
-  import { getContextMenu } from "./ctx.svelte";
   import { onMount } from "svelte";
   import { NOT_SELECTABLE } from "../selecto";
+  import { getContextMenu } from "./ctx.svelte";
+  import { type TriggerProps } from "./index";
 
   const context = getContextMenu();
 
@@ -27,3 +27,12 @@
 >
   {@render children?.()}
 </div>
+
+<!-- <svelte:window
+  on:contextmenu={(e: OnContextMenu) => {
+    console.log("Window");
+
+    context.handleRightClick(e);
+    // e.preventDefault();
+  }}
+/> -->

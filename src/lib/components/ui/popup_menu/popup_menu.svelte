@@ -1,65 +1,52 @@
-<script lang="ts">
+<script lang="ts" module>
   import type { MenuProps } from ".";
+  import * as ContextMenu from "$lib/components/ui/context-menu/index";
+  export { listItem };
 
-  const { menuItems }: { menuItems: MenuProps[] } = $props();
+  // const { menuItems }: { menuItems: MenuProps[] } = $props();
 </script>
 
-{#snippet nestedMenuItem(menuItem: MenuProps)}
+{#snippet listItem(menuItem: MenuProps, onItemClick: any)}
   {@const isDisabled = menuItem?.isDisabled || null}
   {@const divider = menuItem?.hasDivider || null}
 
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <li
     role="menuitem"
-    class="{divider}  outline-none"
-    aria-haspopup="true"
+    class="{divider} outline-none"
+    aria-haspopup={menuItem.subMenu ? "true" : "false"}
     aria-disabled={isDisabled}
-    onclick={menuItem.onclick}
+    onclick={(ev) => {
+      if (!menuItem.subMenu) {
+        ev.stopPropagation();
+      }
+
+      onItemClick(menuItem);
+      menuItem?.onclick?.();
+    }}
   >
     {#if menuItem.icon}
       <img src={menuItem.icon} alt={menuItem.label} />
     {/if}
 
-    {menuItem.label}
+    {#if menuItem.subMenu}
+      {menuItem.label}
+    {:else}
+      <span class="menuitem">{menuItem.label}</span>
+    {/if}
 
     {#if menuItem.subMenu}
       <ul role="menu">
         {#each menuItem.subMenu as subMenuItem (subMenuItem.label)}
-          <li role="menuitem" onclick={() => subMenuItem.onclick?.()}>
-            <span class="menuitem">{subMenuItem.label}</span>
-          </li>
+          {@render listItem(subMenuItem, onItemClick)}
         {/each}
       </ul>
     {/if}
   </li>
 {/snippet}
 
-{#snippet menuItem(menuItem: MenuProps)}
-  {@const isDisabled = menuItem?.isDisabled || null}
-  {@const divider = menuItem?.hasDivider || null}
-
-  <!-- svelte-ignore a11y_click_events_have_key_events -->
-
-  <li
-    role="menuitem"
-    class="{divider} outline-none"
-    aria-disabled={isDisabled}
-    onclick={menuItem.onclick}
-  >
-    {#if menuItem.icon}
-      <img src={menuItem.icon} alt={menuItem.label} />
-    {/if}
-
-    <span class="menuitem">{menuItem.label}</span>
-  </li>
-{/snippet}
-
-<ul role="menu" style="width: 200px" class="can-hover select-none outline-none">
+<!-- <ul role="menu" style="width: 200px" class="can-hover select-none outline-none">
   {#each menuItems as item (item.label)}
-    {#if item.subMenu}
-      {@render nestedMenuItem(item)}
-    {:else}
-      {@render menuItem(item)}
-    {/if}
+    {@render listItem(item)}
   {/each}
-</ul>
+</ul> -->

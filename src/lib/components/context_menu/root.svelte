@@ -5,9 +5,8 @@
 
   const context = setContextMenu();
 
-  type OnContextMenu = MouseEvent & { currentTarget: EventTarget };
-
   let { children }: ContextProps = $props();
+  type OnContextMenu = MouseEvent & { currentTarget: EventTarget };
 
   onMount(() => {
     if (!context.context_trigger) {
@@ -15,7 +14,6 @@
         "[ContextMenu] Missing Trigger: `ContextMenu.Trigger` is required but was not found. Ensure you include it inside the `ContextMenu` component."
       );
     }
-
     if (!context.context_content) {
       throw new Error(
         "[ContextMenu] Missing Content: `ContextMenu.Content` is required but was not found. Ensure you include it inside the `ContextMenu` component."
@@ -27,7 +25,7 @@
 {@render children?.()}
 
 <svelte:window
-  on:contextmenu|preventDefault={(e: OnContextMenu) => {
+  on:contextmenu={(e: OnContextMenu) => {
     e.preventDefault();
   }}
 />

@@ -13,8 +13,6 @@
   const fs = getFs();
   const history = setHistory();
 
-  // const ctx = getWindowContext();
-
   export type FileExplorerProps = TaskManagerItem & {
     meta: {
       folder_path: string;
@@ -37,32 +35,32 @@
     {
       icon: "",
       label: "Desktop",
-      path: "C:/Users/{{root_user}}/Desktop",
+      path: "C:/Libraries/Desktop",
     },
     {
       icon: "/img/file_explorer_downloads.webp",
       label: "Downloads",
-      path: "C:/Users/{{root_user}}/Downloads",
+      path: "C:/Libraries/Downloads",
     },
     {
       icon: "",
       label: "Documents",
-      path: "C:/Users/{{root_user}}/Documents",
+      path: "C:/Libraries/Documents",
     },
     {
       icon: "",
       label: "Music",
-      path: "C:/Users/{{root_user}}/Music",
+      path: "C:/Libraries/Music",
     },
     {
       icon: "",
       label: "Pictures",
-      path: "C:/Users/{{root_user}}/Pictures",
+      path: "C:/Libraries/Pictures",
     },
     {
       icon: "",
       label: "Videos",
-      path: "C:/Users/{{root_user}}/Videos",
+      path: "C:/Libraries/Videos",
     },
   ];
 
@@ -114,7 +112,7 @@
     {/snippet}
   </Window.ExplorerHead>
 
-  <Window.Content>
+  <Window.Content parentClass="has-scrollbar">
     <div
       class="px-1 grid grid-cols-[180px_1fr] h-full border-t-[1px] border-neutral-500/60"
     >

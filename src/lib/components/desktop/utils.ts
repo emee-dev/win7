@@ -152,31 +152,6 @@ export const extractPath = (path_like: string) => {
   return { path, filename_ext };
 };
 
-// export const isMountedToDesktop = (path: string): boolean => {
-//   if (path.endsWith("/Desktop") || path.endsWith("/Desktop/")) {
-//     return true;
-//   } else {
-//     return false;
-//   }
-// };
-
-// export const isFolderOnDesktop = (folderPath: string, desktopPath: string) => {
-//   const desktopIndex = folderPath.indexOf(desktopPath);
-
-//   // "/Desktop" not found
-//   if (desktopIndex === -1) {
-//     return null;
-//   }
-
-//   // Extract the part of the path after /Desktop
-//   const remainingPath = folderPath.slice(desktopIndex + desktopPath.length);
-
-//   // Check if the remaining path starts with a separator and extract the immediate folder
-//   const match = remainingPath.match(/^\/([^\/]+)/);
-
-//   return match?.[1];
-// };
-
 export function getParentFolderInfo(path: string) {
   const regex = /\/desktop\/([^\/]+?)(?=\/|$)/i;
   const match = path.match(regex);
@@ -204,3 +179,22 @@ export function interpolate(
     return key in variables ? variables[key] : `{{${key}}}`;
   });
 }
+
+export const findHandler = (filePath: string) => {
+  const fileHandlers = {
+    Image_Viewer: [".png", ".jpg"],
+    Plyr_Video: [".mp4", ".mov"],
+    Notepad: [".txt"],
+    Plyr_Audio: [".mp3"],
+  };
+
+  const extension = filePath.slice(filePath.lastIndexOf(".")).toLowerCase();
+
+  for (const [handler, extensions] of Object.entries(fileHandlers)) {
+    if (extensions.includes(extension)) {
+      return handler;
+    }
+  }
+
+  return "Unknown_Handler";
+};

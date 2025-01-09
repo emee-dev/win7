@@ -36,11 +36,11 @@
   };
 </script>
 
-{#snippet taskBarItem(window: TaskManagerItem)}
+{#snippet taskBarItem(window: TaskManagerItem & { executeBy: string })}
   <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
   <div
     class={`taskbar-item group relative ${window.windowStatus === "inview" && "opened"}`}
-    style={`--icon: url('${getIconByProgramId(window.programId)}');`}
+    style={`--icon: url('${getIconByProgramId(window.programId || window.executeBy)}');`}
     onclick={() => toggleWindowView(window.id, window.windowStatus)}
   >
     <div
@@ -65,24 +65,20 @@
 
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 <div id="taskbar" class="">
-  <div id="start-button" class="mr-6 ml-5" onclick={toggleStartMenu}>
+  <div id="start-button" class="mr-6 ml-5" onclick={() => toggleStartMenu()}>
     <span class="icon"></span>
   </div>
 
   <div id="taskbar-items">
     {#each fs.getTasks() as item (item.id)}
-      {@render taskBarItem(item)}
+      {@render taskBarItem(item as TaskManagerItem & { executeBy: string })}
     {/each}
   </div>
 
   <div id="taskbar-tray">
     <!-- Action center icon -->
     <div class="taskbar-item">
-      <img
-        src="https://win7simu.visnalize.com/img/action-center.4d8b33c7.webp"
-        style="width: 20px;"
-        alt=""
-      />
+      <img src="/img/action_center_flag.webp" style="width: 20px;" alt="" />
     </div>
 
     <!-- Battery -->

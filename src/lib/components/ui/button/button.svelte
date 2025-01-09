@@ -1,10 +1,10 @@
 <script lang="ts">
   import { cva } from "class-variance-authority";
   import type { ButtonProps } from ".";
-  import "7.css/dist/7.scoped.css";
+  import { cn } from "@/utils";
 
   // Define the button styles using CVA
-  const buttonVariants = cva("button win7", {
+  const buttonVariants = cva("button", {
     variants: {
       variant: {
         default: "",
@@ -32,10 +32,17 @@
   }: ButtonProps = $props();
 </script>
 
-<div class="win7">
-  <button {...rest} {type} class={buttonVariants({ variant, size })} {disabled}>
-    {@render children?.()}
-  </button>
-</div>
+<button
+  {...rest}
+  {type}
+  class={cn(buttonVariants({ variant, size }))}
+  {disabled}
+>
+  {@render children?.()}
+</button>
 
-<style></style>
+<!-- svelte-ignore css_unused_selector -->
+<style>
+  /* This will help scope this button style to only this component */
+  @import url("7.css/dist/7.css");
+</style>

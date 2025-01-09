@@ -4,7 +4,6 @@
     type TaskManagerItem,
   } from "@/components/desktop/file_system.svelte";
   import { getIconByProgramId } from "@/components/desktop/utils";
-  // import Window from "@/components/window/window.svelte";
   import { Window } from "@/components/window_inprogress";
   import { onMount } from "svelte";
 
@@ -23,14 +22,17 @@ rank Svelte as the framework they’re most excited about using.`.trim()
       x: number;
       y: number;
     };
+    file_path: string;
   };
 
   let {
     label,
     id: windowId,
     programId,
+    file_path,
     placement = $bindable({ x: 0, y: 0 }),
-    meta = $bindable({ file_path: "" }),
+    // meta = $bindable({ file_path: "" }),
+    ...rest
   }: NotepadProps = $props();
 
   const onclose = () => {
@@ -42,14 +44,17 @@ rank Svelte as the framework they’re most excited about using.`.trim()
     fs.modifyTask(windowId, { windowStatus: "minimized" });
   };
 
+  // $inspect(rest.pr).with((t, v) => console.log("rest", rest));
+
   onMount(() => {
-    if (!meta.file_path) {
-      return;
-    }
+    console.log("file_path", file_path);
+    // if (!meta || !meta.file_path) {
+    //   return;
+    // }
 
-    console.log("meta.file_path", meta.file_path);
+    // console.log("meta.file_path", meta.file_path);
 
-    console.log("read", fs.fs?.readFile(meta.file_path));
+    // console.log("read", fs.fs?.readFile(meta.file_path));
   });
 </script>
 

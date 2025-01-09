@@ -101,8 +101,8 @@ This project is licensed under the MIT License. See the [LICENSE](https://github
 
 _Note: This project is a simulation and is not affiliated with Microsoft Corporation._
 
-For more information on migrating to Svelte 5 and the features used in this project, refer to the [Svelte 5 Migration Guide][https://svelte.dev/docs/svelte/v5-migration-guide].
+For more information on migrating to Svelte 5 and the features used in this project, refer to the [Svelte 5 Migration Guide](https://svelte.dev/docs/svelte/v5-migration-guide).
 
 📚 To further assist with the migration process, you might find the following video helpful:
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/_q5FZ3Z9Fz8?si=YSgx27c8sjWRYi9f" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+[![migration video](https://img.youtube.com/vi/_q5FZ3Z9Fz8/0.jpg)](https://www.youtube.com/watch?v=_q5FZ3Z9Fz8)

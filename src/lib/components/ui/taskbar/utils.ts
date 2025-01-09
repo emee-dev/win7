@@ -1,3 +1,5 @@
+import html2canvas from "html2canvas";
+
 interface BatteryManager extends EventTarget {
   charging: boolean;
   chargingTime: number;
@@ -67,4 +69,42 @@ export const handleBattery = async (navigator: CustomNavigator) => {
   } catch (error) {
     console.error("Error accessing battery status:", error);
   }
+};
+
+/**
+ * Captures a screenshot of an element with a specific data attribute and returns a Blob.
+ *
+ * @param {string} selector - The data attribute to select the element (e.g., 'data-screenshot-id').
+ * @returns {Promise<Blob>} - A promise that resolves with the screenshot as a Blob.
+ */
+export const captureElement = async (
+  selector: string | HTMLElement
+): Promise<Blob> => {
+  let element;
+
+  if (typeof selector === "string") {
+    element = document.querySelector(selector);
+  }
+
+  if (selector instanceof Element) {
+    element = selector;
+  }
+
+  if (!element) {
+    throw new Error(`Selector ${selector} not found.`);
+  }
+
+  const canvas = await html2canvas(element as HTMLElement, {
+    foreignObjectRendering: true,
+  });
+
+  return new Promise((resolve) => {
+    canvas.toBlob((blob) => {
+      if (blob) {
+        resolve(blob);
+      } else {
+        throw new Error("Failed to capture screenshot as Blob.");
+      }
+    });
+  });
 };

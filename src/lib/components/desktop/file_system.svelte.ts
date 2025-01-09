@@ -2,11 +2,13 @@ import { getContext, setContext } from "svelte";
 import { Directory, FileItem } from "./fs/directory";
 import {
   extractPath,
+  findHandler,
   getDesktopIcon,
   getParentFolderInfo,
   interpolate,
   type InstalledPrograms,
 } from "./utils";
+import { getAllFolders, type FolderDatabase } from "./indexeddb";
 
 type Placement = {
   column: number;
@@ -38,6 +40,7 @@ export type DesktopFile = IconProps &
   MountableFile & {
     type: "file";
     executeBy: InstalledPrograms;
+    // meta?: Record<string, unknown> | undefined;
   };
 
 export type DesktopFolder = IconProps & {
@@ -73,10 +76,11 @@ type MountableProgram = {
   type: "executable";
   programId: InstalledPrograms;
   mount_to: string;
+  meta?: Record<string, unknown> | undefined;
 };
 
-type MountableFile = Omit<MountableProgram, "programId" | "type"> & {
-  executeBy: string;
+type MountableFile = Pick<MountableProgram, "mount_to"> & {
+  // executeBy: string;
   mimetype: string;
   textContent: string;
   type: "file";
@@ -100,14 +104,14 @@ class Win7FileSystem {
   >([]);
 
   private taskManager = $state<TaskManagerItem[]>([
-    {
-      id: crypto.randomUUID(),
-      label: "Plyr_Video",
-      taskStatus: "running",
-      windowStatus: "inview",
-      pinnedToTaskbar: false,
-      programId: "Plyr_Video",
-    },
+    // {
+    //   id: crypto.randomUUID(),
+    //   label: "Plyr_Video",
+    //   taskStatus: "running",
+    //   windowStatus: "inview",
+    //   pinnedToTaskbar: false,
+    //   programId: "Plyr_Video",
+    // },
   ]);
 
   constructor(user_name: string) {
@@ -129,21 +133,44 @@ class Win7FileSystem {
    *
    * @param args
    * @returns
-   * Mounts directories and files to the file system.
+   * Recursively mounts directories and then files to the file system.
    */
-  mount(args: {
+  async mount(args: {
     desktop: HTMLElement;
+    db: FolderDatabase;
     dir: string[];
     files?: (MountableProgram | MountableFile)[];
   }) {
     const dir = this.fs;
     this.desktop = args.desktop;
 
+    let files = args.files || [];
+    let folders = args.dir || [];
+
+    // if (!args.db) {
+    //   return;
+    // }
+
     if (!dir) {
       return;
     }
 
-    args.dir.forEach((path) => {
+    let persistedFiles = await getAllFolders(args.db);
+
+    if (persistedFiles && persistedFiles.length > 0) {
+      persistedFiles.forEach((element) => {
+        if (element.type === "file") {
+          files.push({
+            executeBy: findHandler(element.path),
+            mimetype: element.blob.type,
+            mount_to: element.path,
+            type: "file",
+          } as MountableFile & { executeBy: string });
+        }
+      });
+    }
+
+    folders.forEach((path) => {
       const replaceVariables = interpolate(path, { root_user: this.getUser() });
 
       // Here we check if the folder exists on the desktop path
@@ -175,18 +202,18 @@ class Win7FileSystem {
       return dir.insertPath(replaceVariables);
     });
 
-    if (!args.files) {
+    if (!files) {
       return;
     }
 
-    args.files.forEach((file) => {
+    files.forEach((file) => {
       const replaceVariables = interpolate(file.mount_to, {
         root_user: this.getUser(),
       });
 
-      const noneDesktopItem = extractPath(replaceVariables);
+      const item = extractPath(replaceVariables);
 
-      if (!noneDesktopItem) {
+      if (!item) {
         return;
       }
 
@@ -194,19 +221,31 @@ class Win7FileSystem {
         return;
       }
 
-      const { isOnDesktop, label: desktopFile } =
-        getParentFolderInfo(replaceVariables);
+      const { isOnDesktop } = getParentFolderInfo(replaceVariables);
 
       if (!isOnDesktop) {
-        dir.createFile(
-          noneDesktopItem.path,
-          noneDesktopItem.filename_ext as string,
-          "text/plain",
-          ""
-        );
+        if (file.type === "file") {
+          dir.createFile(
+            item.path,
+            item.filename_ext as string,
+            file.mimetype,
+            file.textContent
+          );
+        }
+
+        if (file.type === "executable") {
+          dir.createFile(
+            item.path,
+            item.filename_ext as string,
+            "application/x-msdownload",
+            null
+          );
+        }
+
         return;
       }
 
+      // is on desktop
       this.mountDesktopIcon(file);
     });
   }
@@ -228,7 +267,7 @@ class Win7FileSystem {
   createDesktopIcon<T extends DesktopIcon>(args: T) {
     const fs = this.getfs();
     const desktopIcon = args as DesktopIcon & ExtraIconProps;
-    const CWD = `C:/Users/${this.getUser()}/Desktop`;
+    const CWD = `C:/Libraries/Desktop`;
     const file_path = `${CWD}/${desktopIcon.label}` as DesktopFolderPath;
 
     if (!fs) {
@@ -254,6 +293,7 @@ class Win7FileSystem {
     if ("executeBy" in desktopIcon && desktopIcon.type === "file") {
       // Checks if it is a typeof file and not a folder.
       if (!Directory.isFile(file_path)) {
+        console.log("Not a file", file_path);
         return;
       }
 
@@ -282,6 +322,7 @@ class Win7FileSystem {
       }
 
       fs.insertPath(file_path);
+
       this.desktopFiles.push({
         id: desktopIcon.id,
         label: desktopIcon.label,
@@ -298,7 +339,7 @@ class Win7FileSystem {
     args: T
   ) {
     const fs = this.getfs();
-    const CWD = `C:/Users/${this.getUser()}/Desktop`;
+    const CWD = `C:/Libraries/Desktop`;
     const { column, row } = this.placeNextIcon();
 
     const replaceVariables = interpolate(args.mount_to, {
@@ -329,6 +370,7 @@ class Win7FileSystem {
         programId: args.programId,
         placement: { column, row },
         file_path: file_path,
+        meta: (args?.meta as any) || undefined,
         icon: getDesktopIcon(file_path),
       } as DesktopExecutable & ExtraIconProps);
     }
@@ -338,19 +380,21 @@ class Win7FileSystem {
         return;
       }
 
-      fs.createFile(CWD, label, "plain/text", args?.textContent || "");
+      fs.createFile(CWD, label, "text/plain", args?.textContent || "");
 
       this.desktopFiles.push({
         id: crypto.randomUUID(),
         label: label,
         type: "file",
-        executeBy: args.executeBy,
+        executeBy: findHandler(file_path),
         placement: { column, row },
         file_path: file_path,
         icon: getDesktopIcon(file_path),
       } as DesktopFile & ExtraIconProps);
     }
   }
+
+  private mountIndexedDbData(db: string) {}
 
   getDesktopFiles() {
     return this.desktopFiles;

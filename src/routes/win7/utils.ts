@@ -1,57 +1,35 @@
-import { cubicOut } from "svelte/easing";
-import type { TransitionConfig } from "svelte/transition";
+export const windows7Folders = [
+  "C:/Users/Public",
+  "C:/Program Files",
+  "C:/Program Files (x86)",
+  "C:/Windows",
+  "C:/Users/{{root_user}}/Favorites",
+  "C:/Users/{{root_user}}/AppData",
+  "C:/Users/{{root_user}}/AppData/Local",
+  "C:/Users/{{root_user}}/AppData/Roaming",
+  "C:/Users/{{root_user}}/AppData/LocalLow",
+  "C:/Users/{{root_user}}/Links",
+  "C:/Users/{{root_user}}/Saved Games",
+  "C:/Users/{{root_user}}/Searches",
+  "C:/Recycle Bin",
+  "C:/Network",
+  "C:/Control Panel",
+  "C:/Libraries/Desktop",
+  "C:/Libraries/Documents",
+  "C:/Libraries/Downloads",
+  "C:/Libraries/Music",
+  "C:/Libraries/Pictures",
+  "C:/Libraries/Videos",
+];
 
-type FlyAndScaleParams = {
-  y?: number;
-  start?: number;
-  duration?: number;
-};
-
-const defaultFlyAndScaleParams = { y: -8, start: 0.95, duration: 200 };
-
-export function flyAndScale(
-  node: Element,
-  params?: FlyAndScaleParams
-): TransitionConfig {
-  const style = getComputedStyle(node);
-  const transform = style.transform === "none" ? "" : style.transform;
-  const withDefaults = { ...defaultFlyAndScaleParams, ...params };
-
-  const scaleConversion = (
-    valueA: number,
-    scaleA: [number, number],
-    scaleB: [number, number]
-  ) => {
-    const [minA, maxA] = scaleA;
-    const [minB, maxB] = scaleB;
-
-    const percentage = (valueA - minA) / (maxA - minA);
-    const valueB = percentage * (maxB - minB) + minB;
-
-    return valueB;
-  };
-
-  const styleToString = (
-    style: Record<string, number | string | undefined>
-  ): string => {
-    return Object.keys(style).reduce((str, key) => {
-      if (style[key] === undefined) return str;
-      return `${str}${key}:${style[key]};`;
-    }, "");
-  };
-
-  return {
-    duration: withDefaults.duration ?? 200,
-    delay: 0,
-    css: (t) => {
-      const y = scaleConversion(t, [0, 1], [withDefaults.y, 0]);
-      const scale = scaleConversion(t, [0, 1], [withDefaults.start, 1]);
-
-      return styleToString({
-        transform: `${transform} translate3d(0, ${y}px, 0) scale(${scale})`,
-        opacity: t,
-      });
-    },
-    easing: cubicOut,
-  };
-}
+// dir: [
+//   "C:/Users/{{root_user}}",
+//   "C:/Users/{{root_user}}/Desktop",
+//   "C:/Users/{{root_user}}/Downloads",
+//   "C:/Users/{{root_user}}/Documents",
+//   "C:/Users/{{root_user}}/Music",
+//   "C:/Users/{{root_user}}/Pictures",
+//   "C:/Users/{{root_user}}/Videos",
+//   "C:/Users/{{root_user}}/Desktop/New folder",
+//   "C:/Users/{{root_user}}/Documents",
+// ],

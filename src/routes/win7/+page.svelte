@@ -1,6 +1,7 @@
 <script lang="ts">
   import { setHistory } from "@/apps/File_Explorer/undoRedo.svelte";
-  import { ContextMenu } from "@/components/context_menu";
+  // import { ContextMenu } from "@/components/context_menu";
+  import * as ContextMenu from "$lib/components/ui/context-menu/index";
   import { DesktopWindows, os } from "@/components/desktop";
   import DesktopIcons from "@/components/desktop/desktop_icons.svelte";
   import { menuItems } from "@/components/desktop/utils";
@@ -8,101 +9,77 @@
   import { Win7ContextMenu } from "@/components/ui/popup_menu";
   import { StartMenu } from "@/components/ui/startmenu";
   import Taskbar from "@/components/ui/taskbar/taskbar.svelte";
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { Button } from "@/components/ui/button";
+  import { useDropzone, type DropzoneParameter } from "@/hooks/Dropzone";
   // import "7.css/dist/7.css";
   import "7.css/dist/gui/tabs.css";
   import "7.css/dist/gui/window.css";
   import "7.css/dist/gui/scrollbar.css";
   import "7.css/dist/gui/menu.css";
   import "7.css/dist/gui/searchbox.css";
+  import "7.css/dist/gui/treeview.css";
+  import "7.css/dist/gui/progressbar.css";
+  import "7.css/dist/gui/global.css";
+  import type {
+    DesktopFile,
+    ExtraIconProps,
+  } from "@/components/desktop/file_system.svelte";
+  import { FolderDatabase, persistItem } from "@/components/desktop/indexeddb";
+  import { listItem } from "@/components/ui/popup_menu/popup_menu.svelte";
+  import type { MenuProps } from "@/components/context_menu";
+  import { windows7Folders } from "./utils";
 
   let desktop: HTMLElement;
-
+  let db: FolderDatabase | null;
   const fs = os.initFs("Guest");
 
   let mouseCoordinates = $state({ x: 0, y: 0 });
-
   let isStartMenuOpen = $state(false);
 
-  // const windows7Folders = [
-  //   "C:\\Users\\[Username]\\Desktop",
-  //   "C:\\Users\\[Username]\\Documents",
-  //   "C:\\Users\\[Username]\\Downloads",
-  //   "C:\\Users\\[Username]\\Pictures",
-  //   "C:\\Users\\[Username]\\Music",
-  //   "C:\\Users\\[Username]\\Videos",
-  //   "C:\\Users\\[Username]",
-  //   "C:\\Users\\Public",
-  //   "C:\\Program Files",
-  //   "C:\\Program Files (x86)", // For 64-bit systems
-  //   "C:\\Windows",
-  //   "C:\\Users\\[Username]\\Favorites",
-  //   "C:\\Users\\[Username]\\AppData", // Hidden system folder
-  //   "C:\\Users\\[Username]\\AppData\\Local",
-  //   "C:\\Users\\[Username]\\AppData\\Roaming",
-  //   "C:\\Users\\[Username]\\AppData\\LocalLow",
-  //   "C:\\Users\\[Username]\\Links", // Shortcuts like 'My Documents'
-  //   "C:\\Users\\[Username]\\Saved Games",
-  //   "C:\\Users\\[Username]\\Searches",
-  //   "C:\\Recycle Bin",
-  //   "C:\\Network",
-  //   "C:\\Control Panel",
-  //   "C:\\Libraries\\Documents",
-  //   "C:\\Libraries\\Music",
-  //   "C:\\Libraries\\Pictures",
-  //   "C:\\Libraries\\Videos",
-  // ];
-
   onMount(() => {
+    db = new FolderDatabase();
+
     fs.mount({
       desktop,
-      dir: [
-        "C:",
-        "C:/Users",
-        "C:/Users/{{root_user}}",
-        "C:/Users/{{root_user}}/Desktop",
-        "C:/Users/{{root_user}}/Downloads",
-        "C:/Users/{{root_user}}/Documents",
-        "C:/Users/{{root_user}}/Music",
-        "C:/Users/{{root_user}}/Pictures",
-        "C:/Users/{{root_user}}/Videos",
-        "C:/Users/{{root_user}}/Desktop/New folder",
-        "C:/Users/{{root_user}}/Documents",
-      ],
+      db,
+      dir: windows7Folders,
       files: [
         {
           fileName: "MyComputer.exe",
-          programId: "MyComputer",
+          programId: "File_Explorer",
           type: "executable",
-          mount_to: "C:/Users/{{root_user}}/Desktop/MyComputer.exe",
+          meta: {
+            folder_path: "C:/Control Panel",
+          },
+          mount_to: "C:/Libraries/Desktop/MyComputer.exe",
         },
         {
-          fileName: "npm.txt",
-          executeBy: "Notepad",
           type: "file",
           textContent: "the following is my npm private keys.",
-          mimetype: "application/text",
-          mount_to: "C:/Users/{{root_user}}/Desktop/npm.txt",
+          mimetype: "text/plain",
+          mount_to: "C:/Libraries/Desktop/npm.txt",
         },
         {
-          fileName: "exam.txt",
-          executeBy: "Notepad",
           type: "file",
           textContent: "the following is my npm private keys.",
-          mimetype: "application/text",
-          mount_to: "C:/Users/{{root_user}}/Desktop/exam.txt",
+          mimetype: "text/plain",
+          mount_to: "C:/Libraries/Desktop/exam.txt",
         },
         {
-          fileName: "exam.txt",
-          executeBy: "Notepad",
           type: "file",
           textContent: "the following is my npm private keys.",
-          mimetype: "application/text",
-          mount_to: "C:/Users/{{root_user}}/Documents/exam.txt",
+          mimetype: "text/plain",
+          mount_to: "C:/Libraries/Documents/exam.txt",
         },
       ],
     });
+  });
+
+  onDestroy(() => {
+    if (db) {
+      db = null;
+    }
   });
 
   const onMouseMove = (ev: any) => {
@@ -111,20 +88,92 @@
   };
 
   const Icon = "/img/bg.jpg";
+
+  const desktopPath = `C:/Users/{{root_user}}/Desktop`;
+
+  let over_dropzone = $state(false);
+
+  let files_data = $state<File[]>([]);
+
+  function hover(data: CustomEvent<boolean>) {
+    over_dropzone = data.detail;
+  }
+
+  async function on_file_drop(data: CustomEvent<File[]>) {
+    try {
+      const files = data.detail;
+
+      if (!files) {
+        return;
+      }
+
+      if (files.length > 1) {
+        console.log(
+          `We only accept single files at the moment. You provided ${files.length}.`
+        );
+        return;
+      }
+
+      // For now we are handling single files
+      const file = files[0];
+      const blob = new Blob([file], { type: file.type });
+
+      // Persist custom/user created files in indexeddb
+      let { column, row } = fs.placeNextIcon();
+
+      // Create a file
+      await persistItem(db, {
+        blob,
+        type: "file",
+        storage: "indexeddb",
+        path: `${desktopPath}/${file.name}`,
+      });
+
+      fs.createDesktopIcon({
+        id: crypto.randomUUID(),
+        label: file.name,
+        type: "file",
+        executeBy: "Plyr_Video",
+        placement: { column, row },
+      } as DesktopFile & ExtraIconProps);
+
+      files_data = files;
+    } catch (err) {
+      console.log("Error", err);
+    }
+  }
+
+  let isOpen = $state(false);
+
+  const onItemClick = (d: MenuProps) => {
+    isOpen = !isOpen;
+  };
+  // $inspect(files_data).with((t, v) => console.log("files", v));
 </script>
 
 <Selecto>
-  <ContextMenu>
-    <ContextMenu.Trigger>
+  <!-- controlledOpen={isOpen} -->
+  <ContextMenu.Root open={isOpen} onOpenChange={(v) => (isOpen = v)}>
+    <ContextMenu.Trigger oncontextmenu={(e) => e.stopPropagation()}>
       <main
         class="desktop relative h-screen scrollbar-hide overflow-hidden select-none"
         bind:this={desktop}
         onmousemove={onMouseMove}
         style="--icon: url('{Icon}');"
+        use:useDropzone
+        onhover={hover}
+        onfiles={on_file_drop}
       >
-        <DesktopIcons />
+        {#each fs.getDesktopFiles() as item (item.id)}
+          <DesktopIcons {...item as any} />
+        {/each}
 
-        <div class="flex">
+        <div class="flex ml-[200px]">
+          {#if over_dropzone}
+            <span>Over zone</span>
+          {:else}
+            <span>Not over zone</span>
+          {/if}
           <Button
             class="ml-auto"
             onclick={() => {
@@ -143,53 +192,23 @@
           >
             Start File_Explorer
           </Button>
-          <!-- <button
+          <Button
             class="ml-auto"
             onclick={() => {
               let { column, row } = fs.placeNextIcon();
 
-              // Create an executable shortcut
-              // fs.createIcon({
-              //   id: crypto.randomUUID(),
-              //   label: "MyComputer.exe",
-              //   programId: "MyComputer",
-              //   type: "executable",
-              //   placement: { column, row },
-              // });
-              fs.createIcon({
+              fs.createDesktopIcon({
                 id: crypto.randomUUID(),
-                label: "RecycleBin.exe",
-                programId: "RecycleBin",
-                type: "executable",
+                label: "abc.txt",
+                type: "file",
+                executeBy: "Plyr_Video",
                 placement: { column, row },
-              });
-
-              // let { column: column2, row: row2 } = fs.placeNextIcon();
-
-              // // Create a file shortcut
-              // fs.createIcon({
-              //   id: crypto.randomUUID(),
-              //   label: "npm.txt",
-              //   executeBy: "Notepad",
-              //   type: "file_or_folder",
-              //   placement: { column: column2, row: row2 },
-              // });
-
-              // let { column: column3, row: row3 } = fs.placeNextIcon();
-
-              // // Create a folder shortcut
-              // fs.createIcon({
-              //   id: crypto.randomUUID(),
-              //   label: "New folder",
-              //   type: "file_or_folder",
-              //   executeBy: "File_Manager",
-              //   placement: { column: column3, row: row3 },
-              // });
+              } as DesktopFile & ExtraIconProps);
             }}
           >
             Add new icon
-          </button> -->
-          <button
+          </Button>
+          <Button
             onclick={() => {
               fs.launchTask({
                 id: crypto.randomUUID(),
@@ -201,8 +220,8 @@
               });
             }}
             >Start Calculator
-          </button>
-          <button
+          </Button>
+          <Button
             onclick={() => {
               fs.launchTask({
                 id: crypto.randomUUID(),
@@ -214,13 +233,14 @@
               });
             }}
             >Start Notepad
-          </button>
-          <button
+          </Button>
+          <Button
             onclick={() => {
               // fs.serializeFs();
+              // console.log(fs.getFolder("C:"));
             }}
             >Serialize FS
-          </button>
+          </Button>
         </div>
 
         <DesktopWindows />
@@ -232,9 +252,18 @@
       </main>
     </ContextMenu.Trigger>
     <ContextMenu.Content class="z-50 w-full max-w-[229px] outline-none">
-      <Win7ContextMenu {menuItems} />
+      <!-- <Win7ContextMenu {menuItems} /> -->
+      <ul
+        role="menu"
+        style="width: 200px"
+        class="can-hover select-none outline-none"
+      >
+        {#each menuItems as item (item.label)}
+          {@render listItem(item, onItemClick)}
+        {/each}
+      </ul>
     </ContextMenu.Content>
-  </ContextMenu>
+  </ContextMenu.Root>
 </Selecto>
 
 <style>

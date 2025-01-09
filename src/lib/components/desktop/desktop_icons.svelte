@@ -1,100 +1,123 @@
 <script lang="ts">
-  import { ContextMenu } from "@/components/context_menu";
+  import * as ContextMenu from "$lib/components/ui/context-menu/index";
   import { os } from "@/components/desktop";
   import type {
+    DesktopFile,
     DesktopIcon,
     ExtraIconProps,
+    TaskManagerItem,
   } from "@/components/desktop/file_system.svelte";
   import { Directory } from "@/components/desktop/file_system.svelte";
   import { SELECTABLE_ITEM } from "@/components/selecto";
-  import { Win7ContextMenu } from "@/components/ui/popup_menu";
   import { cn } from "@/utils";
-  import type { SvelteHTMLElements } from "svelte/elements";
+  import type { MenuProps } from "../context_menu";
+  import { listItem } from "../ui/popup_menu/popup_menu.svelte";
 
-  type IconProps = DesktopIcon & SvelteHTMLElements["div"] & ExtraIconProps;
+  type IconProps = DesktopIcon & ExtraIconProps;
+
+  let props: IconProps = $props();
 
   const fs = os.getFs();
+
+  let isOpen = $state(false);
+
+  const onItemClick = (d: MenuProps) => {
+    isOpen = !isOpen;
+  };
+
+  const menuItems = [
+    {
+      label: "Open",
+      onclick() {},
+    },
+    { label: "Pin to Taskbar" },
+    { label: "Delete" },
+    { label: "Rename" },
+  ];
 </script>
 
-{#snippet Icon(props: IconProps)}
-  <!-- svelte-ignore a11y_no_static_element_interactions -->
-  <div
-    ondblclick={() => {
-      if (Directory.isFile(props.file_path)) {
-        // Check if is an installed program
-        if ("programId" in props) {
-          fs.launchTask({
-            id: crypto.randomUUID(),
-            label: props.programId,
-            taskStatus: "running",
-            windowStatus: "inview",
-            pinnedToTaskbar: false,
-            programId: props.programId,
-          });
+<ContextMenu.Root open={isOpen} onOpenChange={(v) => (isOpen = v)}>
+  <ContextMenu.Trigger>
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div
+      ondblclick={() => {
+        if (Directory.isFile(props.file_path)) {
+          if ("programId" in props && props.type === "executable") {
+            fs.launchTask({
+              id: crypto.randomUUID(),
+              label: props.programId,
+              taskStatus: "running",
+              windowStatus: "inview",
+              pinnedToTaskbar: false,
+              programId: props.programId,
+              meta: (props?.meta as Record<string, string>) || undefined,
+            });
+          }
+
+          if ("executeBy" in props && props.type === "file") {
+            fs.launchTask({
+              id: crypto.randomUUID(),
+              label: props.executeBy,
+              taskStatus: "running",
+              windowStatus: "inview",
+              pinnedToTaskbar: false,
+              executeBy: props.executeBy,
+              file_path: props.file_path,
+              meta: props?.meta as Record<string, string>,
+            } as any);
+          }
+
+          // if ("executeBy" in props) {
+          //   fs.launchTask({
+          //     id: crypto.randomUUID(),
+          //     label: props.executeBy,
+          //     taskStatus: "running",
+          //     windowStatus: "inview",
+          //     pinnedToTaskbar: false,
+          //     executeBy: props.executeBy,
+          //     meta: props?.meta as Record<string, string>,
+          //   });
+          // }
         }
 
-        if ("executeBy" in props) {
+        if (Directory.isFolder(props.file_path)) {
           fs.launchTask({
             id: crypto.randomUUID(),
-            label: props.executeBy,
+            label: "File_Explorer",
             taskStatus: "running",
             windowStatus: "inview",
             pinnedToTaskbar: false,
-            executeBy: props.executeBy,
+            programId: "File_Explorer",
             meta: {
-              file_path: props.file_path,
+              folder_path: props.file_path,
             },
           });
         }
-      }
-
-      if (Directory.isFolder(props.file_path)) {
-        fs.launchTask({
-          id: crypto.randomUUID(),
-          label: "File_Explorer",
-          taskStatus: "running",
-          windowStatus: "inview",
-          pinnedToTaskbar: false,
-          programId: "File_Explorer",
-          meta: {
-            folder_path: props.file_path,
-          },
-        });
-      }
-    }}
-    class={cn("item ml-1", SELECTABLE_ITEM)}
-    style={`width: 70px; height: 70px; z-index: 1; top: ${props.placement?.column}px; left: ${props.placement?.row}px;`}
-    {...props}
-  >
-    <span class="icon-wrapper">
-      <span class="icon" style="--icon: url('{props.icon}');"> </span>
-    </span>
-    <div class=" h-full text-wrap">{props.label.replace(".exe", "")}</div>
-  </div>
-{/snippet}
-
-{#each fs.getDesktopFiles() as item (item.id)}
-  <ContextMenu>
-    <ContextMenu.Trigger>
-      {@render Icon(item as IconProps)}
-    </ContextMenu.Trigger>
-    <ContextMenu.Content
-      class="z-50 w-full max-w-[229px] outline-none first:bg-red-400"
+      }}
+      class={cn("item ml-1", SELECTABLE_ITEM)}
+      style={`width: 70px; height: 70px; z-index: 1; top: ${props.placement?.column}px; left: ${props.placement?.row}px;`}
+      {...props}
     >
-      <Win7ContextMenu
-        menuItems={[
-          {
-            label: "Open",
-            onclick() {},
-          },
-          { label: "Pin to Taskbar" },
-          { label: "Delete" },
-          { label: "Rename" },
-        ]}
-      />
-    </ContextMenu.Content>
-  </ContextMenu>
-{/each}
+      <span class="icon-wrapper">
+        <span class="icon" style="--icon: url('{props.icon}');"> </span>
+      </span>
+      <div class=" h-full text-wrap">{props.label.replace(".exe", "")}</div>
+    </div>
+  </ContextMenu.Trigger>
+  <ContextMenu.Content
+    class="z-50 w-full max-w-[229px] outline-none first:bg-red-400"
+  >
+    <ul
+      role="menu"
+      style="width: 200px"
+      class="can-hover select-none outline-none"
+    >
+      {#each menuItems as item (item.label)}
+        {@render listItem(item, onItemClick)}
+      {/each}
+    </ul>
+  </ContextMenu.Content>
+</ContextMenu.Root>
 
 <style>
   .item {

@@ -19,14 +19,15 @@
       x: number;
       y: number;
     };
+    file_path: string;
   };
 
   let {
     label,
     id: windowId,
-
+    file_path,
     placement = $bindable({ x: 0, y: 0 }),
-    meta = $bindable({ file_path: "" }),
+    // meta = $bindable({ file_path: "" }),
   }: PlyrVideoProps = $props();
 
   const onclose = () => {

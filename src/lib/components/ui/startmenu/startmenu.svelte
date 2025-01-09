@@ -1,9 +1,13 @@
 <script lang="ts">
+  import { os } from "@/components/desktop";
+  import { type TaskManagerItem } from "@/components/desktop/file_system.svelte";
   import {
     getIconByProgramId,
     type InstalledPrograms,
   } from "@/components/desktop/utils";
   import type { Action } from "svelte/action";
+
+  const fs = os.getFs();
 
   let isFeaturedView = $state(true);
   let { isStartMenuOpen = $bindable(false) }: { isStartMenuOpen: boolean } =
@@ -12,25 +16,57 @@
   const leftCaret = `\\23F4`;
   const rightCaret = `\\23F5`;
 
-  const installed: InstalledPrograms[] = [
-    "Calculator",
-    "File_Explorer",
-    "MyComputer",
-    "Notepad",
-    "RecycleBin",
-  ];
-
-  type FeaturedPrograms = {
-    id: string;
-    label: InstalledPrograms;
-  };
-
-  const featuredItems = installed.map((item) => {
-    return {
+  const installed = [
+    {
       id: crypto.randomUUID(),
-      label: item,
-    };
-  });
+      label: "Calculator",
+      taskStatus: "running",
+      windowStatus: "inview",
+      pinnedToTaskbar: false,
+      programId: "Calculator",
+    },
+    {
+      id: crypto.randomUUID(),
+      label: "File_Explorer",
+      taskStatus: "running",
+      windowStatus: "inview",
+      pinnedToTaskbar: false,
+      programId: "File_Explorer",
+      meta: {
+        folder_path: "C:",
+      },
+    },
+    {
+      id: crypto.randomUUID(),
+      label: "MyComputer",
+      taskStatus: "running",
+      windowStatus: "inview",
+      pinnedToTaskbar: false,
+      programId: "File_Explorer",
+      meta: {
+        folder_path: "C:/Control Panel",
+      },
+    },
+    {
+      id: crypto.randomUUID(),
+      label: "Notepad",
+      taskStatus: "running",
+      windowStatus: "inview",
+      pinnedToTaskbar: false,
+      programId: "Notepad",
+    },
+    {
+      id: crypto.randomUUID(),
+      label: "RecycleBin",
+      taskStatus: "running",
+      windowStatus: "inview",
+      pinnedToTaskbar: false,
+      programId: "File_Explorer",
+      meta: {
+        folder_path: "C:/Recycle Bin",
+      },
+    },
+  ];
 
   function handleClickOutside(event: any) {
     isStartMenuOpen = false;
@@ -61,21 +97,29 @@
   };
 </script>
 
-{#snippet featuredPrograms(args: FeaturedPrograms)}
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+{#snippet featuredPrograms(args: TaskManagerItem)}
   <div
-    data-icon="player"
     class="program featured flex items-center active"
-    style=" --icon: url('{getIconByProgramId(args.label)}');"
+    style=" --icon: url('{getIconByProgramId(
+      args.label as InstalledPrograms
+    )}');"
+    onclick={() => fs.launchTask(args)}
   >
     {args.label.replace("_", " ")}
   </div>
 {/snippet}
 
-{#snippet mainPrograms(args: FeaturedPrograms)}
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+{#snippet mainPrograms(args: TaskManagerItem)}
   <div
-    data-icon="player"
     class="program flex items-center"
-    style=" --icon: url('{getIconByProgramId(args.label)}');"
+    style=" --icon: url('{getIconByProgramId(
+      args.label as InstalledPrograms
+    )}');"
+    onclick={() => fs.launchTask(args)}
   >
     {args.label}
   </div>
@@ -91,12 +135,12 @@
     <div class="programs-list has-scrollbar">
       {#if isFeaturedView}
         <!-- There can only be 8 featured items at a time. -->
-        {#each featuredItems as program (program.id)}
-          {@render featuredPrograms(program)}
+        {#each installed as program (program.id)}
+          {@render featuredPrograms(program as TaskManagerItem)}
         {/each}
       {:else}
-        {#each featuredItems as normalProgram}
-          {@render mainPrograms(normalProgram)}
+        {#each installed as normalProgram}
+          {@render mainPrograms(normalProgram as TaskManagerItem)}
         {/each}
       {/if}
     </div>
@@ -104,9 +148,9 @@
       <hr
         class="mx-[auto] my-[0] border-[1px] border-[solid] border-[#d6e5f5] w-[90%]"
       />
+
       <!-- svelte-ignore a11y_click_events_have_key_events -->
       <!-- svelte-ignore a11y_no_static_element_interactions -->
-
       <div
         class={`programs-nav before:content-['${isFeaturedView ? rightCaret : leftCaret}']`}
         onclick={() => {
@@ -124,18 +168,114 @@
     <div class="account">
       <div class="img no-name">
         <img
-          src="https://win7simu.visnalize.com/img/guest.1a7eab2b.webp"
+          src="/img/startmenu_guest.webp"
           alt="profile_img"
           width="50"
           height="50"
         />
       </div>
     </div>
-    <div class="link">Document</div>
-    <div class="link">Pictures</div>
-    <div class="link">Music</div>
-    <div class="link has-line">Computer</div>
-    <div class="link">Control Panel</div>
+
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div
+      class="link"
+      onclick={() => {
+        fs.launchTask({
+          id: crypto.randomUUID(),
+          label: "File_Explorer",
+          taskStatus: "running",
+          windowStatus: "inview",
+          pinnedToTaskbar: false,
+          programId: "File_Explorer",
+          meta: {
+            folder_path: "C:/Libraries/Documents",
+          },
+        });
+      }}
+    >
+      Documents
+    </div>
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div
+      class="link"
+      onclick={() => {
+        fs.launchTask({
+          id: crypto.randomUUID(),
+          label: "File_Explorer",
+          taskStatus: "running",
+          windowStatus: "inview",
+          pinnedToTaskbar: false,
+          programId: "File_Explorer",
+          meta: {
+            folder_path: "C:/Libraries/Pictures",
+          },
+        });
+      }}
+    >
+      Pictures
+    </div>
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div
+      class="link"
+      onclick={() => {
+        fs.launchTask({
+          id: crypto.randomUUID(),
+          label: "File_Explorer",
+          taskStatus: "running",
+          windowStatus: "inview",
+          pinnedToTaskbar: false,
+          programId: "File_Explorer",
+          meta: {
+            folder_path: "C:/Libraries/Music",
+          },
+        });
+      }}
+    >
+      Music
+    </div>
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div
+      class="link has-line"
+      onclick={() => {
+        fs.launchTask({
+          id: crypto.randomUUID(),
+          label: "File_Explorer",
+          taskStatus: "running",
+          windowStatus: "inview",
+          pinnedToTaskbar: false,
+          programId: "File_Explorer",
+          meta: {
+            folder_path: "C:",
+          },
+        });
+      }}
+    >
+      Computer
+    </div>
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div
+      class="link"
+      onclick={() => {
+        fs.launchTask({
+          id: crypto.randomUUID(),
+          label: "File_Explorer",
+          taskStatus: "running",
+          windowStatus: "inview",
+          pinnedToTaskbar: false,
+          programId: "File_Explorer",
+          meta: {
+            folder_path: "C:/Control Panel",
+          },
+        });
+      }}
+    >
+      Control Panel
+    </div>
     <div class="link">Default Programs</div>
     <div class="link">Help and Support</div>
     <div class="button-group">
