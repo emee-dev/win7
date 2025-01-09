@@ -104,14 +104,14 @@ class Win7FileSystem {
   >([]);
 
   private taskManager = $state<TaskManagerItem[]>([
-    // {
-    //   id: crypto.randomUUID(),
-    //   label: "Plyr_Video",
-    //   taskStatus: "running",
-    //   windowStatus: "inview",
-    //   pinnedToTaskbar: false,
-    //   programId: "Plyr_Video",
-    // },
+    {
+      id: crypto.randomUUID(),
+      label: "Plyr_Video",
+      taskStatus: "running",
+      windowStatus: "inview",
+      pinnedToTaskbar: false,
+      programId: "Plyr_Video",
+    },
   ]);
 
   constructor(user_name: string) {

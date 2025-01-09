@@ -6,7 +6,7 @@
   import { getIconByProgramId } from "@/components/desktop/utils";
   import { Window } from "@/components/window_inprogress";
   // @ts-ignore
-  import Plyr from "plyr";
+  // import Plyr from "plyr";
   import "plyr/dist/plyr.css";
   import { hasWindow } from "std-env";
 
@@ -39,14 +39,19 @@
     fs.modifyTask(windowId, { windowStatus: "minimized" });
   };
 
-  onMount(() => {
+  async function loadPlyr() {
+    const Plyr = (await import("plyr")).default;
+
     player = new Plyr("#player", {
       disableContextMenu: true,
       fullscreen: { enabled: false },
-
-      // blankVideo:
-      //   "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+      // You can uncomment and set the blankVideo property if needed.
+      // blankVideo: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
     });
+  }
+
+  onMount(() => {
+    loadPlyr();
   });
 
   onDestroy(() => {
