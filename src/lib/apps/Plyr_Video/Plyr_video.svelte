@@ -54,7 +54,7 @@
 
   // TODO add error handling.
   async function loadVideo() {
-    if (meta && meta.storage === "indexeddb") {
+    if (meta && file_path && meta.storage === "indexeddb") {
       let fileItem = await fs.getPersistedFileByPath(file_path);
 
       if (!fileItem) {
