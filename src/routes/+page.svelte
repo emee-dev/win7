@@ -1,45 +1,16 @@
 <script lang="ts">
-  import Sparkle from "./Sparkle.svelte";
-
   const disclaimers = [
-    "This project uses experimental Svelte 5 features.",
-    "Runes are powerful magic. Use with caution!",
-    "Not responsible for accidental transmutations.",
+    "1. This project is a simple recreation of the popular windows 7, It is not an exact copy. ",
+    "2. This project uses some of Svelte 5 features. Such as $state, $effect, $props etc.",
+    "3. It is not affiliated with Microsoft Corporation svelte.",
+    "4. Do not expect much from it. But you will propably like it.",
   ];
-
-  const tutorials = [
-    "Runes 101: Basic incantations",
-    "Advanced Spell Casting with $derived",
-    "Magical State Management",
-  ];
-
-  const apis = [
-    "Potion API",
-    "Spell Book REST API",
-    "Magical Creatures GraphQL API",
-  ];
-
-  let showMagic = $state(false);
 
   interface SectionProps {
     title: string;
     items: string[];
     listType?: "disc" | "decimal" | "none";
   }
-
-  $effect(() => {
-    const timer = setTimeout(() => {
-      showMagic = true;
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  });
-
-  $effect(() => {
-    if (showMagic) {
-      console.log("The magic has been revealed!");
-    }
-  });
 </script>
 
 {#snippet section({ title, items, listType = "disc" }: SectionProps)}
@@ -59,49 +30,27 @@
 {/snippet}
 
 <div
-  class="min-h-screen bg-gray-900 text-gray-100 p-8 font-serif relative overflow-hidden"
+  class="h-screen bg-gray-900 text-gray-100 p-8 font-serif relative overflow-hidden"
 >
-  {#each Array.from({ length: 50 }).fill(50) as item}
-    <Sparkle />
-  {/each}
-
   <header class="text-center mb-8">
-    <h1 class="text-4xl font-bold mb-2">
-      🎃 Svelte 5 Runes: A Magical Journey 🧙‍♂️
-    </h1>
-    <p class="text-xl">Unveiling the secrets of the new enchanted syntax</p>
+    <h1 class="text-4xl font-bold mb-2">🎃 Svelte 5 Runes🧙‍♂️</h1>
+    <p class="text-xl">Exploring the secrets of the new enchanted syntax</p>
   </header>
 
-  <div>
-    {#if showMagic}
-      <main
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 1 }}
-        class="grid grid-cols-1 md:grid-cols-3 gap-8"
-      >
-        {@render section({
-          title: "📜 Magical Disclaimers",
-          items: disclaimers,
-        })}
-
-        {@render section({
-          title: "📚 Spell Tutorials",
-          items: tutorials,
-          listType: "decimal",
-        })}
-
-        {@render section({
-          title: "🔮 Mystical APIs",
-          items: apis,
-          listType: "none",
-        })}
-      </main>
-    {/if}
+  <div class="">
+    <main class="grid grid-cols-1 place-items-center pt-6 mb-8">
+      {@render section({
+        title: "📜 Disclaimers",
+        items: disclaimers,
+      })}
+    </main>
   </div>
 
-  <footer class="text-center mt-8">
+  <footer class="text-center mt-8 h-full">
+    <button class="mb-4 decoration-yellow-300">
+      <a href="/win7" class="underline underline-offset-4"> Surprise Me.</a> 👈
+    </button>
+
     <p>Created with 🖤 and a sprinkle of magic dust</p>
   </footer>
 </div>

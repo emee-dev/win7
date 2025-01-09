@@ -53,6 +53,7 @@
 		"dom-to-image-more": "^3.5.0",
 		"html2canvas": "^1.4.1",
 		"interactjs": "^1.10.27",
+		"motion": "^11.16.4",
 		"moveable": "^0.53.0",
 		"plyr": "^3.7.8",
 		"process": "^0.11.10",
