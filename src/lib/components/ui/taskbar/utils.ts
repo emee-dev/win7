@@ -1,4 +1,5 @@
 import html2canvas from "html2canvas";
+import { hasWindow } from "std-env";
 
 interface BatteryManager extends EventTarget {
   charging: boolean;
@@ -79,8 +80,12 @@ export const handleBattery = async (navigator: CustomNavigator) => {
  */
 export const captureElement = async (
   selector: string | HTMLElement
-): Promise<Blob> => {
+): Promise<void | Blob> => {
   let element;
+
+  if (!hasWindow) {
+    return;
+  }
 
   if (typeof selector === "string") {
     element = document.querySelector(selector);

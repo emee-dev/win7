@@ -58,6 +58,7 @@
 		"process": "^0.11.10",
 		"screenfull": "^6.0.2",
 		"selecto": "^1.26.3",
+		"std-env": "^3.8.0",
 		"svelte-awesome": "^3.3.5",
 		"svelte-file-dropzone": "^2.0.9",
 		"tsx": "^4.19.2",

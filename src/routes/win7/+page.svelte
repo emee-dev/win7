@@ -25,6 +25,7 @@
   import { mediaAssets, windows7Folders } from "@/const";
   import { useDropzone } from "@/hooks/Dropzone";
   import { onDestroy, onMount } from "svelte";
+  import {hasWindow} from "std-env"
 
   let desktop: HTMLElement;
   let db: FolderDatabase | null;
@@ -153,6 +154,10 @@
   $effect(() => {
     if (!videoElement) {
       return;
+    }
+
+    if(!hasWindow) {
+      return
     }
 
     const handler = () => {
