@@ -1,6 +1,3 @@
-<!-- <div class="taskbar-item" data-target="computer" data-icon="computer"></div>
-    <div class="taskbar-item opened" data-target="bin" data-icon="bin"></div> -->
-
 <script lang="ts">
   import { onMount } from "svelte";
   import {
@@ -12,7 +9,7 @@
 
   const fs = getFs();
 
-  let { isStartMenuOpen = $bindable(false) }: { isStartMenuOpen: boolean } =
+  let { isStartMenuOpen = $bindable() }: { isStartMenuOpen: boolean } =
     $props();
 
   onMount(() => {
@@ -21,7 +18,10 @@
     }
   });
 
-  const toggleStartMenu = () => (isStartMenuOpen = !isStartMenuOpen);
+  const toggleStartMenu = () => {
+    console.log("isStartMenuOpen", isStartMenuOpen);
+    isStartMenuOpen = !isStartMenuOpen;
+  };
 
   const toggleWindowView = (
     windowId: string,

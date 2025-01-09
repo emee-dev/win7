@@ -71,7 +71,9 @@
   ];
 
   function handleClickOutside(event: any) {
-    isStartMenuOpen = false;
+    // if (isStartMenuOpen) {
+    //   isStartMenuOpen = !isStartMenuOpen;
+    // }
   }
 
   type OutsideClick = Action<
@@ -82,25 +84,25 @@
     }
   >;
 
-  const clicks: OutsideClick = (node) => {
-    if (!hasWindow) {
-      return;
-    }
+  // const clicks: OutsideClick = (node) => {
+  //   if (!hasWindow) {
+  //     return;
+  //   }
 
-    const handleClick = (event: any) => {
-      if (node && !node.contains(event.target) && !event.defaultPrevented) {
-        node.dispatchEvent(new CustomEvent("click_outside", node as any));
-      }
-    };
+  //   const handleClick = (event: any) => {
+  //     if (node && !node.contains(event.target) && !event.defaultPrevented) {
+  //       node.dispatchEvent(new CustomEvent("click_outside", node as any));
+  //     }
+  //   };
 
-    document.addEventListener("click", handleClick, true);
+  //   document.addEventListener("click", handleClick, true);
 
-    return {
-      destroy() {
-        document.removeEventListener("click", handleClick, true);
-      },
-    };
-  };
+  //   return {
+  //     destroy() {
+  //       document.removeEventListener("click", handleClick, true);
+  //     },
+  //   };
+  // };
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -131,12 +133,9 @@
   </div>
 {/snippet}
 
-<div
-  use:clicks
-  onclick_outside={handleClickOutside}
-  id="start-menu"
-  class={isStartMenuOpen ? "flex" : "hidden"}
->
+<!-- use:clicks
+onclick_outside={handleClickOutside} -->
+<div id="start-menu" class={isStartMenuOpen ? "flex" : "hidden"}>
   <div class="programs">
     <div class="programs-list has-scrollbar">
       {#if isFeaturedView}
@@ -172,8 +171,10 @@
   </div>
   <div class="links">
     <div class="account">
-      <div class="img no-name">
-        <!-- src="/img/startmenu_guest.webp" -->
+      <div
+        class="img no-name"
+        style="--icon: url('{mediaAssets.AccountProfileRing}')"
+      >
         <img
           src={mediaAssets.StartMenuGuest}
           alt="profile_img"
@@ -460,8 +461,6 @@
     padding: 8px 10px;
   }
 
-  /* Startmenu link section */
-  /* 	https://win7simu.visnalize.com/img/guest.1a7eab2b.webp */
   #start-menu .links {
     user-select: none;
     font-size: 9pt;
@@ -500,7 +499,7 @@
     background-repeat: no-repeat;
     background-position: 50%;
     background-size: contain;
-    background-image: url("/img/account_profile_ring.webp");
+    background-image: var(--icon);
   }
 
   .account .img {
@@ -512,10 +511,6 @@
 
   /* Supposed to happen on hover of link */
   .links .link {
-    /* -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-    -webkit-box-pack: center;
-    -webkit-box-flex: 1; */
     font-size: 9pt;
     color: #fff;
     user-select: none;
@@ -525,7 +520,6 @@
     box-sizing: border-box;
     height: 35px;
     position: relative;
-    /* transition: all 0.15s; */
     padding: 3px 5px;
     margin: 2px 0;
     border-radius: 3px;

@@ -6,6 +6,7 @@
   import Icon from "svelte-awesome";
   import arrowLeft from "svelte-awesome/icons/arrowLeft";
   import arrowRight from "svelte-awesome/icons/arrowRight";
+  import { mediaAssets } from "@/const";
 
   let controls: HTMLElement;
   const ctx = getWindowContext();
@@ -125,7 +126,7 @@
       {#if !ctx.isAddressFocused}
         <div
           class="addr w-[85%] icon pt-[3px] pr-0 pb-[3px] pl-[24px] overflow-scroll scrollbar-hide"
-          style="--icon: url('/img/mycomputer.webp')"
+          style="--icon: url('{mediaAssets.MyComputerIcon}')"
           onclick={() => (ctx.isAddressFocused = true)}
         >
           {@render breadCrumbs(history)}
@@ -133,7 +134,7 @@
       {:else}
         <form
           class="addr w-[85%] icon pt-[3px] pr-0 pb-[3px] pl-[24px]"
-          style="--icon: url('/img/mycomputer.webp')"
+          style="--icon: url('{mediaAssets.MyComputerIcon}')"
           onsubmit={(e) => {
             e.preventDefault();
 
@@ -163,7 +164,7 @@
 
       <div
         class="addr max-w-[20px] icon pt-[3px] pr-0 pb-[3px] pl-[24px]"
-        style="--icon: url('/img/file_explorer_toggle.webp')"
+        style="--icon: url('{mediaAssets.FileExplorerToggle}')"
         onclick={() => (ctx.isAddressFocused = !ctx.isAddressFocused)}
       ></div>
     </div>
