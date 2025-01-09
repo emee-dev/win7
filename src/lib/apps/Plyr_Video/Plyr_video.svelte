@@ -8,6 +8,7 @@
   // @ts-ignore
   import Plyr from "plyr";
   import "plyr/dist/plyr.css";
+  import { hasWindow } from "std-env";
 
   import { onDestroy, onMount } from "svelte";
 
@@ -49,6 +50,10 @@
   });
 
   onDestroy(() => {
+    if (!hasWindow) {
+      return;
+    }
+
     if (player) {
       player.destroy();
     }
