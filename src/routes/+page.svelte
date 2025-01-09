@@ -1,306 +1,107 @@
 <script lang="ts">
-  import interact from "interactjs";
-  import { onMount } from "svelte";
-  import Window from "@/components/window/window.svelte";
-  import { Button } from "@/components/ui/button";
-  import Notepad from "@/apps/Notepad/notepad.svelte";
-  import { ContextMenu } from "@/components/context_menu";
-  import type { MenuProps } from "@/components/context_menu";
+  import Sparkle from "./Sparkle.svelte";
 
-  let menuItems = $state<MenuProps[]>([
-    {
-      label: "View",
-      onclick() {
-        // menuItems.push({
-        //   label: "Hello world",
-        // });
+  const disclaimers = [
+    "This project uses experimental Svelte 5 features.",
+    "Runes are powerful magic. Use with caution!",
+    "Not responsible for accidental transmutations.",
+  ];
 
-        menuItems = menuItems.filter((item) => item.label !== "Paste");
-      },
-    },
-    {
-      label: "Sort by",
-      subMenu: [
-        {
-          label: "Name",
-        },
-        {
-          label: "Size",
-        },
-        {
-          label: "Item type",
-        },
-        {
-          label: "Date modified",
-        },
-      ],
-    },
-    {
-      label: "Refresh",
-      hasDivider: "has-divider",
-    },
-    {
-      label: "Paste",
-      isDisabled: true,
-    },
-    {
-      label: "Paste shortcut",
-      hasDivider: "has-divider",
-      isDisabled: true,
-    },
-    {
-      icon: "https://img.icons8.com/color/18/000000/monitor--v1.png",
-      label: "Screen resolution",
-    },
-    {
-      icon: "https://img.icons8.com/color/18/000000/virtual-machine2.png",
-      label: "Gadgets",
-    },
-    {
-      icon: "https://img.icons8.com/color/18/000000/remote-desktop.png",
-      label: "Personalize",
-    },
-  ]);
+  const tutorials = [
+    "Runes 101: Basic incantations",
+    "Advanced Spell Casting with $derived",
+    "Magical State Management",
+  ];
+
+  const apis = [
+    "Potion API",
+    "Spell Book REST API",
+    "Magical Creatures GraphQL API",
+  ];
+
+  let showMagic = $state(false);
+
+  interface SectionProps {
+    title: string;
+    items: string[];
+    listType?: "disc" | "decimal" | "none";
+  }
+
+  $effect(() => {
+    const timer = setTimeout(() => {
+      showMagic = true;
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  });
+
+  $effect(() => {
+    if (showMagic) {
+      console.log("The magic has been revealed!");
+    }
+  });
 </script>
 
-<main
-  class="bg-red-500 desktop relative h-screen scrollbar-hide overflow-hidden"
->
-  <div id="computer" class="computer icon" data-label="Computer"></div>
-  <div id="test-file" class="test-file icon" data-label="Test.txt"></div>
-  <div id="trash" class="trash-empty icon" data-label="Recycle Bin"></div>
-
-  <!-- <ContextMenu {menuItems} /> -->
-
-  <!-- <Window title="*Untitled - Notepad">
-    <Notepad />
-  </Window> -->
-
-  <div
-    id="task-bar"
-    class="flex items-center w-full select-none bottom-0 h-[45px] z-[9999999]"
+{#snippet section({ title, items, listType = "disc" }: SectionProps)}
+  <section
+    class="bg-gray-800 p-6 rounded-lg shadow-lg border-2 border-[#FF3E00]"
   >
-    <div id="blur-overlay"></div>
-    <div
-      class="group relative ml-2 block w-8 h-8 z-[3] bg-[100%] left-2.5 inset-y-[3px];"
-    >
-      <img src="/start-button.png" alt="button" class="object-fill" />
-      <!-- Gradient hover effect -->
-      <div
-        class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity rounded-full"
-        style="background: radial-gradient(circle, rgba(255,255,255,0.5) 30%, rgba(0,0,0,0.2) 75%, transparent 100%);"
-      ></div>
-    </div>
+    <h2 class="text-2xl font-bold mb-4">{title}</h2>
+    <ul class={`list-${listType} list-inside`}>
+      {#each items as item}
+        <li class="mb-2">
+          {listType === "none" ? "✨ " : ""}
+          {item}
+        </li>
+      {/each}
+    </ul>
+  </section>
+{/snippet}
 
-    <!-- <div id="pined-items"> -->
-    <div class="flex ml-10 items-center transition-all">
-      <div
-        class="relative hover:h-12 iexplore block w-[60px] h-10 bg-no-repeat bg-center z-[3] rounded-sm border-[solid] border-transparent;"
-      >
-        <img src="/1023.ico" alt="button" />
-      </div>
-      <div
-        class="relative hover:h-12 block w-[60px] h-10 bg-no-repeat bg-center z-[3] rounded-sm border-[solid] border-transparent;"
-      >
-        <img src="/1023.ico" alt="button" />
-      </div>
-    </div>
+<div
+  class="min-h-screen bg-gray-900 text-gray-100 p-8 font-serif relative overflow-hidden"
+>
+  {#each Array.from({ length: 50 }).fill(50) as item}
+    <Sparkle />
+  {/each}
 
-    <div id="datetime">
-      <span class="time"></span>
-      <span class="date"></span>
-    </div>
-    <div id="show-desktop"></div>
+  <header class="text-center mb-8">
+    <h1 class="text-4xl font-bold mb-2">
+      🎃 Svelte 5 Runes: A Magical Journey 🧙‍♂️
+    </h1>
+    <p class="text-xl">Unveiling the secrets of the new enchanted syntax</p>
+  </header>
+
+  <div>
+    {#if showMagic}
+      <main
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 1 }}
+        class="grid grid-cols-1 md:grid-cols-3 gap-8"
+      >
+        {@render section({
+          title: "📜 Magical Disclaimers",
+          items: disclaimers,
+        })}
+
+        {@render section({
+          title: "📚 Spell Tutorials",
+          items: tutorials,
+          listType: "decimal",
+        })}
+
+        {@render section({
+          title: "🔮 Mystical APIs",
+          items: apis,
+          listType: "none",
+        })}
+      </main>
+    {/if}
   </div>
-</main>
 
-<style>
-  .desktop {
-    background-image: url("/bg.jpg");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-  }
-
-  /* Task bar styles gotten from https://codepen.io/legarth/pen/jrKLqd */
-  #task-bar {
-    position: absolute;
-    border-top: solid 1px rgba(255, 255, 255, 0.5);
-    -webkit-box-shadow: 0 -1px 0 0 #00506b;
-    box-shadow: 0 -1px 0 0 #00506b;
-  }
-
-  /* #task-bar > #blur-overlay { */
-  #blur-overlay {
-    position: absolute;
-    top: 0;
-    background-attachment: fixed;
-    background-repeat: no-repeat;
-    background-position: center;
-    z-index: 2;
-  }
-
-  #blur-overlay:after {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background: -moz-linear-gradient(
-      left,
-      rgba(0, 0, 0, 0.5) 0%,
-      rgba(0, 0, 0, 0.5) 10%,
-      rgba(0, 0, 0, 0.25) 15%,
-      rgba(0, 0, 0, 0.25) 75%,
-      rgba(0, 0, 0, 0.6) 85%,
-      rgba(0, 0, 0, 0.6) 100%
-    );
-    background: -webkit-linear-gradient(
-      left,
-      rgba(0, 0, 0, 0.5) 0%,
-      rgba(0, 0, 0, 0.5) 10%,
-      rgba(0, 0, 0, 0.25) 15%,
-      rgba(0, 0, 0, 0.25) 75%,
-      rgba(0, 0, 0, 0.6) 85%,
-      rgba(0, 0, 0, 0.6) 100%
-    );
-    background: linear-gradient(
-      to right,
-      rgba(0, 0, 0, 0.5) 0%,
-      rgba(0, 0, 0, 0.5) 10%,
-      rgba(0, 0, 0, 0.25) 15%,
-      rgba(0, 0, 0, 0.25) 75%,
-      rgba(0, 0, 0, 0.6) 85%,
-      rgba(0, 0, 0, 0.6) 100%
-    );
-    filter: progid: DXImageTransform.Microsoft.gradient( startColorstr='#66000000', endColorstr='#66000000', GradientType=1);
-    content: "";
-    z-index: 3;
-  }
-
-  #datetime {
-    position: absolute;
-    top: 5px;
-    right: 30px;
-    z-index: 3;
-    text-align: center;
-  }
-
-  #datetime > span {
-    display: block;
-    margin: 0;
-  }
-
-  #show-desktop {
-    position: absolute;
-    top: 2px;
-    right: 0;
-    bottom: 0;
-    width: 15px;
-    background: -moz-linear-gradient(
-      -45deg,
-      rgba(255, 255, 255, 0.2) 0%,
-      rgba(255, 255, 255, 0) 30%,
-      rgba(0, 0, 0, 0.2) 31%,
-      rgba(0, 0, 0, 0.2) 100%
-    );
-    background: -webkit-linear-gradient(
-      -45deg,
-      rgba(255, 255, 255, 0.2) 0%,
-      rgba(255, 255, 255, 0) 30%,
-      rgba(0, 0, 0, 0.2) 31%,
-      rgba(0, 0, 0, 0.2) 100%
-    );
-    background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.2) 0%,
-      rgba(255, 255, 255, 0) 30%,
-      rgba(0, 0, 0, 0.2) 31%,
-      rgba(0, 0, 0, 0.2) 100%
-    );
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#33ffffff', endColorstr='#33000000',GradientType=1 );
-    border: solid 1px rgba(255, 255, 255, 0.2);
-    z-index: 3;
-    -webkit-box-shadow: -1px 0 0 0 #000;
-    box-shadow: -1px 0 0 0 #000;
-  }
-
-  #show-desktop:hover {
-    background: -moz-linear-gradient(
-      -45deg,
-      rgba(255, 255, 255, 0.4) 0%,
-      rgba(255, 255, 255, 0.2) 30%,
-      rgba(255, 255, 255, 0.2) 31%,
-      rgba(255, 255, 255, 0.2) 100%
-    );
-    background: -webkit-linear-gradient(
-      -45deg,
-      rgba(255, 255, 255, 0.4) 0%,
-      rgba(255, 255, 255, 0.2) 30%,
-      rgba(255, 255, 255, 255.2) 31%,
-      rgba(255, 255, 255, 0.2) 100%
-    );
-    background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.4) 0%,
-      rgba(255, 255, 255, 0.2) 30%,
-      rgba(255, 255, 255, 0.2) 31%,
-      rgba(255, 255, 255, 0.2) 100%
-    );
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#33ffffff', endColorstr='#33000000',GradientType=1 );
-    border: solid 1px rgba(255, 255, 255, 0.2);
-  }
-
-  /* Icons */
-
-  .icon {
-    position: absolute;
-    display: block;
-    width: 70px;
-    height: 70px;
-    background-size: 48px;
-    background-repeat: no-repeat;
-    background-position: top center;
-    border: solid 1px transparent;
-    border-radius: 2px;
-    z-index: 2;
-  }
-
-  .icon::after {
-    display: block;
-    position: absolute;
-    top: 50px;
-    width: 100%;
-    text-align: center;
-    content: attr(data-label);
-    color: #ffffff;
-    text-shadow: 0 2px 2px #000;
-  }
-
-  .icon:hover {
-    background-color: rgba(255, 255, 255, 0.3);
-    border-color: rgba(255, 255, 255, 0.3);
-  }
-
-  /* On drag state */
-  /* .icon.ui-draggable-dragging:hover {
-    background-color: transparent;
-    border: none;
-  } */
-
-  /* Icons */
-  #computer {
-    top: 0;
-    left: 0;
-  }
-
-  #trash {
-    bottom: 10;
-    right: 0;
-  }
-
-  #test-file {
-    top: 80px;
-    left: 0;
-  }
-</style>
+  <footer class="text-center mt-8">
+    <p>Created with 🖤 and a sprinkle of magic dust</p>
+  </footer>
+</div>
