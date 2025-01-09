@@ -6,6 +6,7 @@
     type InstalledPrograms,
   } from "@/components/desktop/utils";
   import { mediaAssets } from "@/const";
+  import { hasWindow } from "std-env";
   import type { Action } from "svelte/action";
 
   const fs = os.getFs();
@@ -82,6 +83,10 @@
   >;
 
   const clicks: OutsideClick = (node) => {
+    if (!hasWindow) {
+      return;
+    }
+
     const handleClick = (event: any) => {
       if (node && !node.contains(event.target) && !event.defaultPrevented) {
         node.dispatchEvent(new CustomEvent("click_outside", node as any));
