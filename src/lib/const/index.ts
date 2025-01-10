@@ -25,7 +25,7 @@ export const windows7Folders = [
 ];
 
 export const mediaAssets = {
-  DesktopBackground:
+  DesktopDefaultBackground:
     "https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/bg.jpg",
   Bootvideo:
     "https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/boot_sample.mp4",
@@ -73,6 +73,48 @@ export const mediaAssets = {
     "https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/startmenu_guest.webp",
   TextFileIcon:
     "https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/text_file.webp",
+} as const;
+
+export const desktopBackgrounds = {
+  DesktopBg1: "https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/bg1.jpg",
+  DesktopBg2: "https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/bg2.jpg",
+  DesktopBg3: "https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/bg3.jpg",
+  DesktopBg4: "https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/bg4.jpg",
+  DesktopBg5: "https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/bg5.jpg",
+  DesktopBg6: "https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/bg6.jpg",
+  DesktopBg7: "https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/bg7.jpg",
+  DesktopBg8: "https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/bg8.jpg",
+  DesktopBg9: "https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/bg9.jpg",
+  DesktopBg10:
+    "https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/bg10.jpg",
+  DesktopBg11:
+    "https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/bg11.jpg",
+  DesktopBg12:
+    "https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/bg12.jpg",
+  DesktopBg13:
+    "https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/bg13.jpg",
+  DesktopBg14:
+    "https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/bg14.jpg",
+  DesktopBg15:
+    "https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/bg15.jpg",
+  DesktopBg16:
+    "https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/bg16.jpg",
+  DesktopBg17:
+    "https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/bg17.jpg",
+  DesktopBg18:
+    "https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/bg18.jpg",
+  DesktopBg19:
+    "https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/bg19.jpg",
+  DesktopBg20:
+    "https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/bg20.jpg",
+  DesktopBg21:
+    "https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/bg21.jpg",
+  DesktopBg22:
+    "https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/bg22.jpg",
+  DesktopBg23:
+    "https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/bg23.jpg",
+  DesktopBg24:
+    "https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/bg24.jpg",
 } as const;
 
 export let textFiles = [

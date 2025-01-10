@@ -10,8 +10,10 @@
   const fs = os.getFs();
 
   let isFeaturedView = $state(true);
-  let { isStartMenuOpen = $bindable(false) }: { isStartMenuOpen: boolean } =
-    $props();
+  let {
+    isStartMenuOpen = $bindable(false),
+    startMenu = $bindable(null),
+  }: { isStartMenuOpen: boolean; startMenu: HTMLDivElement | null } = $props();
 
   const leftCaret = `\\23F4`;
   const rightCaret = `\\23F5`;
@@ -97,7 +99,11 @@
   </div>
 {/snippet}
 
-<div id="start-menu" class={isStartMenuOpen ? "flex" : "hidden"}>
+<div
+  id="start-menu"
+  bind:this={startMenu}
+  class={isStartMenuOpen ? "flex" : "hidden"}
+>
   <div class="programs">
     <div class="programs-list has-scrollbar">
       {#if isFeaturedView}

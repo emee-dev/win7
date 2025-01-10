@@ -9,49 +9,59 @@
   import "7.css/dist/gui/balloon.css";
   import "7.css/dist/gui/window.css";
   import { DesktopWindows, os } from "@/components/desktop";
-  import DesktopIcons from "@/components/desktop/desktop_icons.svelte";
+  import DesktopIcons, {
+    type IconProps,
+  } from "@/components/desktop/desktop_icons.svelte";
   import type {
     DesktopFile,
     ExtraIconProps,
     MountableFile,
   } from "@/components/desktop/file_system.svelte";
   import { FolderDatabase, persistItem } from "@/components/desktop/indexeddb";
-  import {
-    findHandler,
-    getDesktopIcon,
-    menuItems,
-  } from "@/components/desktop/utils";
+  import { findHandler, getDesktopIcon } from "@/components/desktop/utils";
   import { Selecto } from "@/components/selecto";
   import * as ContextMenu from "@/components/ui/context-menu/index";
   import { type MenuProps } from "@/components/ui/popup_menu";
   import { listItem } from "@/components/ui/popup_menu/popup_menu.svelte";
   import { StartMenu } from "@/components/ui/startmenu";
   import Taskbar from "@/components/ui/taskbar/taskbar.svelte";
-  import { mediaAssets, textFiles, windows7Folders } from "@/const";
+  import {
+    desktopBackgrounds,
+    mediaAssets,
+    textFiles,
+    windows7Folders,
+  } from "@/const";
   import { useDropzone } from "@/hooks/Dropzone";
   import { onDestroy, onMount } from "svelte";
   import { hasWindow } from "std-env";
   import { Howl } from "howler";
+  import { Assets } from "pixi.js";
 
   let sound: Howl;
   let desktop: HTMLElement;
-  let db: FolderDatabase | null;
+  // svelte-ignore non_reactive_update
   let videoElement: HTMLVideoElement;
+  // svelte-ignore non_reactive_update
+  let startMenu: HTMLDivElement | null = null;
+
   const fs = os.initFs("Guest");
+  const desktopPath = "C:/Libraries/Desktop";
 
   let mouseCoordinates = $state({ x: 0, y: 0 });
   let isStartMenuOpen = $state(false);
+  let isOpen = $state(false);
+  let over_dropzone = $state(false);
+  let files_data = $state<File[]>([]);
   let hasBootEnded = $state(process.env.NODE_ENV === "development" || false);
+  let currentBg = $state<string>(mediaAssets.DesktopDefaultBackground);
 
   onMount(() => {
-    db = new FolderDatabase();
     sound = new Howl({
       src: ["https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/boot.mp3"],
     });
 
     fs.mount({
       desktop,
-      db,
       dir: windows7Folders,
       files: [
         {
@@ -68,10 +78,25 @@
     });
   });
 
-  onDestroy(() => {
-    if (db) {
-      db = null;
+  $effect(() => {
+    if (!videoElement) {
+      return;
     }
+
+    if (!hasWindow) {
+      return;
+    }
+
+    const handler = () => {
+      hasBootEnded = true;
+      sound.play();
+    };
+
+    videoElement.addEventListener("ended", handler);
+
+    return () => {
+      videoElement.removeEventListener("ended", handler);
+    };
   });
 
   const onMouseMove = (ev: any) => {
@@ -79,21 +104,19 @@
     mouseCoordinates.y = ev.clientY;
   };
 
-  const desktopPath = "C:/Libraries/Desktop";
-
-  let over_dropzone = $state(false);
-
-  let files_data = $state<File[]>([]);
-
-  function hover(data: CustomEvent<boolean>) {
-    over_dropzone = data.detail;
-  }
+  const onItemClick = (d: MenuProps) => (isOpen = !isOpen);
+  const hover = (data: CustomEvent<boolean>) => (over_dropzone = data.detail);
 
   async function on_file_drop(data: CustomEvent<File[]>) {
     try {
       const files = data.detail;
+      const db = fs.getFolderDb();
 
       if (!files) {
+        return;
+      }
+
+      if (!db) {
         return;
       }
 
@@ -140,34 +163,43 @@
     }
   }
 
-  let isOpen = $state(false);
+  const menuItems: MenuProps[] = [
+    {
+      icon: "https://img.icons8.com/color/18/000000/monitor--v1.png",
+      label: "Sort by",
+      subMenu: [
+        {
+          label: "Name",
+        },
+      ],
+    },
+    {
+      label: "Refresh",
+      hasDivider: "has-divider",
+    },
+    {
+      label: "Paste",
+      isDisabled: true,
+    },
+    {
+      label: "Paste shortcut",
+      hasDivider: "has-divider",
+      isDisabled: true,
+    },
+    {
+      icon: "https://img.icons8.com/color/18/000000/remote-desktop.png",
+      label: "Toggle wallpaper",
+      onclick() {
+        let bgs = Object.values(desktopBackgrounds);
 
-  const onItemClick = (d: MenuProps) => {
-    isOpen = !isOpen;
-  };
+        let randomBg = Math.ceil(Math.random() * bgs.length);
 
-  console.log(process.env.NODE_ENV);
+        let bg = bgs[randomBg];
 
-  $effect(() => {
-    if (!videoElement) {
-      return;
-    }
-
-    if (!hasWindow) {
-      return;
-    }
-
-    const handler = () => {
-      hasBootEnded = true;
-      sound.play();
-    };
-
-    videoElement.addEventListener("ended", handler);
-
-    return () => {
-      videoElement.removeEventListener("ended", handler);
-    };
-  });
+        currentBg = bg;
+      },
+    },
+  ];
 </script>
 
 <Selecto>
@@ -178,7 +210,7 @@
         class="desktop relative h-screen scrollbar-hide overflow-hidden select-none"
         bind:this={desktop}
         onmousemove={onMouseMove}
-        style="--icon: url('{mediaAssets.DesktopBackground}');"
+        style="--icon: url('{currentBg}');"
         use:useDropzone
         onhover={hover}
         onfiles={on_file_drop}
@@ -284,8 +316,8 @@
           </Button>
         </div> -->
 
-        <StartMenu bind:isStartMenuOpen />
-        <Taskbar bind:isStartMenuOpen />
+        <StartMenu bind:isStartMenuOpen bind:startMenu />
+        <Taskbar bind:isStartMenuOpen bind:startMenu />
       </main>
     </ContextMenu.Trigger>
     <ContextMenu.Content class="z-50 w-full max-w-[229px] outline-none">
@@ -295,7 +327,6 @@
         class="can-hover select-none outline-none"
       >
         {#each menuItems as item (item.label)}
-          <!-- TODO add context handling -->
           {@render listItem(item, onItemClick)}
         {/each}
       </ul>

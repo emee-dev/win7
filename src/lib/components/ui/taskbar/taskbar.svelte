@@ -1,19 +1,22 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import {
     getFs,
     type TaskManagerItem,
   } from "@/components/desktop/file_system.svelte";
   import { getIconByProgramId } from "@/components/desktop/utils";
   import { mediaAssets } from "@/const";
-  import type { Action } from "svelte/action";
+  import { onMount, untrack } from "svelte";
   import { Icon } from "svelte-awesome";
   import Close from "svelte-awesome/icons/close";
+  import type { Action } from "svelte/action";
+  import { getCurrentDateTime } from "./utils";
 
   const fs = getFs();
 
-  let { isStartMenuOpen = $bindable() }: { isStartMenuOpen: boolean } =
-    $props();
+  let {
+    isStartMenuOpen = $bindable(),
+    startMenu = $bindable(null),
+  }: { isStartMenuOpen: boolean; startMenu: HTMLDivElement | null } = $props();
 
   type OutsideClick = Action<
     HTMLDivElement,
@@ -25,6 +28,17 @@
 
   let showWelcomeToast = $state(false);
 
+  let calendar = $state({
+    time: { hours: 0, minutes: 0 },
+    date: { day: 0, month: 0, year: 0 },
+  });
+
+  $effect.pre(() => {
+    untrack(() => {
+      calendar = getCurrentDateTime();
+    });
+  });
+
   onMount(() => {
     let holdOn = setTimeout(() => {
       showWelcomeToast = true;
@@ -32,7 +46,7 @@
 
     let id = setTimeout(() => {
       showWelcomeToast = false;
-    }, 2000);
+    }, 5000);
 
     if (navigator) {
       //   handleBattery(navigator as CustomNavigator);
@@ -69,7 +83,13 @@
 
   const clickListener: OutsideClick = (node) => {
     const handleClick = (event: any) => {
-      if (node && !node.contains(event.target) && !event.defaultPrevented) {
+      if (
+        node &&
+        startMenu &&
+        !node.contains(event.target) &&
+        !startMenu.contains(event.target) &&
+        !event.defaultPrevented
+      ) {
         node.dispatchEvent(new CustomEvent("click_outside", node as any));
       }
     };
@@ -82,8 +102,6 @@
       },
     };
   };
-
-  let t = `This balloon is positioned top left of the source control. This balloon is positioned top left of the source control. This balloon is positioned top left of the source control.`;
 </script>
 
 {#snippet taskBarItem(window: TaskManagerItem & { executeBy: string })}
@@ -141,15 +159,13 @@
 
       {#if showWelcomeToast}
         <div
-          class=" absolute min-w-[200px] text-end w-[380px] h-[90px] -translate-y-[28px] right-0"
+          class=" absolute min-w-[100px] text-end w-[240px] h-[90px] -translate-y-[28px] right-0"
         >
           <div
             role="tooltip"
-            class="is-top group text-black is-left relative w-full min-w-[200px] h-auto max-h-[90px] right-0 p-2"
+            class="is-top group text-black is-left relative w-full min-w-[90px] h-auto max-h-[90px] right-0 p-2"
           >
-            <span class="">
-              Thank you for this opportunity. I hope you love it.
-            </span>
+            <span class=""> Welcome 😃. I hope you 💖 it. </span>
 
             <div
               class="absolute rounded-md top-0 right-2 hidden group-hover:block"
@@ -162,17 +178,18 @@
       {/if}
     </div>
 
-    <!-- Battery -->
     <div class="taskbar-item">
       <div class="battery">
         <div style="height: 31%; top: 69%;"></div>
       </div>
     </div>
 
-    <!-- Calendar icon -->
     <div class="taskbar-item calendar">
-      <span>15:30</span>
-      <span>15/12/2024</span>
+      <!-- <span>15:30</span>
+      <span>15/12/2024</span> -->
+      <span>{calendar.time.hours}:{calendar.time.minutes}</span>
+      <span>{calendar.date.day}/{calendar.date.month}/{calendar.date.year}</span
+      >
     </div>
 
     <div

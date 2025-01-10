@@ -26,7 +26,7 @@
     isOpen = !isOpen;
   };
 
-  const menuItems: MenuProps[] = [
+  const menuItems: MenuProps<IconProps>[] = [
     { label: "Open", onclick() {} },
     { label: "Pin to Taskbar" },
     {

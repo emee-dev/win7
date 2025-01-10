@@ -5,11 +5,10 @@
   } from "@/components/desktop/file_system.svelte";
   import { getIconByProgramId, interpolate } from "@/components/desktop/utils";
   import { Window } from "@/components/window";
-  import { getWindowContext } from "@/components/window/ctx.svelte";
+  import { mediaAssets } from "@/const";
   import { onMount, untrack } from "svelte";
   import { setHistory } from "./undoRedo.svelte";
   import { formatFs, type Folder } from "./utils";
-  import { mediaAssets } from "@/const";
 
   const fs = getFs();
   const history = setHistory();

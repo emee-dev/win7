@@ -121,7 +121,6 @@ class Win7FileSystem {
    */
   async mount(args: {
     desktop: HTMLElement;
-    db: FolderDatabase;
     dir: string[];
     files?: (MountableProgram | MountableFile)[];
   }) {
@@ -131,28 +130,32 @@ class Win7FileSystem {
     let files = args.files || [];
     let folders = args.dir || [];
 
+    let db = this.folderDB;
+
     if (!dir) {
       return;
     }
 
-    let persistedFiles = await getAllDbEntities(args.db);
+    if (db) {
+      let persistedFiles = await getAllDbEntities(db);
 
-    if (persistedFiles && persistedFiles.length > 0) {
-      persistedFiles.forEach((element) => {
-        if (element.type === "file") {
-          files.push({
-            executeBy: findHandler(element.path),
-            mimetype: element.blob.type,
-            mount_to: element.path,
-            type: "file",
-            meta: {
-              storage: "indexeddb",
-            },
-          } as MountableFile & { executeBy: string; mimetype: string });
-        } else {
-          folders.push(element.path);
-        }
-      });
+      if (persistedFiles && persistedFiles.length > 0) {
+        persistedFiles.forEach((element) => {
+          if (element.type === "file") {
+            files.push({
+              executeBy: findHandler(element.path),
+              mimetype: element.blob.type,
+              mount_to: element.path,
+              type: "file",
+              meta: {
+                storage: "indexeddb",
+              },
+            } as MountableFile & { executeBy: string; mimetype: string });
+          } else {
+            folders.push(element.path);
+          }
+        });
+      }
     }
 
     folders.forEach((path) => {
@@ -446,6 +449,10 @@ class Win7FileSystem {
     return this.taskManager;
   }
 
+  getFolderDb() {
+    return this.folderDB;
+  }
+
   launchTask(task: TaskManagerItem) {
     // Make sure meta is not an empty object to avoid overwriting default bindings/values
     const metaHasProperties = task.meta
@@ -498,7 +505,6 @@ class Win7FileSystem {
     let newFiles = desktopFiles.filter((item) => item.file_path !== file_path);
 
     this.desktopFiles = newFiles;
-    // console.log("js", JSON.stringify(desktopFiles, null, 3));
   }
 }
 

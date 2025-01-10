@@ -4,11 +4,13 @@
   import { type IconProps } from "@/components/desktop/desktop_icons.svelte";
 
   export { listItem };
-
-  // const { menuItems }: { menuItems: MenuProps[] } = $props();
 </script>
 
-{#snippet listItem(menuItem: MenuProps, onItemClick: any, iconProps?: any)}
+{#snippet listItem(
+  menuItem: MenuProps<IconProps>,
+  onItemClick: any,
+  iconProps?: any
+)}
   {@const isDisabled = menuItem?.isDisabled || null}
   {@const divider = menuItem?.hasDivider || null}
 
@@ -25,9 +27,9 @@
 
       onItemClick(menuItem);
 
-      if (iconProps) {
-        menuItem?.onclick?.(iconProps);
-      }
+      // if (iconProps) {
+      menuItem?.onclick?.(iconProps);
+      // }
     }}
   >
     {#if menuItem.icon}
@@ -49,9 +51,3 @@
     {/if}
   </li>
 {/snippet}
-
-<!-- <ul role="menu" style="width: 200px" class="can-hover select-none outline-none">
-  {#each menuItems as item (item.label)}
-    {@render listItem(item)}
-  {/each}
-</ul> -->

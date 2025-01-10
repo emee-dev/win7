@@ -113,3 +113,21 @@ export const captureElement = async (
     });
   });
 };
+
+export function getCurrentDateTime() {
+  const now = new Date();
+
+  // Get the time components
+  const hours = now.getHours();
+  const minutes = now.getMinutes();
+
+  // Get the date components
+  const day = now.getDate();
+  const month = now.getMonth() + 1; // Months are zero-indexed
+  const year = now.getFullYear();
+
+  return {
+    time: { hours, minutes },
+    date: { day, month, year },
+  };
+}
