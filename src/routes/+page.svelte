@@ -2,8 +2,8 @@
   const disclaimers = [
     "1. This project is a simple recreation of the popular windows 7, It is not an exact copy. ",
     "2. This project uses some of Svelte 5 features. Such as $state, $effect, $props etc.",
-    "3. It is not affiliated with Microsoft Corporation svelte.",
-    "4. Do not expect much from it. But you will propably like it.",
+    "3. It is not affiliated with Microsoft Corporation or svelte.",
+    "4. Do not expect much from it. I hope you like it.",
   ];
 
   interface SectionProps {
@@ -40,7 +40,7 @@
   <div class="">
     <main class="grid grid-cols-1 place-items-center pt-6 mb-8">
       {@render section({
-        title: "📜 Disclaimers",
+        title: "📜 Disclaimer",
         items: disclaimers,
       })}
     </main>
@@ -48,7 +48,13 @@
 
   <footer class="text-center mt-8 h-full">
     <button class="mb-4 decoration-yellow-300">
-      <a data-sveltekit-preload-code="viewport" href="/win7" class="underline underline-offset-4"> Surprise Me.</a> 👈
+      <a
+        data-sveltekit-preload-code="viewport"
+        href="/win7"
+        class="underline underline-offset-4"
+      >
+        Surprise Me.</a
+      > 👈
     </button>
 
     <p>Created with 🖤 and a sprinkle of magic dust</p>
