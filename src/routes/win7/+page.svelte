@@ -9,13 +9,10 @@
   import "7.css/dist/gui/balloon.css";
   import "7.css/dist/gui/window.css";
   import { DesktopWindows, os } from "@/components/desktop";
-  import DesktopIcons, {
-    type IconProps,
-  } from "@/components/desktop/desktop_icons.svelte";
+  import DesktopIcons from "@/components/desktop/desktop_icons.svelte";
   import type {
     DesktopFile,
     ExtraIconProps,
-    MountableFile,
   } from "@/components/desktop/file_system.svelte";
   import { FolderDatabase, persistItem } from "@/components/desktop/indexeddb";
   import { findHandler, getDesktopIcon } from "@/components/desktop/utils";
@@ -32,10 +29,10 @@
     windows7Folders,
   } from "@/const";
   import { useDropzone } from "@/hooks/Dropzone";
-  import { onDestroy, onMount } from "svelte";
+  import { onMount } from "svelte";
   import { hasWindow } from "std-env";
   import { Howl } from "howler";
-  import { Assets } from "pixi.js";
+  import Button from "@/components/ui/button/button.svelte";
 
   let sound: Howl;
   let desktop: HTMLElement;
@@ -240,81 +237,6 @@
             </div>
           </div>
         {/if}
-
-        <!-- <div class="flex ml-[200px]">
-          {#if over_dropzone}
-            <span>Over zone</span>
-          {:else}
-            <span>Not over zone</span>
-          {/if}
-          <Button
-            class="ml-auto"
-            onclick={() => {
-              fs.launchTask({
-                id: crypto.randomUUID(),
-                label: "File_Explorer",
-                taskStatus: "running",
-                windowStatus: "inview",
-                pinnedToTaskbar: false,
-                programId: "File_Explorer",
-                meta: {
-                  folder_path: "C:/Users",
-                },
-              });
-            }}
-          >
-            Start File_Explorer
-          </Button>
-          <Button
-            class="ml-auto"
-            onclick={() => {
-              let { column, row } = fs.placeNextIcon();
-
-              fs.createDesktopIcon({
-                id: crypto.randomUUID(),
-                label: "abc.txt",
-                type: "file",
-                executeBy: "Plyr_Video",
-                placement: { column, row },
-              } as DesktopFile & ExtraIconProps);
-            }}
-          >
-            Add new icon
-          </Button>
-          <Button
-            onclick={() => {
-              fs.launchTask({
-                id: crypto.randomUUID(),
-                label: "Calculator",
-                taskStatus: "running",
-                windowStatus: "inview",
-                pinnedToTaskbar: false,
-                programId: "Calculator",
-              });
-            }}
-            >Start Calculator
-          </Button>
-          <Button
-            onclick={() => {
-              fs.launchTask({
-                id: crypto.randomUUID(),
-                label: "Notepad",
-                taskStatus: "running",
-                windowStatus: "inview",
-                pinnedToTaskbar: false,
-                programId: "Notepad",
-              });
-            }}
-            >Start Notepad
-          </Button>
-          <Button
-            onclick={() => {
-              // fs.serializeFs();
-              // console.log(fs.getFolder("C:"));
-            }}
-            >Serialize FS
-          </Button>
-        </div> -->
 
         <StartMenu bind:isStartMenuOpen bind:startMenu />
         <Taskbar bind:isStartMenuOpen bind:startMenu />

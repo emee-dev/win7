@@ -68,6 +68,15 @@
         folder_path: "C:/Recycle Bin",
       },
     },
+    {
+      id: crypto.randomUUID(),
+      label: "Plyr_Video",
+      taskStatus: "running",
+      windowStatus: "inview",
+      pinnedToTaskbar: false,
+      programId: "Plyr_Video",
+      file_path: "",
+    },
   ];
 </script>
 

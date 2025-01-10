@@ -341,12 +341,7 @@ class Directory extends Item {
     return currentDir.children.delete(fileName);
   }
 
-  modifyFile(
-    path: string,
-    fileName: string,
-    mimetype: string,
-    textContent: string | null = null
-  ): void {
+  modifyFile(path: string, fileName: string, blob: Blob): void {
     if (!/\.\w+$/.test(fileName)) {
       throw new Error(
         `Invalid file name '${fileName}'. A valid file extension is required.`
@@ -371,10 +366,7 @@ class Directory extends Item {
       throw new Error(`File '${fileName}' does not exist.`);
     }
 
-    currentDir.children.set(
-      fileName,
-      new FileItem(fileName, mimetype, textContent)
-    );
+    currentDir.children.set(fileName, FileItem.fromBlob(blob, fileName, path));
   }
 
   listContents(): string[] {

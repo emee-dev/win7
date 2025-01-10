@@ -1,18 +1,16 @@
 <script lang="ts">
-  import * as ContextMenu from "@/components/ui/context-menu/index";
   import { os } from "@/components/desktop";
   import type {
     DesktopIcon,
     ExtraIconProps,
   } from "@/components/desktop/file_system.svelte";
   import { Directory } from "@/components/desktop/file_system.svelte";
-  import { NOT_SELECTABLE, SELECTABLE_ITEM } from "@/components/selecto";
-  import { cn } from "@/utils";
-  import { listItem } from "../ui/popup_menu/popup_menu.svelte";
-
-  import type { Action } from "svelte/action";
-  import { onDestroy, onMount } from "svelte";
+  import { SELECTABLE_ITEM } from "@/components/selecto";
+  import * as ContextMenu from "@/components/ui/context-menu/index";
   import { type MenuProps } from "@/components/ui/popup_menu";
+  import { cn } from "@/utils";
+  import type { Action } from "svelte/action";
+  import { listItem } from "../ui/popup_menu/popup_menu.svelte";
 
   export type IconProps = DesktopIcon & ExtraIconProps;
   let props: IconProps = $props();
@@ -27,18 +25,53 @@
   };
 
   const menuItems: MenuProps<IconProps>[] = [
-    { label: "Open", onclick() {} },
-    { label: "Pin to Taskbar" },
     {
-      label: "Delete",
-      async onclick(props) {
-        console.log(await fs.deleteFile(props.file_path));
+      label: "Open",
+      onclick(props) {
+        if (Directory.isFile(props.file_path)) {
+          if ("programId" in props && props.type === "executable") {
+            fs.launchTask({
+              id: crypto.randomUUID(),
+              label: props.programId,
+              taskStatus: "running",
+              windowStatus: "inview",
+              pinnedToTaskbar: false,
+              programId: props.programId,
+              meta: (props?.meta as Record<string, string>) || undefined,
+            });
+          }
+          if ("executeBy" in props && props.type === "file") {
+            fs.launchTask({
+              id: crypto.randomUUID(),
+              label: props.executeBy,
+              taskStatus: "running",
+              windowStatus: "inview",
+              pinnedToTaskbar: false,
+              executeBy: props.executeBy,
+              file_path: props.file_path,
+              meta: props?.meta as Record<string, string>,
+            } as any);
+          }
+        }
+        if (Directory.isFolder(props.file_path)) {
+          fs.launchTask({
+            id: crypto.randomUUID(),
+            label: "File_Explorer",
+            taskStatus: "running",
+            windowStatus: "inview",
+            pinnedToTaskbar: false,
+            programId: "File_Explorer",
+            meta: {
+              folder_path: props.file_path,
+            },
+          });
+        }
       },
     },
     {
-      label: "Rename",
-      onclick() {
-        isRenaming = !isRenaming;
+      label: "Delete",
+      async onclick(props) {
+        await fs.deleteFile(props.file_path);
       },
     },
   ];
@@ -131,17 +164,28 @@
         <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
         <form
           class="input-wrapper"
-          onsubmit={(e) => {
+          onsubmit={async (e) => {
             e.preventDefault();
             let form = new FormData(e.currentTarget);
+            const desktopPath = "C:/Libraries/Desktop";
 
-            let input = form.get("rename") as string;
-
-            // fs.modifyTask()
+            let new_name = form.get("rename") as string;
 
             let file = fs.fs?.readFile(props.file_path);
 
-            console.log("file", file);
+            if (!file || !new_name) {
+              return;
+            }
+
+            // if (props.meta?.storage === "static") {
+            //   fs.fs!.modifyFile(
+            //     desktopPath,
+            //     new_name.trim(),
+            //     new Blob([await file.readAsText()], { type: file.mimetype })
+            //   );
+            // } else {
+            //   // Will Modify the file in indexeddb
+            // }
           }}
           use:handleClickOutside
           onclick_outside={() => {
