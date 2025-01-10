@@ -52,8 +52,6 @@ export const menuItems: MenuProps[] = [
 
 export type VariantPrograms = "RecycleBin";
 
-// export type ProgramVariants = `${InstalledPrograms}_filled`;
-
 export type NonVariantPrograms =
   | "Calculator"
   | "Notepad"

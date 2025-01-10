@@ -1,54 +1,34 @@
 <script lang="ts">
   import Calculator from "@/apps/Calculator/calculator.svelte";
-  import FileExplorer, {
-    type FileExplorerProps,
-  } from "@/apps/File_Explorer/file_explorer.svelte";
+  import File_Explorer from "@/apps/File_Explorer/file_explorer.svelte";
   import Notepad from "@/apps/Notepad/notepad.svelte";
-  import { getFs, type TaskManagerItem } from "./file_system.svelte";
+  import Plyr_Video from "@/apps/Plyr_Video/Plyr_video.svelte";
+  import type { Component } from "svelte";
   import { type InstalledPrograms } from "./utils";
-  import PlyrVideo, {
-    type PlyrVideoProps,
-  } from "@/apps/Plyr_Video/Plyr_video.svelte";
+  import type { TaskManagerItem } from "./file_system.svelte";
 
-  const fs = getFs();
+  type WindowProps = TaskManagerItem & {
+    executeBy: InstalledPrograms;
+  };
+
+  let props: WindowProps = $props();
+
+  type ProgramRegistry = Record<InstalledPrograms, Component<any>>;
+
+  const programRegistry: ProgramRegistry = {
+    Calculator,
+    Notepad,
+    File_Explorer,
+    Plyr_Video,
+    MyComputer: File_Explorer,
+    RecycleBin: File_Explorer,
+  };
+
+  const { programId, executeBy } = props;
+  const programToRender: InstalledPrograms = executeBy || programId;
+
+  const Dynamic = programRegistry[programToRender] ?? Calculator;
 </script>
 
-{#snippet renderCalculator(task: TaskManagerItem)}
-  <Calculator {...task} />
-{/snippet}
-
-{#snippet renderNotepad(task: TaskManagerItem & { file_path: string })}
-  <Notepad {...task} />
-{/snippet}
-
-{#snippet renderFileExplorer(task: FileExplorerProps)}
-  <FileExplorer {...task} />
-{/snippet}
-
-{#snippet renderPlyrVideo(task: PlyrVideoProps)}
-  <PlyrVideo {...task} />
-{/snippet}
-
-{#each fs.getTasks() as window (window.id)}
-  {@const programId = window.programId as InstalledPrograms}
-  {@const executeBy = window?.executeBy as InstalledPrograms}
-
-  {#if programId === "Calculator"}
-    {@render renderCalculator(window)}
-  {:else if programId === "Notepad"}
-    {@render renderNotepad(window)}
-  {:else if programId === "File_Explorer"}
-    {@render renderFileExplorer(window as FileExplorerProps)}
-  {:else if programId === "Plyr_Video"}
-    {@render renderPlyrVideo(window as PlyrVideoProps)}
-  {/if}
-
-  <!-- Execute by -->
-  {#if executeBy === "Notepad"}
-    {@render renderNotepad(window)}
-  {:else if programId === "File_Explorer" && !executeBy}
-    {@render renderFileExplorer(window as FileExplorerProps)}
-  {:else if executeBy === "Plyr_Video"}
-    {@render renderPlyrVideo(window as PlyrVideoProps)}
-  {/if}
-{/each}
+<!-- <Dynamic {...{ ...props, id: crypto.randomUUID() }} /> -->
+<Dynamic {...props} />

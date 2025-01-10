@@ -1,12 +1,5 @@
 <script lang="ts">
-  type MenuProps = {
-    label: string;
-    icon?: string;
-    subMenu?: MenuProps[];
-    isDisabled?: boolean;
-    onclick?: () => void;
-  };
-
+  import { type MenuProps } from "./index";
   const { menuItems }: { menuItems: MenuProps[] } = $props();
 </script>
 

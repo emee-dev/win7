@@ -16,7 +16,7 @@ type Placement = {
 };
 
 // 1. %s system user, 2. %s file_name
-type DesktopFolderPath = `C:/Users/${string}/Desktop/${string}`;
+type DesktopFolderPath = `C:/Libraries/Desktop/${string}`;
 
 export type IconProps = {
   id: string;
@@ -68,10 +68,13 @@ type MountableProgram = {
   meta?: Record<string, unknown> | undefined;
 };
 
-type MountableFile = Pick<MountableProgram, "mount_to"> & {
-  mimetype: string;
-  textContent: string;
+export type MountableFile = {
+  blob: Blob;
+  mount_to: string;
   type: "file";
+  meta?: {
+    storage?: "static" | "indexeddb";
+  };
 };
 
 const ICON_SIZE = 70;
@@ -92,16 +95,7 @@ class Win7FileSystem {
     (DesktopExecutable | DesktopFile | DesktopFolder)[]
   >([]);
 
-  private taskManager = $state<TaskManagerItem[]>([
-    // {
-    //   id: crypto.randomUUID(),
-    //   label: "Plyr_Video",
-    //   taskStatus: "running",
-    //   windowStatus: "inview",
-    //   pinnedToTaskbar: false,
-    //   programId: "Plyr_Video",
-    // },
-  ]);
+  private taskManager = $state<TaskManagerItem[]>([]);
 
   constructor(user_name: string) {
     const root = new Directory(user_name);
@@ -151,8 +145,12 @@ class Win7FileSystem {
             mimetype: element.blob.type,
             mount_to: element.path,
             type: "file",
-            storage: "indexeddb",
-          } as MountableFile & { executeBy: string; storage: "indexeddb" });
+            meta: {
+              storage: "indexeddb",
+            },
+          } as MountableFile & { executeBy: string; mimetype: string });
+        } else {
+          folders.push(element.path);
         }
       });
     }
@@ -212,21 +210,11 @@ class Win7FileSystem {
 
       if (!isOnDesktop) {
         if (file.type === "file") {
-          dir.createFile(
-            item.path,
-            item.filename_ext as string,
-            file.mimetype,
-            file.textContent
-          );
+          dir.createBlobFile(item.path, item.filename_ext, file.blob);
         }
 
         if (file.type === "executable") {
-          dir.createFile(
-            item.path,
-            item.filename_ext as string,
-            "application/x-msdownload",
-            null
-          );
+          dir.createExecutableFile(item.path, item.filename_ext as string);
         }
 
         return;
@@ -264,7 +252,7 @@ class Win7FileSystem {
     }
 
     if ("programId" in desktopIcon) {
-      fs.createFile(CWD, desktopIcon.label, "application/executable", null);
+      fs.createExecutableFile(CWD, desktopIcon.label);
 
       this.desktopFiles.push({
         id: desktopIcon.id,
@@ -278,16 +266,12 @@ class Win7FileSystem {
     }
 
     if ("executeBy" in desktopIcon && desktopIcon.type === "file") {
-      // Checks if it is a typeof file and not a folder.
-      if (!Directory.isFile(file_path)) {
-        return;
-      }
+      if (!Directory.isFile(file_path)) return;
 
-      fs.createFile(
+      fs.createBlobFile(
         CWD,
         desktopIcon.label,
-        "plain/text",
-        desktopIcon?.textContent || ""
+        new Blob([""], { type: "text/plain" })
       );
 
       this.desktopFiles.push({
@@ -346,7 +330,7 @@ class Win7FileSystem {
     }
 
     if ("programId" in args && args.type === "executable") {
-      fs.createFile(CWD, label, "application/executable", null);
+      fs.createExecutableFile(CWD, label);
 
       this.desktopFiles.push({
         id: crypto.randomUUID(),
@@ -360,42 +344,45 @@ class Win7FileSystem {
       } as DesktopExecutable & ExtraIconProps);
     }
 
-    // if ("executeBy" in args && args.type === "file") {
-    //   if (!Directory.isFile(file_path)) {
-    //     return;
-    //   }
+    // @ts-expect-error it is possibly undefined
+    if (!args.executeBy && args.type === "file") {
+      if (!Directory.isFile(file_path)) return;
 
-    //   fs.createFile(CWD, label, "text/plain", args?.textContent || "");
-
-    //   this.desktopFiles.push({
-    //     id: crypto.randomUUID(),
-    //     label: label,
-    //     type: "file",
-    //     executeBy: findHandler(file_path),
-    //     placement: { column, row },
-    //     file_path: file_path,
-    //     icon: getDesktopIcon(file_path),
-    //   } as DesktopFile & ExtraIconProps);
-    // }
-
-    if (args.type === "file") {
-      if (!Directory.isFile(file_path)) {
-        return;
-      }
-
-      fs.createFile(CWD, label, "text/plain", args?.textContent || "");
+      fs.createBlobFile(CWD, label, args.blob);
 
       this.desktopFiles.push({
         id: crypto.randomUUID(),
         label: label,
         type: "file",
-        executeBy: findHandler(file_path),
-        placement: { column, row },
+        meta: args.meta,
         file_path: file_path,
+        placement: { column, row },
         icon: getDesktopIcon(file_path),
-        meta: {
-          storage: "indexeddb",
-        },
+        executeBy: findHandler(file_path),
+      } as DesktopFile & ExtraIconProps);
+    }
+
+    // These types of files are the ones persisted in database and should not have its
+    // Blob dropped into memory for efficiency reasons.
+    if (
+      args.meta &&
+      args.type === "file" &&
+      args.meta.storage === "indexeddb"
+    ) {
+      if (!Directory.isFile(file_path)) return;
+
+      // TODO it should have an optional blob argument. Blob can be too large to read at once.
+      fs.createBlobFile(CWD, label, new Blob([""], { type: "text/plain" }));
+
+      this.desktopFiles.push({
+        id: crypto.randomUUID(),
+        label: label,
+        type: "file",
+        meta: args.meta,
+        file_path: file_path,
+        placement: { column, row },
+        icon: getDesktopIcon(file_path),
+        executeBy: findHandler(file_path),
       } as DesktopFile & ExtraIconProps);
     }
   }
@@ -491,6 +478,27 @@ class Win7FileSystem {
     let modified = this.taskManager.filter((item) => item.id !== taskId);
 
     this.taskManager = modified;
+  }
+
+  /**
+   * Will delete the file from system.
+   */
+  async deleteFile(file_path: string) {
+    let db = this.folderDB;
+    let fs = this.fs;
+    let desktopFiles = this.desktopFiles as (DesktopFile | DesktopFolder)[];
+
+    if (!db || !fs) return null;
+
+    await db.folders.delete(file_path);
+
+    fs.deleteFile(file_path);
+
+    // @ts-expect-error it exists
+    let newFiles = desktopFiles.filter((item) => item.file_path !== file_path);
+
+    this.desktopFiles = newFiles;
+    // console.log("js", JSON.stringify(desktopFiles, null, 3));
   }
 }
 

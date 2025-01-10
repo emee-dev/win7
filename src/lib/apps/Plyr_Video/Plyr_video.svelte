@@ -4,7 +4,7 @@
     type TaskManagerItem,
   } from "@/components/desktop/file_system.svelte";
   import { getIconByProgramId } from "@/components/desktop/utils";
-  import { Window } from "@/components/window_inprogress";
+  import { Window } from "@/components/window";
   import "plyr/dist/plyr.css";
   import { hasWindow } from "std-env";
   import { onDestroy, onMount } from "svelte";

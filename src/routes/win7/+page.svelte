@@ -12,6 +12,7 @@
   import type {
     DesktopFile,
     ExtraIconProps,
+    MountableFile,
   } from "@/components/desktop/file_system.svelte";
   import { FolderDatabase, persistItem } from "@/components/desktop/indexeddb";
   import {
@@ -20,17 +21,18 @@
     menuItems,
   } from "@/components/desktop/utils";
   import { Selecto } from "@/components/selecto";
-  import { Button } from "@/components/ui/button";
   import * as ContextMenu from "@/components/ui/context-menu/index";
   import { type MenuProps } from "@/components/ui/popup_menu";
   import { listItem } from "@/components/ui/popup_menu/popup_menu.svelte";
   import { StartMenu } from "@/components/ui/startmenu";
   import Taskbar from "@/components/ui/taskbar/taskbar.svelte";
-  import { mediaAssets, windows7Folders } from "@/const";
+  import { mediaAssets, textFiles, windows7Folders } from "@/const";
   import { useDropzone } from "@/hooks/Dropzone";
   import { onDestroy, onMount } from "svelte";
   import { hasWindow } from "std-env";
+  import { Howl } from "howler";
 
+  let sound: Howl;
   let desktop: HTMLElement;
   let db: FolderDatabase | null;
   let videoElement: HTMLVideoElement;
@@ -42,6 +44,9 @@
 
   onMount(() => {
     db = new FolderDatabase();
+    sound = new Howl({
+      src: ["https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/boot.mp3"],
+    });
 
     fs.mount({
       desktop,
@@ -57,24 +62,7 @@
           },
           mount_to: "C:/Libraries/Desktop/MyComputer.exe",
         },
-        {
-          type: "file",
-          textContent: "the following is my npm private keys.",
-          mimetype: "text/plain",
-          mount_to: "C:/Libraries/Desktop/npm.txt",
-        },
-        {
-          type: "file",
-          textContent: "the following is my npm private keys.",
-          mimetype: "text/plain",
-          mount_to: "C:/Libraries/Desktop/exam.txt",
-        },
-        {
-          type: "file",
-          textContent: "the following is my npm private keys.",
-          mimetype: "text/plain",
-          mount_to: "C:/Libraries/Documents/exam.txt",
-        },
+        ...textFiles,
       ],
     });
   });
@@ -124,18 +112,6 @@
 
       let file_path = `${desktopPath}/${file.name}`;
 
-      // Two things to do.
-      // 1. Persist file in indexeddb.
-      // 2. store metadata in fs for temp reference.
-      // 3. If on desktop also push into desktop icons array
-
-      // console.log("persist", {
-      //   blob,
-      //   type: "file",
-      //   storage: "indexeddb",
-      //   path: file_path,
-      // });
-
       // persist user created files
       await persistItem(db as FolderDatabase, {
         blob,
@@ -144,13 +120,6 @@
         path: file_path,
       });
 
-      // fs.fs!.createFile(file_path, file.name, file.type, null);
-
-      // In order to handle dblclicks on such icons
-      // We need to let the executable know what type of
-      // file it is processing.
-      
-      // @ts-expect-error it is a prototype
       fs.getDesktopFiles().push({
         id: crypto.randomUUID(),
         label: file.name,
@@ -187,6 +156,7 @@
 
     const handler = () => {
       hasBootEnded = true;
+      sound.play();
     };
 
     videoElement.addEventListener("ended", handler);
@@ -195,7 +165,6 @@
       videoElement.removeEventListener("ended", handler);
     };
   });
-  // $inspect(files_data).with((t, v) => console.log("files", v));
 </script>
 
 <Selecto>
@@ -215,7 +184,9 @@
           <DesktopIcons {...item as any} />
         {/each}
 
-        <DesktopWindows />
+        {#each fs.getTasks() as window}
+          <DesktopWindows {...window} />
+        {/each}
 
         {#if !hasBootEnded}
           <div
@@ -235,7 +206,7 @@
           </div>
         {/if}
 
-        <div class="flex ml-[200px]">
+        <!-- <div class="flex ml-[200px]">
           {#if over_dropzone}
             <span>Over zone</span>
           {:else}
@@ -308,7 +279,7 @@
             }}
             >Serialize FS
           </Button>
-        </div>
+        </div> -->
 
         <StartMenu bind:isStartMenuOpen />
         <Taskbar bind:isStartMenuOpen />

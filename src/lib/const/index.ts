@@ -1,3 +1,5 @@
+import type { MountableFile } from "@/components/desktop/file_system.svelte";
+
 export const windows7Folders = [
   "C:/Users/Public",
   "C:/Program Files",
@@ -68,3 +70,33 @@ export const mediaAssets = {
   TextFileIcon:
     "https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/text_file.webp",
 } as const;
+
+export let textFiles = [
+  {
+    type: "file",
+    textContent:
+      "Svelte 5 Hackathon Ideas:\n- Build a dynamic weather dashboard with real-time updates.\n- Create a minimalist task management app with drag-and-drop functionality.\n- Develop an interactive learning platform with quizzes and progress tracking.\n\nRemember: Simplicity, performance, and user experience are key!\n\nHackathon website: https://hack.sveltesociety.dev/2024",
+    mount_to: "C:/Libraries/Desktop/inspiration-ideas.txt",
+  },
+  {
+    type: "file",
+    textContent:
+      "Essential Svelte 5 Tips:\n- Leverage Svelte's reactivity for real-time data updates.\n- Use Svelte stores for state management across components.\n- Optimize your app's performance with code splitting and lazy loading.\n\nInspiration: \"The best way to predict the future is to create it.\"\n\nHackathon website: https://hack.sveltesociety.dev/2024",
+    mount_to: "C:/Libraries/Desktop/svelte-tips.txt",
+  },
+  {
+    type: "file",
+    textContent:
+      'Hackathon Motivation:\n- Stay focused on your goals and keep iterating on your ideas.\n- Collaboration and feedback are crucial—don’t hesitate to ask for help.\n- Push your limits and try something new with Svelte 5’s features.\n\n"Innovation distinguishes between a leader and a follower." – Steve Jobs\n\nHackathon website: https://hack.sveltesociety.dev/2024',
+    mount_to: "C:/Libraries/Desktop/hackathon-motivation.txt",
+  },
+].map((item) => {
+  return {
+    type: "file",
+    blob: new Blob([item.textContent], { type: "text/plain" }),
+    mount_to: item.mount_to,
+    meta: {
+      storage: "static",
+    },
+  };
+}) as MountableFile[];

@@ -1,12 +1,14 @@
 <script lang="ts" module>
   import type { MenuProps } from ".";
   import * as ContextMenu from "$lib/components/ui/context-menu/index";
+  import { type IconProps } from "@/components/desktop/desktop_icons.svelte";
+
   export { listItem };
 
   // const { menuItems }: { menuItems: MenuProps[] } = $props();
 </script>
 
-{#snippet listItem(menuItem: MenuProps, onItemClick: any)}
+{#snippet listItem(menuItem: MenuProps, onItemClick: any, iconProps: IconProps)}
   {@const isDisabled = menuItem?.isDisabled || null}
   {@const divider = menuItem?.hasDivider || null}
 
@@ -22,7 +24,7 @@
       }
 
       onItemClick(menuItem);
-      menuItem?.onclick?.();
+      menuItem?.onclick?.(iconProps);
     }}
   >
     {#if menuItem.icon}
@@ -38,7 +40,7 @@
     {#if menuItem.subMenu}
       <ul role="menu">
         {#each menuItem.subMenu as subMenuItem (subMenuItem.label)}
-          {@render listItem(subMenuItem, onItemClick)}
+          {@render listItem(subMenuItem, onItemClick, iconProps)}
         {/each}
       </ul>
     {/if}

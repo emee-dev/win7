@@ -1,11 +1,5 @@
 import { getContext, setContext } from "svelte";
 
-// type HistoryItem = {
-//   id: string;
-//   currentValue: string;
-//   [index: string]: string;
-// };
-
 class History {
   private operations: string[] = $state<string[]>([]);
   private currentValue: string | null = $state<string | null>(null);

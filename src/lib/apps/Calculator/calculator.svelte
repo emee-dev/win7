@@ -4,7 +4,7 @@
     type TaskManagerItem,
   } from "@/components/desktop/file_system.svelte";
   import { combineNumbers, type ValidOperators } from "./utils";
-  import { Window } from "@/components/window_inprogress";
+  import { Window } from "@/components/window";
   import { getIconByProgramId } from "@/components/desktop/utils";
 
   type CalculatorProps = {

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import { type HeadProps } from ".";
   import { NOT_SELECTABLE } from "../selecto";
 

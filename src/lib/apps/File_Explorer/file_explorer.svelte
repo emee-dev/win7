@@ -4,8 +4,8 @@
     type TaskManagerItem,
   } from "@/components/desktop/file_system.svelte";
   import { getIconByProgramId, interpolate } from "@/components/desktop/utils";
-  import { Window } from "@/components/window_inprogress";
-  import { getWindowContext } from "@/components/window_inprogress/ctx.svelte";
+  import { Window } from "@/components/window";
+  import { getWindowContext } from "@/components/window/ctx.svelte";
   import { onMount, untrack } from "svelte";
   import { setHistory } from "./undoRedo.svelte";
   import { formatFs, type Folder } from "./utils";

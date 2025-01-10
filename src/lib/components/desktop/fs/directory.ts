@@ -16,24 +16,100 @@ class Item {
   }
 }
 
+// class FileItem extends Item {
+//   public mimetype: string;
+//   public content: string | null;
+
+//   constructor(
+//     name: string,
+//     mimetype: string,
+//     content: string | null = null,
+//     full_path?: string
+//   ) {
+//     super(name, full_path);
+//     if (!/\.\w+$/.test(name)) {
+//       throw new Error(
+//         `Invalid file name '${name}'. A valid file extension is required.`
+//       );
+//     }
+//     this.mimetype = mimetype;
+//     this.content = content;
+//   }
+// }
+
 class FileItem extends Item {
   public mimetype: string;
-  public content: string | null;
+  private blob: Blob;
+  public lastModified: Date;
 
   constructor(
     name: string,
     mimetype: string,
-    content: string | null = null,
+    content: Blob | string | null = null,
     full_path?: string
   ) {
     super(name, full_path);
+
     if (!/\.\w+$/.test(name)) {
       throw new Error(
         `Invalid file name '${name}'. A valid file extension is required.`
       );
     }
+
     this.mimetype = mimetype;
-    this.content = content;
+    this.blob = this.createBlob(content);
+    this.lastModified = new Date();
+  }
+
+  private createBlob(content: Blob | string | null): Blob {
+    if (content instanceof Blob) {
+      return content;
+    } else if (typeof content === "string") {
+      return new Blob([content], { type: this.mimetype });
+    } else {
+      return new Blob([], { type: this.mimetype });
+    }
+  }
+
+  public get size(): number {
+    return this.blob.size;
+  }
+
+  public async readAsText(): Promise<string> {
+    return await this.blob.text();
+  }
+
+  public async readAsArrayBuffer(): Promise<ArrayBuffer> {
+    return await this.blob.arrayBuffer();
+  }
+
+  public updateContent(newContent: Blob | string): void {
+    this.blob = this.createBlob(newContent);
+    this.lastModified = new Date();
+  }
+
+  public static fromBlob(
+    blob: Blob,
+    name: string,
+    full_path?: string
+  ): FileItem {
+    return new FileItem(name, blob.type, blob, full_path);
+  }
+
+  public static fromBase64(
+    base64: string,
+    name: string,
+    mimetype: string,
+    full_path?: string
+  ): FileItem {
+    const binaryString = atob(base64);
+    const binaryLength = binaryString.length;
+    const bytes = new Uint8Array(binaryLength);
+    for (let i = 0; i < binaryLength; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    const blob = new Blob([bytes], { type: mimetype });
+    return new FileItem(name, mimetype, blob, full_path);
   }
 }
 
@@ -44,10 +120,6 @@ class Directory extends Item {
     super(name, full_path);
     this.children = new Map();
   }
-
-  // public static isFilePath(path: string): boolean {
-  //   return /\.\w+$/.test(path);
-  // }
 
   public static isFile(path: string): boolean {
     const fileRegex = /.*\.[a-zA-Z0-9]+$/;
@@ -146,12 +218,43 @@ class Directory extends Item {
     }
   }
 
-  createFile(
-    path: string,
-    fileName: string,
-    mimetype: string,
-    textContent: string | null = null
-  ): void {
+  // createTextFile(
+  //   path: string,
+  //   fileName: string,
+  //   mimetype: string,
+  //   textContent: string | null = null
+  // ): void {
+  //   if (!/\.\w+$/.test(fileName)) {
+  //     throw new Error(
+  //       `Invalid file name '${fileName}'. A valid file extension is required.`
+  //     );
+  //   }
+
+  //   const parts = path.split("/").filter((part) => part.length > 0);
+  //   let currentDir: Directory = this;
+
+  //   for (const part of parts) {
+  //     const nextItem = currentDir.children.get(part);
+  //     if (nextItem instanceof Directory) {
+  //       currentDir = nextItem;
+  //     } else if (nextItem === undefined) {
+  //       throw new Error(`Directory '${part}' does not exist.`);
+  //     } else {
+  //       throw new Error(`Path conflict: '${part}' is not a directory.`);
+  //     }
+  //   }
+
+  //   if (currentDir.children.has(fileName)) {
+  //     throw new Error(`File '${fileName}' already exists.`);
+  //   }
+
+  //   currentDir.children.set(
+  //     fileName,
+  //     new FileItem(fileName, mimetype, textContent, path)
+  //   );
+  // }
+
+  createExecutableFile(path: string, fileName: string): void {
     if (!/\.\w+$/.test(fileName)) {
       throw new Error(
         `Invalid file name '${fileName}'. A valid file extension is required.`
@@ -178,8 +281,64 @@ class Directory extends Item {
 
     currentDir.children.set(
       fileName,
-      new FileItem(fileName, mimetype, textContent, path)
+      new FileItem(fileName, "application/x-msdownload", null, path)
     );
+  }
+
+  createBlobFile(path: string, fileName: string, blob: Blob): void {
+    if (!/\.\w+$/.test(fileName)) {
+      throw new Error(
+        `Invalid file name '${fileName}'. A valid file extension is required.`
+      );
+    }
+
+    const parts = path.split("/").filter((part) => part.length > 0);
+    let currentDir: Directory = this;
+
+    for (const part of parts) {
+      const nextItem = currentDir.children.get(part);
+      if (nextItem instanceof Directory) {
+        currentDir = nextItem;
+      } else if (nextItem === undefined) {
+        throw new Error(`Directory '${part}' does not exist.`);
+      } else {
+        throw new Error(`Path conflict: '${part}' is not a directory.`);
+      }
+    }
+
+    if (currentDir.children.has(fileName)) {
+      throw new Error(`File '${fileName}' already exists.`);
+    }
+
+    currentDir.children.set(fileName, FileItem.fromBlob(blob, fileName, path));
+  }
+
+  deleteFile(filePath: string) {
+    if (!Directory.isFile(filePath)) {
+      throw new Error(
+        `Invalid file path '${filePath}'. It must end with a file extension.`
+      );
+    }
+
+    const parts = filePath.split("/").filter((part) => part.length > 0);
+    const fileName = parts.pop() as string;
+
+    let currentDir: Directory = this;
+
+    for (const part of parts) {
+      const nextItem = currentDir.children.get(part);
+      if (nextItem instanceof Directory) {
+        currentDir = nextItem;
+      } else {
+        throw new Error(`Path conflict: '${part}' is not a directory.`);
+      }
+    }
+
+    if (!currentDir.children.has(fileName)) {
+      throw new Error(`File '${fileName}' does not exist.`);
+    }
+
+    return currentDir.children.delete(fileName);
   }
 
   modifyFile(

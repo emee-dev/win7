@@ -6,11 +6,20 @@
   } from "@/components/desktop/file_system.svelte";
   import { getIconByProgramId } from "@/components/desktop/utils";
   import { mediaAssets } from "@/const";
+  import type { Action } from "svelte/action";
 
   const fs = getFs();
 
   let { isStartMenuOpen = $bindable() }: { isStartMenuOpen: boolean } =
     $props();
+
+  type OutsideClick = Action<
+    HTMLDivElement,
+    unknown,
+    {
+      onclick_outside: (e: CustomEvent) => void;
+    }
+  >;
 
   onMount(() => {
     if (navigator) {
@@ -33,6 +42,28 @@
     if (status === "minimized") {
       fs.modifyTask(windowId, { windowStatus: "inview" });
     }
+  };
+
+  function handleClickOutside(event: any) {
+    if (isStartMenuOpen) {
+      isStartMenuOpen = !isStartMenuOpen;
+    }
+  }
+
+  const clickListener: OutsideClick = (node) => {
+    const handleClick = (event: any) => {
+      if (node && !node.contains(event.target) && !event.defaultPrevented) {
+        node.dispatchEvent(new CustomEvent("click_outside", node as any));
+      }
+    };
+
+    document.addEventListener("click", handleClick, true);
+
+    return {
+      destroy() {
+        document.removeEventListener("click", handleClick, true);
+      },
+    };
   };
 </script>
 
@@ -65,7 +96,13 @@
 
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 <div id="taskbar" class="">
-  <div id="start-button" class="mr-6 ml-5" onclick={() => toggleStartMenu()}>
+  <div
+    id="start-button"
+    class="mr-6 ml-5"
+    use:clickListener
+    onclick_outside={handleClickOutside}
+    onclick={() => toggleStartMenu()}
+  >
     <span class="icon" style="--icon: url('{mediaAssets.StartButton}');"></span>
   </div>
 

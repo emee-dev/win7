@@ -1,9 +1,9 @@
 <script lang="ts">
   import { Win7BarMenu } from "@/components/ui/bar_menu";
   import { getWindowContext } from "./ctx.svelte";
-  import { type MenuProps } from "../context_menu";
   import { cn } from "@/utils";
-  import type { ContentProps } from ".";
+  import type { ContentProps } from "./index";
+  import { type MenuProps } from "@/components/ui/popup_menu";
 
   const ctx = getWindowContext();
 

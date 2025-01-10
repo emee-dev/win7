@@ -61,9 +61,9 @@ For detailed implementations of each feature, refer to the following:
 - 📝 **Notepad Application**: [Notepad.svelte](https://github.com/emee-dev/win7/blob/main/src/lib/apps/Calculator/calculator.svelte)
 - 🗄️ **File Explorer**: [File_Explorer.svelte](https://github.com/emee-dev/win7/tree/main/src/lib/apps/File_Explorer)
 
-## 🎬 Demo Video
+## 🎬 Demo
 
-Check out the demo video to see the project in action!  
+Check out the demo to see the project in action!  
 📹 [Vercel](https://windows7-lovat.vercel.app/)
 📹 [Watch the Demo on YouTube](https://youtu.be/your-demo-video-link)
 

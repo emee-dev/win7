@@ -6,8 +6,6 @@
     type InstalledPrograms,
   } from "@/components/desktop/utils";
   import { mediaAssets } from "@/const";
-  import { hasWindow } from "std-env";
-  import type { Action } from "svelte/action";
 
   const fs = os.getFs();
 
@@ -69,40 +67,6 @@
       },
     },
   ];
-
-  function handleClickOutside(event: any) {
-    // if (isStartMenuOpen) {
-    //   isStartMenuOpen = !isStartMenuOpen;
-    // }
-  }
-
-  type OutsideClick = Action<
-    HTMLDivElement,
-    unknown,
-    {
-      onclick_outside: (e: CustomEvent) => void;
-    }
-  >;
-
-  // const clicks: OutsideClick = (node) => {
-  //   if (!hasWindow) {
-  //     return;
-  //   }
-
-  //   const handleClick = (event: any) => {
-  //     if (node && !node.contains(event.target) && !event.defaultPrevented) {
-  //       node.dispatchEvent(new CustomEvent("click_outside", node as any));
-  //     }
-  //   };
-
-  //   document.addEventListener("click", handleClick, true);
-
-  //   return {
-  //     destroy() {
-  //       document.removeEventListener("click", handleClick, true);
-  //     },
-  //   };
-  // };
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -113,7 +77,7 @@
     style=" --icon: url('{getIconByProgramId(
       args.label as InstalledPrograms
     )}');"
-    onclick={() => fs.launchTask(args)}
+    onclick={() => fs.launchTask({ ...args, id: crypto.randomUUID() })}
   >
     {args.label.replace("_", " ")}
   </div>
@@ -127,14 +91,12 @@
     style=" --icon: url('{getIconByProgramId(
       args.label as InstalledPrograms
     )}');"
-    onclick={() => fs.launchTask(args)}
+    onclick={() => fs.launchTask({ ...args, id: crypto.randomUUID() })}
   >
     {args.label}
   </div>
 {/snippet}
 
-<!-- use:clicks
-onclick_outside={handleClickOutside} -->
 <div id="start-menu" class={isStartMenuOpen ? "flex" : "hidden"}>
   <div class="programs">
     <div class="programs-list has-scrollbar">

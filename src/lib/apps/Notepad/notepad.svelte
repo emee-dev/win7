@@ -4,7 +4,7 @@
     type TaskManagerItem,
   } from "@/components/desktop/file_system.svelte";
   import { getIconByProgramId } from "@/components/desktop/utils";
-  import { Window } from "@/components/window_inprogress";
+  import { Window } from "@/components/window";
   import { onDestroy, onMount } from "svelte";
 
   let defaultText = $state(
@@ -85,7 +85,10 @@
       return;
     }
 
-    // objectUrl = textFile.content;
+    objectUrl = {
+      url: "",
+      content: (await textFile?.readAsText()) || defaultText,
+    };
   }
 
   onMount(() => {
