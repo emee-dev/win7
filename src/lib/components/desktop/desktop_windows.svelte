@@ -46,7 +46,7 @@
   <!-- Execute by -->
   {#if executeBy === "Notepad"}
     {@render renderNotepad(window)}
-  {:else if programId === "File_Explorer"}
+  {:else if programId === "File_Explorer" && !executeBy}
     {@render renderFileExplorer(window as FileExplorerProps)}
   {:else if executeBy === "Plyr_Video"}
     {@render renderPlyrVideo(window as PlyrVideoProps)}

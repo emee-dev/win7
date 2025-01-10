@@ -1,17 +1,23 @@
-# 🎉 Windows 7 Simulation with Svelte 5 🎉
+# 🎉 Windows 7 Simulator with Svelte 5 🎉
 
-Welcome to the **Windows 7 Simulation** project, crafted for the **Wizzbangery Wizard** track of the Svelte Hackathon. This application emulates some of the Windows 7 operating system's interface and functionalities, utilizing the latest features introduced in Svelte 5 (runes).
+Welcome to the **Windows 7 Simulator** project, crafted for the **Wizzbangery Wizard** track of the Svelte Hackathon. This application emulates some of the Windows 7 operating system's interface and functionalities, utilizing the latest features introduced in Svelte 5 (runes).
 
 ## ✨ Features
 
 - 🖥️ **Desktop Interface**: A close recreation of the Windows 7 desktop, complete with draggable icons and a functional taskbar.
+  - Drag and drop single files into the desktop, currently supporting .mp4 and .txt files, with more to come.
+  - Icons layout, grouping, and drag functionality with context menu.
 - 📂 **Applications**:
-  - ➕ **Calculator**: A simple arithmetic calculator.
-  - 🎥 **Video Player**: Play videos in a native-like player.
-  <!-- - 📷 **Camera**: Access and display webcam feed. -->
-  - 📝 **Notepad**: A basic text editor for note-taking.
+  - ➕ **Calculator (WIP)**: A simple arithmetic calculator.
+- 🎥 **Video Player**: Play videos in a native-like player.
+  - Successfully plays video (.mp4) files in the system.
+- 📝 **Notepad**: A basic text editor for note-taking.
+  - Successfully reads uploaded .txt files.
 - 🗄️ **File System Simulation**: Navigate through a mock file system with folders and files.
-- 🎮 **Games**: Classic JavaScript games integrated via iframes.
+  - History implementation with rewind, forward, undo, and redo logic.
+  - Folders/files navigation via the address bar.
+  - File search (WIP).
+- 🎮 **Games**: Classic JavaScript games integrated via iframes, time permitting.
 
 ## 🚀 Technologies and Svelte 5 Features Used
 
@@ -25,14 +31,14 @@ This project leverages several new features from Svelte 5:
 - **$bindable**: Enables two-way binding with custom components.
 - **$props**: Accesses component props directly.
 - **Context API**: Shares data between components without prop drilling.
-- **Composable Components**: Utilizes dot notation for nested components, e.g., `<Component.NestedComponent />`.
+- **Composable Components**: Utilizes dot notation for nested components, e.g., `<Component.NestedComponent />` and snippets.
 
 ### 📜 Template Syntax
 
 - **{#snippet}**: Defines reusable snippets of code.
 - **{@render}**: Controls conditional rendering.
 - **bind:** Binds properties for two-way data binding.
-<!-- - **use:** Applies actions to elements. -->
+- **use:** Applies actions to elements.
 
 ### 🔧 Special Elements
 
@@ -52,10 +58,8 @@ For detailed implementations of each feature, refer to the following:
 - 📌 **Taskbar Component**: [Taskbar.svelte](https://github.com/your-repo/windows7-simulation/blob/main/src/components/Taskbar.svelte)
 - ➕ **Calculator Application**: [Calculator.svelte](https://github.com/emee-dev/win7/blob/main/src/lib/apps/Calculator/calculator.svelte)
 - 🎥 **Video Player Application**: [VideoPlayer.svelte](https://github.com/emee-dev/win7/blob/main/src/lib/apps/Calculator/calculator.svelte)
-<!-- - 📷 **Camera Application**: [Camera.svelte](https://github.com/your-repo/windows7-simulation/blob/main/src/apps/Camera.svelte) -->
 - 📝 **Notepad Application**: [Notepad.svelte](https://github.com/emee-dev/win7/blob/main/src/lib/apps/Calculator/calculator.svelte)
 - 🗄️ **File Explorer**: [File_Explorer.svelte](https://github.com/emee-dev/win7/tree/main/src/lib/apps/File_Explorer)
-<!-- - 🎮 **Game Integration**: [Games.svelte](https://github.com/your-repo/windows7-simulation/blob/main/src/apps/Games.svelte) -->
 
 ## 🎬 Demo Video
 
