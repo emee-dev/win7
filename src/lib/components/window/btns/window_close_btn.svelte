@@ -2,8 +2,10 @@
   import { cn } from "@/utils";
   import type { CloseBtnProps } from "..";
   import { getWindowContext } from "../ctx.svelte";
+  import { getFs } from "@/components/desktop/file_system.svelte";
 
   const ctx = getWindowContext();
+  const fs = getFs();
 
   let { onclose, class: className }: CloseBtnProps = $props();
 

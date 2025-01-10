@@ -41,7 +41,7 @@
 
   let mouseCoordinates = $state({ x: 0, y: 0 });
   let isStartMenuOpen = $state(false);
-  let hasBootEnded = $state(true);
+  let hasBootEnded = $state(process.env.NODE_ENV === "development" || false);
 
   onMount(() => {
     db = new FolderDatabase();
@@ -145,6 +145,8 @@
   const onItemClick = (d: MenuProps) => {
     isOpen = !isOpen;
   };
+
+  console.log(process.env.NODE_ENV);
 
   $effect(() => {
     if (!videoElement) {

@@ -34,43 +34,42 @@
 
   const quickAccess = [
     {
-      icon: "",
+      icon: mediaAssets.FileExplorerDesktop,
       label: "Desktop",
       path: "C:/Libraries/Desktop",
     },
     {
-      // icon: "/img/file_explorer_downloads.webp",
       icon: mediaAssets.FileExplorerDownloads,
       label: "Downloads",
       path: "C:/Libraries/Downloads",
     },
     {
-      icon: "",
+      icon: mediaAssets.FileExplorerGenericFolder,
       label: "Documents",
       path: "C:/Libraries/Documents",
     },
     {
-      icon: "",
+      icon: mediaAssets.FileExplorerGenericFolder,
       label: "Music",
       path: "C:/Libraries/Music",
     },
     {
-      icon: "",
+      icon: mediaAssets.FileExplorerGenericFolder,
       label: "Pictures",
       path: "C:/Libraries/Pictures",
     },
     {
-      icon: "",
+      icon: mediaAssets.FileExplorerGenericFolder,
       label: "Videos",
       path: "C:/Libraries/Videos",
     },
   ];
 
   let folderItems = $state<Folder[]>([]);
+  let selectedIndex = $state<number>(0);
 
   const onclose = () => {
     fs.terminateTask(windowId);
-    console.log("windowId", windowId);
   };
 
   const onminimize = () => {
@@ -125,7 +124,6 @@
           <li>
             <details open>
               <summary class="flex items-center gap-x-1">
-                <!-- src="/img/file_explorer_libraries.webp" -->
                 <img
                   src={mediaAssets.FileExplorerLibraries}
                   alt="file explorer libs"
@@ -172,11 +170,14 @@
           <span class="px-2 py-1 font-medium text-base">Folders</span>
           {#if folderItems.length > 0}
             <div class="flex flex-wrap gap-2 p-3">
-              {#each folderItems as item (item.name)}
+              {#each folderItems as item, index (item.name)}
                 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
                 <div
-                  class="w-[200px] h-[25%] flex program rounded-sm"
-                  onclick={(e) => {}}
+                  class="w-[200px] h-[25%] flex program rounded-sm {selectedIndex ===
+                  index
+                    ? 'active'
+                    : ''}"
+                  onclick={(e) => (selectedIndex = index)}
                   ondblclick={() => {
                     if (item.type === "Folder") {
                       history.append(item.path as string);

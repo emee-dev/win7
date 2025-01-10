@@ -39,6 +39,10 @@ export const mediaAssets = {
     "https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/file_explorer.webp",
   FileExplorerDownloads:
     "https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/file_explorer_downloads.webp",
+  FileExplorerGenericFolder:
+    "https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/generic_folder.webp",
+  FileExplorerDesktop:
+    "https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/desktop.webp",
   FileExplorerLibraries:
     "https://z4woa7oobctpvgvy.public.blob.vercel-storage.com/file_explorer_libraries.webp",
   FileExplorerToggle:

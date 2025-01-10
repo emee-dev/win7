@@ -26,7 +26,9 @@
   let showWelcomeToast = $state(false);
 
   onMount(() => {
-    showWelcomeToast = true;
+    let holdOn = setTimeout(() => {
+      showWelcomeToast = true;
+    }, 1000);
 
     let id = setTimeout(() => {
       showWelcomeToast = false;
@@ -36,7 +38,10 @@
       //   handleBattery(navigator as CustomNavigator);
     }
 
-    return clearTimeout(id);
+    return () => {
+      clearTimeout(holdOn);
+      clearTimeout(id);
+    };
   });
 
   const toggleStartMenu = () => {

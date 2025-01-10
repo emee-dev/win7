@@ -62,7 +62,7 @@
   style="height: 100%;"
 >
   {#if ctx.showBarMenu}
-    <Win7BarMenu {menuItems} />
+    <Win7BarMenu menuItems={[]} />
   {/if}
 
   <div class={cn("content-area flex-1 bg-white p-0", wrapperClass)}>
