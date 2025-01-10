@@ -48,7 +48,7 @@
 
   <footer class="text-center mt-8 h-full">
     <button class="mb-4 decoration-yellow-300">
-      <a href="/win7" class="underline underline-offset-4"> Surprise Me.</a> 👈
+      <a data-sveltekit-preload-code="viewport" href="/win7" class="underline underline-offset-4"> Surprise Me.</a> 👈
     </button>
 
     <p>Created with 🖤 and a sprinkle of magic dust</p>

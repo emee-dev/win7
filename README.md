@@ -64,6 +64,7 @@ For detailed implementations of each feature, refer to the following:
 ## 🎬 Demo Video
 
 Check out the demo video to see the project in action!  
+📹 [Vercel](https://windows7-lovat.vercel.app/)
 📹 [Watch the Demo on YouTube](https://youtu.be/your-demo-video-link)
 
 ## 🚀 Getting Started
@@ -92,6 +93,16 @@ To run this project locally:
 4. **Open in browser**:
 
    Navigate to `http://localhost:5173` to view the application.
+
+Your **Credits / Acknowledgement** section is concise, but it could benefit from a little more detail to give proper recognition to the projects that inspired your work. Here's a revised version with some added substance:
+
+## 😆 Credits / Acknowledgement
+
+This project draws significant inspiration from the following remarkable projects:
+
+- [**7.css**](https://khang-nd.github.io/7.css/): A CSS framework that beautifully replicates the look and feel of Windows 7, providing the foundational styles for the classic Windows UI in web applications.
+- [**daedalOS**](https://github.com/DustinBrett/daedalOS): An impressive browser-based operating system simulation, offering a comprehensive approach to replicating desktop environments within a web browser.
+- [**win7simu**](https://win7simu.visnalize.com/): An online simulation of Windows 7 that showcases the nostalgic interface and interactions, serving as a reference for UI and user experience design in this project.
 
 ## 🤝 Contribution
 
