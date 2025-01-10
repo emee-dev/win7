@@ -7,6 +7,8 @@
   import { getIconByProgramId } from "@/components/desktop/utils";
   import { mediaAssets } from "@/const";
   import type { Action } from "svelte/action";
+  import { Icon } from "svelte-awesome";
+  import Close from "svelte-awesome/icons/close";
 
   const fs = getFs();
 
@@ -21,10 +23,20 @@
     }
   >;
 
+  let showWelcomeToast = $state(false);
+
   onMount(() => {
+    showWelcomeToast = true;
+
+    let id = setTimeout(() => {
+      showWelcomeToast = false;
+    }, 2000);
+
     if (navigator) {
       //   handleBattery(navigator as CustomNavigator);
     }
+
+    return clearTimeout(id);
   });
 
   const toggleStartMenu = () => {
@@ -65,6 +77,8 @@
       },
     };
   };
+
+  let t = `This balloon is positioned top left of the source control. This balloon is positioned top left of the source control. This balloon is positioned top left of the source control.`;
 </script>
 
 {#snippet taskBarItem(window: TaskManagerItem & { executeBy: string })}
@@ -74,7 +88,7 @@
     style={`--icon: url('${getIconByProgramId(window.programId || window.executeBy)}');`}
     onclick={() => toggleWindowView(window.id, window.windowStatus)}
   >
-    <div
+    <!-- <div
       class="window hidden group-hover:block right-[50%] h-[180px] translate-x-[50%] absolute shadow-none bottom-[calc(40px)] bg-neutral-400"
       style="width: 230px; max-width: 229px;"
     >
@@ -90,7 +104,7 @@
           <li>Or even a File Explorer!</li>
         </ul>
       </div>
-    </div>
+    </div> -->
   </div>
 {/snippet}
 
@@ -113,13 +127,34 @@
   </div>
 
   <div id="taskbar-tray">
-    <!-- Action center icon -->
-    <div class="taskbar-item">
+    <div class="taskbar-item relative justify-center w-fit tippy_target">
       <img
         src={mediaAssets.ActionCenterFlag}
         style="width: 20px;"
         alt="action center flag"
       />
+
+      {#if showWelcomeToast}
+        <div
+          class=" absolute min-w-[200px] text-end w-[380px] h-[90px] -translate-y-[28px] right-0"
+        >
+          <div
+            role="tooltip"
+            class="is-top group text-black is-left relative w-full min-w-[200px] h-auto max-h-[90px] right-0 p-2"
+          >
+            <span class="">
+              Thank you for this opportunity. I hope you love it.
+            </span>
+
+            <div
+              class="absolute rounded-md top-0 right-2 hidden group-hover:block"
+              onclick={() => (showWelcomeToast = !showWelcomeToast)}
+            >
+              <Icon data={Close} />
+            </div>
+          </div>
+        </div>
+      {/if}
     </div>
 
     <!-- Battery -->
@@ -233,7 +268,6 @@
   #start-button > span:hover {
     --window-color: rgba(170, 209, 251, 0.65);
     --window-color-inactive: rgba(170, 209, 251, 0.3);
-    /* --icon: url("/img/startbutton.webp"); */
     --tw-shadow: 0 0 transparent;
     --tw-ring-offset-width: 0px;
     --tw-ring-offset-color: #fff;
@@ -258,15 +292,6 @@
   }
 
   #taskbar-items {
-    /* --window-color: rgba(170, 209, 251, 0.65);
-    --window-color-inactive: rgba(170, 209, 251, 0.3);
-    --bg: url("https://win7simu.visnalize.com/img/default.deccec52.webp");
-    --tw-shadow: 0 0 transparent;
-    --tw-ring-offset-width: 0px;
-    --tw-ring-offset-color: #fff;
-    --tw-ring-color: rgba(59, 130, 246, 0.5);
-    --tw-ring-offset-shadow: 0 0 transparent;
-    --tw-ring-shadow: 0 0 transparent;  */
     font-size: 16px;
     visibility: inherit;
     font-family:
@@ -373,15 +398,6 @@
 
   /* Tray */
   #taskbar-tray {
-    --window-color: rgba(170, 209, 251, 0.65);
-    --window-color-inactive: rgba(170, 209, 251, 0.3);
-    --tw-shadow: 0 0 transparent;
-    --tw-ring-offset-width: 0px;
-    --tw-ring-offset-color: #fff;
-    --tw-ring-color: rgba(59, 130, 246, 0.5);
-    --tw-ring-offset-shadow: 0 0 transparent;
-    --tw-ring-shadow: 0 0 transparent;
-    --tw-ring-inset: var(--tw-empty,);
     font-size: 16px;
     font-family:
       Segoe UI,

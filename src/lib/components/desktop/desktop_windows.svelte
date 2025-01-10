@@ -30,5 +30,4 @@
   const Dynamic = programRegistry[programToRender] ?? Calculator;
 </script>
 
-<!-- <Dynamic {...{ ...props, id: crypto.randomUUID() }} /> -->
 <Dynamic {...props} />

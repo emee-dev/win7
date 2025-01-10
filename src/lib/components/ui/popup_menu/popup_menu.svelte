@@ -8,7 +8,7 @@
   // const { menuItems }: { menuItems: MenuProps[] } = $props();
 </script>
 
-{#snippet listItem(menuItem: MenuProps, onItemClick: any, iconProps: IconProps)}
+{#snippet listItem(menuItem: MenuProps, onItemClick: any, iconProps?: any)}
   {@const isDisabled = menuItem?.isDisabled || null}
   {@const divider = menuItem?.hasDivider || null}
 
@@ -24,7 +24,10 @@
       }
 
       onItemClick(menuItem);
-      menuItem?.onclick?.(iconProps);
+
+      if (iconProps) {
+        menuItem?.onclick?.(iconProps);
+      }
     }}
   >
     {#if menuItem.icon}

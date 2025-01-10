@@ -6,6 +6,7 @@
   import "7.css/dist/gui/searchbox.css";
   import "7.css/dist/gui/tabs.css";
   import "7.css/dist/gui/treeview.css";
+  import "7.css/dist/gui/balloon.css";
   import "7.css/dist/gui/window.css";
   import { DesktopWindows, os } from "@/components/desktop";
   import DesktopIcons from "@/components/desktop/desktop_icons.svelte";
@@ -184,8 +185,8 @@
           <DesktopIcons {...item as any} />
         {/each}
 
-        {#each fs.getTasks() as window}
-          <DesktopWindows {...window} />
+        {#each fs.getTasks() as window (window.id)}
+          <DesktopWindows {...window as any} />
         {/each}
 
         {#if !hasBootEnded}
@@ -292,6 +293,7 @@
         class="can-hover select-none outline-none"
       >
         {#each menuItems as item (item.label)}
+          <!-- TODO add context handling -->
           {@render listItem(item, onItemClick)}
         {/each}
       </ul>
