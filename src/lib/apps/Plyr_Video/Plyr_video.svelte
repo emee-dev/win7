@@ -67,6 +67,15 @@
 
   onMount(() => {
     loadPlyr();
+    let id: NodeJS.Timeout;
+
+    if (!file_path) {
+      id = setTimeout(() => {
+        onclose();
+      }, 2000);
+    }
+
+    return () => clearTimeout(id);
   });
 
   $effect.pre(() => {

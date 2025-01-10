@@ -65,7 +65,7 @@ For detailed implementations of each feature, refer to the following:
 
 Check out the demo to see the project in action!  
 📹 [Vercel](https://windows7-lovat.vercel.app/)
-📹 [Watch the Demo on YouTube](https://youtu.be/your-demo-video-link)
+📹 [Watch the Demo on YouTube](https://youtu.be/IjeMHRzM7mA)
 
 ## 🚀 Getting Started
 
